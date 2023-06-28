@@ -1,33 +1,33 @@
 {
-	"name": "getwid-megamenu",
-	"version": "1.0.0",
-	"private": true,
-	"description": "WordPress Mega Menu Block",
-	"author": "MotoPress",
-	"license": "GPL-2.0-or-later",
-	"keywords": [
-		"WordPress",
-		"block"
-	],
-	"main": "build/index.js",
-	"devDependencies": {
-		"@wordpress/scripts": "^26.6.0",
-		"@wordpress/i18n": "^4.36.0",
-		"@wordpress/element": "^5.13.0",
+  "name": "getwid-megamenu",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WordPress Mega Menu Block",
+  "author": "MotoPress",
+  "license": "GPL-2.0-or-later",
+  "keywords": [
+    "WordPress",
+    "block"
+  ],
+  "main": "build/index.js",
+  "devDependencies": {
+    "@wordpress/scripts": "^26.6.0",
+    "@wordpress/i18n": "^4.36.0",
+    "@wordpress/element": "^5.13.0",
     "@wordpress/block-editor": "^12.3.0",
     "@wordpress/components": "^25.1.0",
-		"@wordpress/data": "^9.5.0",
-		"@wordpress/compose": "^6.12.0"
-	},
-	"scripts": {
-		"start": "wp-scripts start",
-		"build": "wp-scripts build",
-		"format:js": "wp-scripts format-js",
-		"lint:js": "wp-scripts lint-js"
-	},
-	"dependencies": {
-		"classnames": "^2.3.2"
-	},
+    "@wordpress/data": "^9.5.0",
+    "@wordpress/compose": "^6.12.0"
+  },
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build",
+    "format:js": "wp-scripts format-js",
+    "lint:js": "wp-scripts lint-js"
+  },
+  "dependencies": {
+    "classnames": "^2.3.2"
+  },
   "prettier": "@wordpress/prettier-config",
   "browserslist": [
     "extends @wordpress/browserslist-config"

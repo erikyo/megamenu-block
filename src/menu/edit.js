@@ -3,25 +3,30 @@
  */
 import classnames from 'classnames';
 import Controls from './controls';
+import { useRef } from '@wordpress/element';
+import * as PropTypes from 'prop-types';
+import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
+import {InnerBlocks} from "@wordpress/block-editor";
 
 /**
  * WordPress dependencies
  */
-const { __ } = wp.i18n;
-const { useRef } = wp.element;
-const {
-	InnerBlocks
-} = wp.blockEditor;
-const { withSelect } = wp.data;
-const { compose } = wp.compose;
 
-const TEMPLATE = [
-	['getwid-megamenu/menu-item', {}],
-];
+const TEMPLATE = [ [ 'getwid-megamenu/menu-item', {} ] ];
 
-const ALLOWED_BLOCKS = [
-	'getwid-megamenu/menu-item'
-];
+const ALLOWED_BLOCKS = [ 'getwid-megamenu/menu-item' ];
+
+InnerBlocks.propTypes = {
+	template: PropTypes.arrayOf( PropTypes.any ),
+	ref: PropTypes.any,
+	orientation: PropTypes.string,
+	templateLock: PropTypes.bool,
+	renderAppender: PropTypes.any,
+	allowedBlocks: PropTypes.arrayOf( PropTypes.string ),
+	templateInsertUpdatesSelection: PropTypes.bool,
+	__experimentalMoverDirection: PropTypes.string,
+};
 
 function MegaMenu( args ) {
 	const {
@@ -33,22 +38,19 @@ function MegaMenu( args ) {
 
 	const ref = useRef();
 
-	const menuClasses = classnames(
-		'wp-block-getwid-megamenu',
-		'gw-mm',
-		{
-			[ `justify-items-${ attributes.itemsJustification }` ] : attributes.itemsJustification,
-			[ `has-full-width-dropdown` ] : attributes.expandDropdown,
-		}
-	);
+	const menuClasses = classnames( 'wp-block-getwid-megamenu', 'gw-mm', {
+		[ `justify-items-${ attributes.itemsJustification }` ]:
+			attributes.itemsJustification,
+		[ `has-full-width-dropdown` ]: attributes.expandDropdown,
+	} );
 
 	const menuWrapperStyle = {
-		maxWidth: attributes.menuMaxWidth
+		maxWidth: attributes.menuMaxWidth,
 	};
 
 	return (
 		<>
-			<Controls { ...args }/>
+			<Controls { ...args } />
 			<div className={ menuClasses }>
 				<div className="gw-mm__wrapper" style={ menuWrapperStyle }>
 					<div className="gw-mm__content-wrapper">
@@ -83,7 +85,7 @@ export default compose( [
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
 			getSelectedBlockClientId,
-			getBlocksByClientId
+			getBlocksByClientId,
 		} = select( 'core/block-editor' );
 		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
 			clientId,
@@ -93,12 +95,12 @@ export default compose( [
 		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
 			selectedBlockId,
 		] )?.length;
-		const menuItems = getBlocksByClientId( clientId )[0].innerBlocks;
+		const menuItems = getBlocksByClientId( clientId )[ 0 ].innerBlocks;
 
 		return {
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
-			menuItems
+			menuItems,
 		};
 	} ),
 ] )( MegaMenu );
