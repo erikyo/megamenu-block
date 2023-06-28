@@ -16,6 +16,7 @@ defined( 'ABSPATH' ) || exit;
 
 define( 'GETWID_MEGAMENU_VERSION', '1.0.5' );
 define( 'GETWID_MEGAMENU_FILE', __FILE__ );
+define( 'GETWID_MEGAMENU_PATH', plugin_dir_path(GETWID_MEGAMENU_FILE) );
 
 if ( ! function_exists( 'getwid_megamenu_init' ) && function_exists( 'register_block_type' ) ) {
 	function getwid_megamenu_init() {

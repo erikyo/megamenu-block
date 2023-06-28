@@ -13,18 +13,14 @@ class BlockRegister {
 	}
 
 	private function register_blocks_assets() {
+
+		$asset = include GETWID_MEGAMENU_PATH . 'build/index.asset.php';
+
 		wp_register_script(
 			'getwid-megamenu-block',
 			plugins_url( 'build/index.js', GETWID_MEGAMENU_FILE ),
-			[
-				'wp-i18n',
-				'wp-editor',
-				'wp-element',
-				'wp-blocks',
-				'wp-components',
-				'wp-polyfill'
-			],
-			GETWID_MEGAMENU_VERSION,
+			$asset['dependencies'],
+			$asset['version'],
 			true
 		);
 
@@ -61,6 +57,8 @@ class BlockRegister {
 	}
 
 	public function enqueue_frontend_assets() {
-		wp_enqueue_script( 'getwid-megamenu-block-frontend', plugins_url( 'build/frontend.js', GETWID_MEGAMENU_FILE ), [ 'jquery' ], GETWID_MEGAMENU_VERSION, true );
+		$asset = include GETWID_MEGAMENU_PATH . 'build/frontend.asset.php';
+
+		wp_enqueue_script( 'getwid-megamenu-block-frontend', plugins_url( 'build/frontend.js', GETWID_MEGAMENU_FILE ), $asset['dependencies'], GETWID_MEGAMENU_VERSION, true );
 	}
 }
