@@ -1,3 +1,5 @@
+const TIMEOUT: number = 500;
+
 document.addEventListener( 'DOMContentLoaded', () => {
 	const menus = document.querySelectorAll(
 		'.gw-mm'
@@ -18,11 +20,51 @@ document.addEventListener( 'DOMContentLoaded', () => {
 				const dropdownWrapper: HTMLElement | null = menu.querySelector(
 					'.gw-mm-item__dropdown-wrapper'
 				);
-				dropdownWrapper.style.left = '';
-				dropdownWrapper.style.width = '';
-				dropdownWrapper.style.maxWidth = '';
+				if (dropdownWrapper) {
+					dropdownWrapper.style.left = '';
+					dropdownWrapper.style.width = '';
+					dropdownWrapper.style.maxWidth = '';
+				}
 				return;
 			}
+
+			const megamenuItem: NodeListOf< HTMLElement > = menu.querySelectorAll(
+				'.wp-block-getwid-megamenu-item.has-children'
+			);
+
+			megamenuItem.forEach((menuItem) => {
+
+				if (menu.classList.contains('activator-click')) {
+					menuItem.addEventListener('click', (e) => {
+						e.preventDefault();
+						menuItem.classList.toggle('is-opened');
+					});
+				} else {
+					let menuLeft = false;
+					let timeoutId: NodeJS.Timeout;
+
+					menuItem.addEventListener('mouseenter', () => {
+						if (!menuLeft) {
+							menuItem.classList.add('is-opened');
+						}
+						clearTimeout(timeoutId);
+						menuLeft = false;
+					});
+
+					menuItem.addEventListener('mouseleave', () => {
+
+						timeoutId = setTimeout(() => {
+							if (menuLeft) {
+								menuItem.classList.remove('is-opened');
+								menuLeft = false;
+							}
+						}, TIMEOUT);
+
+						menuLeft = true;
+					});
+				}
+
+			})
 
 			const dropdowns: NodeListOf< HTMLElement > = menu.querySelectorAll(
 				'.gw-mm-item__dropdown-wrapper'
@@ -85,7 +127,6 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			const toggleButtonWrapper: HTMLElement | null = menu.querySelector(
 				'.gw-mm__toggle-wrapper'
 			);
-			const toggleButton = menu.querySelector( '.gw-mm__toggle' );
 
 			if ( toggleButtonWrapper ) {
 				if ( breakpoint >= window.innerWidth ) {
