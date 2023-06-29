@@ -1,4 +1,5 @@
 import MPMegaMenuColorPalette from '../custom-controls/color-palette';
+import {SelectControl} from "@wordpress/components";
 
 const { __ } = wp.i18n;
 const { useEffect } = wp.element;
@@ -162,6 +163,16 @@ function Controls( args ) {
 						checked={ attributes.expandDropdown }
 						onChange={ expandDropdown }
 					/>
+          <SelectControl
+            label="Activator"
+            value={ attributes.activator }
+            options={ [
+              { label: __('Click'), value: 'click' },
+              { label: __('Hover'), value: 'hover' },
+            ] }
+            onChange={ ( newValue ) => setAttributes( { activator: newValue } ) }
+            __nextHasNoMarginBottom
+          />
 				</PanelBody>
 				<PanelBody
 					title={ __( 'Width Settings' ) }

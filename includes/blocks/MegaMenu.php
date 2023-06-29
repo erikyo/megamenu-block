@@ -17,6 +17,7 @@ class MegaMenu extends AbstractBlock {
 		$classes = array_merge(
 			isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
 			isset( $attributes['align'] ) ? array( 'align' . $attributes['align'] ) : array(),
+			isset( $attributes['activator'] ) ? array( 'activator-' . $attributes['activator'] ) : array(),
 			isset( $attributes['itemsJustification'] ) ? array( 'justify-items-' . $attributes['itemsJustification'] ) : array(),
 			isset( $attributes['expandDropdown'] ) && $attributes['expandDropdown'] ? array( 'has-full-width-dropdown' ) : array(),
 			$collapse_on_mobile ? array('is-collapsible') : array()
