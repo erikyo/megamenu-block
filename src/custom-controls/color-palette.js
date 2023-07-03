@@ -7,8 +7,9 @@ import {
 /**
  * The function `MPMegaMenuColorPalette` is a JavaScript function that renders a color palette control
  * with a label, color indicator, and options for custom colors and clearing the selection.
+ *
  * @param args - The `args` parameter is an object that contains the following properties:
- * @returns a JSX element.
+ * @return a JSX element.
  */
 function MPMegaMenuColorPalette( args ) {
 	const { label, color, disableCustomColors, clearable, onChange } = args;

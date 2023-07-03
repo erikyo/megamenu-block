@@ -47,17 +47,44 @@
 			"default": "hover"
 		}
     },
-    "supports": {
-        "anchor": true,
+	"supports": {
+		"anchor": true,
 		"align": true,
 		"className": true,
+		"color": {
+			"background": true,
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true,
-			"blockGap": true
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
 		},
-        "reusable": false,
-        "customClassName": true,
-        "lightBlockWrapper": false
-    }
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"reusable": false,
+		"customClassName": true,
+		"lightBlockWrapper": false
+	}
 }

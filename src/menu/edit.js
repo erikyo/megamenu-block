@@ -7,7 +7,7 @@ import { useRef } from '@wordpress/element';
 import * as PropTypes from 'prop-types';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import {InnerBlocks} from "@wordpress/block-editor";
+import { InnerBlocks } from '@wordpress/block-editor';
 
 /**
  * WordPress dependencies

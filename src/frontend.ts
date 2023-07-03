@@ -20,7 +20,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 				const dropdownWrapper: HTMLElement | null = menu.querySelector(
 					'.gw-mm-item__dropdown-wrapper'
 				);
-				if (dropdownWrapper) {
+				if ( dropdownWrapper ) {
 					dropdownWrapper.style.left = '';
 					dropdownWrapper.style.width = '';
 					dropdownWrapper.style.maxWidth = '';
@@ -28,43 +28,41 @@ document.addEventListener( 'DOMContentLoaded', () => {
 				return;
 			}
 
-			const megamenuItem: NodeListOf< HTMLElement > = menu.querySelectorAll(
-				'.wp-block-getwid-megamenu-item.has-children'
-			);
+			const megamenuItem: NodeListOf< HTMLElement > =
+				menu.querySelectorAll(
+					'.wp-block-getwid-megamenu-item.has-children'
+				);
 
-			megamenuItem.forEach((menuItem) => {
-
-				if (menu.classList.contains('activator-click')) {
-					menuItem.addEventListener('click', (e) => {
+			megamenuItem.forEach( ( menuItem ) => {
+				if ( menu.classList.contains( 'activator-click' ) ) {
+					menuItem.addEventListener( 'click', ( e ) => {
 						e.preventDefault();
-						menuItem.classList.toggle('is-opened');
-					});
+						menuItem.classList.toggle( 'is-opened' );
+					} );
 				} else {
 					let menuLeft = false;
 					let timeoutId: NodeJS.Timeout;
 
-					menuItem.addEventListener('mouseenter', () => {
-						if (!menuLeft) {
-							menuItem.classList.add('is-opened');
+					menuItem.addEventListener( 'mouseenter', () => {
+						if ( ! menuLeft ) {
+							menuItem.classList.add( 'is-opened' );
 						}
-						clearTimeout(timeoutId);
+						clearTimeout( timeoutId );
 						menuLeft = false;
-					});
+					} );
 
-					menuItem.addEventListener('mouseleave', () => {
-
-						timeoutId = setTimeout(() => {
-							if (menuLeft) {
-								menuItem.classList.remove('is-opened');
+					menuItem.addEventListener( 'mouseleave', () => {
+						timeoutId = setTimeout( () => {
+							if ( menuLeft ) {
+								menuItem.classList.remove( 'is-opened' );
 								menuLeft = false;
 							}
-						}, TIMEOUT);
+						}, TIMEOUT );
 
 						menuLeft = true;
-					});
+					} );
 				}
-
-			})
+			} );
 
 			const dropdowns: NodeListOf< HTMLElement > = menu.querySelectorAll(
 				'.gw-mm-item__dropdown-wrapper'

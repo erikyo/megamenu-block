@@ -162,7 +162,7 @@ function MenuItemEdit( props ) {
 		<>
 			<div className={ itemClasses } ref={ menuItem }>
 				<div className={ itemLinkClasses } style={ itemLinkStyles }>
-					<a>
+					<a href={ '#' }>
 						<RichText
 							placeholder={ itemLabelPlaceholder }
 							value={ text }

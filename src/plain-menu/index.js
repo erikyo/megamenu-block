@@ -12,5 +12,5 @@ registerBlockType( metadata.name, {
 	attributes: metadata.attributes,
 	supports: metadata.supports,
 	edit,
-	save
+	save,
 } );

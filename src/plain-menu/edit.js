@@ -8,41 +8,33 @@ import Controls from './controls';
  * WordPress dependencies
  */
 const { useRef } = wp.element;
-const {
-	InnerBlocks
-} = wp.blockEditor;
+const { InnerBlocks } = wp.blockEditor;
 const { withSelect } = wp.data;
 const { compose } = wp.compose;
 
-const TEMPLATE = [
-	['getwid-megamenu/plain-menu-item', {}],
-];
-const ALLOWED_BLOCKS = [
-	'getwid-megamenu/plain-menu-item',
-];
+const TEMPLATE = [ [ 'getwid-megamenu/plain-menu-item', {} ] ];
+const ALLOWED_BLOCKS = [ 'getwid-megamenu/plain-menu-item' ];
 
 function PlainMenu( args ) {
 	const {
 		selectedBlockHasDescendants,
 		isImmediateParentOfSelectedBlock,
 		isSelected,
-		attributes
+		attributes,
 	} = args;
 
 	const ref = useRef();
 
-	const menuClasses = classnames(
-		'wp-block-getwid-plain-menu',
-		'gw-pm',
-		{
-			[ `justify-items-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-			[ `is-orientation-${attributes.orientation}`]: attributes.orientation
-		}
-	);
+	const menuClasses = classnames( 'wp-block-getwid-plain-menu', 'gw-pm', {
+		[ `justify-items-${ attributes.itemsJustification }` ]:
+			attributes.itemsJustification,
+		[ `is-orientation-${ attributes.orientation }` ]:
+			attributes.orientation,
+	} );
 
 	return (
 		<>
-			<Controls { ...args }/>
+			<Controls { ...args } />
 			<div className={ menuClasses }>
 				<div className="gw-pm__content">
 					<InnerBlocks
@@ -84,7 +76,7 @@ export default compose( [
 		] )?.length;
 		return {
 			isImmediateParentOfSelectedBlock,
-			selectedBlockHasDescendants
+			selectedBlockHasDescendants,
 		};
 	} ),
 ] )( PlainMenu );
