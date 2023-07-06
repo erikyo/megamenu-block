@@ -1,8 +1,6 @@
 <?php
 
-
-namespace GetwidMegaMenu;
-
+namespace MegaMenuBlock;
 
 class MegaMenu extends AbstractBlock {
 
@@ -18,62 +16,31 @@ class MegaMenu extends AbstractBlock {
 			isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
 			isset( $attributes['align'] ) ? array( 'align' . $attributes['align'] ) : array(),
 			isset( $attributes['activator'] ) ? array( 'activator-' . $attributes['activator'] ) : array(),
-			isset( $attributes['itemsJustification'] ) ? array( 'justify-items-' . $attributes['itemsJustification'] ) : array(),
-			isset( $attributes['expandDropdown'] ) && $attributes['expandDropdown'] ? array( 'has-full-width-dropdown' ) : array(),
+			! isset( $attributes['dropdownMaxWidth'] ) ? array( 'has-full-width-dropdown' ) : array(),
 			$collapse_on_mobile ? array('is-collapsible') : array()
 		);
 
-		$html = '<div class="wp-block-getwid-megamenu gw-mm ' . implode( ' ', $classes ) . '"';
-		if ( isset( $attributes['dropdownMaxWidth'] ) ) {
-			$html .= ' data-dropdown-width="' . $attributes['dropdownMaxWidth'] . '"';
-		}
-		if ( isset( $attributes['dropdownContentMaxWidth'] ) ) {
-			$html .= ' data-dropdown-content-width="' . $attributes['dropdownContentMaxWidth'] . '"';
-		}
+		$html = sprintf(
+			'<div class="wp-block-megamenu %s" data-responsive-breakpoint="%s">',
+			implode( ' ', $classes ),
+			$attributes['responsiveBreakpoint'] ?? MEGAMENU_RESPONSIVE_BREAKPOINT
+		);
 
-		$responsive_breakpoint = isset( $attributes['responsiveBreakpoint'] ) ? $attributes['responsiveBreakpoint'] : 782;
+			if ( $collapse_on_mobile ) {
+				$toggle_button_alignment_style = isset( $attributes['toggleButtonAlignment'] ) ? sprintf( 'style="text-align: %s;"', $attributes['toggleButtonAlignment'] ) : '';
 
-		$html .= ' data-responsive-breakpoint="' . $responsive_breakpoint . '"';
-		$html .= '>';
+				$button = sprintf( '<button class="wp-block-megamenu__toggle"><span class="dashicons dashicons-menu"></span>%s</button>', esc_html__( 'Menu', 'megamenu' ) );
+				$html .= sprintf( '<div class="wp-block-megamenu__toggle-wrapper is-hidden" %s>%s</div>', $toggle_button_alignment_style, $button );
+			}
 
-		$html .= '<nav class="gw-mm__wrapper"';
-		if ( isset( $attributes['menuMaxWidth'] ) ) {
-			$html .= ' style="max-width:' . $attributes['menuMaxWidth'] . 'px"';
-		}
-		$html .= '>';
+			$html .= $content;
 
-		if ( $collapse_on_mobile ) {
-			$toggle_button_alignment_style = isset( $attributes['toggleButtonAlignment'] ) ? 'style="text-align: ' . $attributes['toggleButtonAlignment'] . ';"' : '';
-
-			$button = '<button class="gw-mm__toggle"><span class="dashicons dashicons-menu"></span>' . esc_html__( 'Menu', 'getwid-megamenu' ) . '</button>';
-			$button = apply_filters( 'getwid-megamenu/blocks/megamenu/mobile-toggle-button', $button, $classes );
-
-			$html .= '<div class="gw-mm__toggle-wrapper is-hidden" ' . $toggle_button_alignment_style . '>';
-			$html .= $button;
-			$html .= '</div>';
-		}
-
-		$html .= '<div class="gw-mm__content-wrapper">';
-		$html .= '<ul class="gw-mm__content">';
-		$html .= $content;
-		$html .= '</ul></div></nav></div>';
+		$html .= '</div>';
 
 		return $html;
 	}
 
 	protected function setName() {
-		$this->name = 'getwid-megamenu/menu';
-	}
-
-	protected function setStyle() {
-		$this->style = 'getwid-megamenu-block-style';
-	}
-
-	protected function setEditorStyle() {
-		$this->editor_style = 'getwid-megamenu-block-editor';
-	}
-
-	protected function setEditorScript() {
-		$this->editor_script = 'getwid-megamenu-block';
+		$this->name = 'megamenu/menu';
 	}
 }

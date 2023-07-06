@@ -1,46 +1,39 @@
 <?php
 
 
-namespace GetwidMegaMenu;
+namespace MegaMenuBlock;
 
 
 abstract class AbstractBlock {
 
 	protected $name;
-	protected $style;
-	protected $editor_style;
-	protected $editor_script;
 
 	public function __construct() {
 		$this->setName();
-		$this->setStyle();
-		$this->setEditorStyle();
-		$this->setEditorScript();
 		$this->register();
 	}
 
+	/**
+	 * Registers all block assets so that they can be enqueued through Gutenberg in
+	 * the corresponding context.
+	 */
 	public function register() {
 		register_block_type(
 			$this->name,
 			[
-				'style'           => $this->style,
-				'editor_style'    => $this->editor_style,
-				'editor_script'   => $this->editor_script,
 				'render_callback' => [$this, 'render_callback']
 			]
 		);
 	}
 
+	/**
+	 * This function is called when the block is being rendered on the front end of the site
+	 *
+	 * @param array    $attributes     The array of attributes for this block.
+	 * @param string   $content        Rendered block output. ie. <InnerBlocks.Content />.
+	 */
 	public function render_callback($attributes, $content) {
 		return $content;
 	}
-
-	abstract protected function setName();
-
-	abstract protected function setStyle();
-
-	abstract protected function setEditorStyle();
-
-	abstract protected function setEditorScript();
 
 }
