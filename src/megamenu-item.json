@@ -1,9 +1,10 @@
 {
-	"name": "getwid-megamenu/menu-item",
+	"name": "megamenu/menu-item",
 	"title": "Menu Item",
 	"category": "layout",
+	"icon": "link",
 	"parent": [
-		"getwid-megamenu/menu"
+		"megamenu/menu"
 	],
 	"attributes": {
 		"url": {
@@ -25,25 +26,23 @@
 		"rel": {
 			"type": "string"
 		},
-		"textColor": {
+		"dropdownWrapperStyle": {
 			"type": "string"
 		},
-		"customTextColor": {
-			"type": "string"
+		"parentAttributes": {
+			"type": "Object",
+			"default": {}
 		},
-		"fontSize": {
-			"type": "string"
-		},
-		"customFontSize": {
-			"type": "string"
+		"showDropdown": {
+			"type": "boolean"
 		}
 	},
 	"supports": {
 		"anchor": true,
 		"className": false,
 		"color": {
-			"background": true,
 			"gradients": true,
+			"heading": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
@@ -52,11 +51,10 @@
 		},
 		"spacing": {
 			"margin": true,
-			"padding": true,
-			"__experimentalDefaultControls": {
-				"margin": false,
-				"padding": false
-			}
+			"padding": true
+		},
+		"dimensions": {
+			"minHeight": true
 		},
 		"typography": {
 			"fontSize": true,
@@ -72,7 +70,6 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalSelector": "p",
-		"__unstablePasteTextInline": true
+		"__experimentalSelector": ".wp-block-megamenu-item"
 	}
 }

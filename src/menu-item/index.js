@@ -1,17 +1,14 @@
-const { registerBlockType } = wp.blocks;
-const { __ } = wp.i18n;
+import { registerBlockType } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
-import metadata from './block.json';
+import blockMeta from '../megamenu-item.json';
 import save from './save';
 import edit from './edit';
 
-registerBlockType( metadata.name, {
-	title: __( 'Menu Item', 'getwid-megamenu' ),
-	icon: 'admin-links',
-	category: metadata.category,
-	parent: metadata.parent,
-	attributes: metadata.attributes,
-	supports: metadata.supports,
+registerBlockType( blockMeta.name, {
+	...blockMeta,
+	title: __( 'Menu Item', 'megamenu' ),
+	icon: 'link',
 	edit,
 	save,
 } );

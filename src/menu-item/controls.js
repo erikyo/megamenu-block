@@ -1,24 +1,29 @@
-/**
- * WordPress dependencies
- */
-const { escape } = lodash;
-const { __ } = wp.i18n;
-const { useCallback, useState, useEffect } = wp.element;
-const {
+import { useCallback, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import {
+	BlockControls,
+	InspectorControls,
+	__experimentalLinkControl as LinkControl,
+} from '@wordpress/block-editor';
+import {
 	PanelBody,
+	Popover,
 	TextControl,
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
-	Popover,
-} = wp.components;
-const { BlockControls, InspectorControls, __experimentalLinkControl } =
-	wp.blockEditor;
+} from '@wordpress/components';
+
+/**
+ * WordPress dependencies
+ */
+const { escape } = lodash;
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
 function Controls( args ) {
-	const { isSelected, attributes, setAttributes, toggleItemDropdown } = args;
+	const { attributes, setAttributes, toggleItemDropdown, hasDescendants } =
+		args;
 
 	const { linkTarget, rel, text, url } = attributes;
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
@@ -29,7 +34,6 @@ function Controls( args ) {
 		setIsURLPickerOpen( true );
 		return false;
 	};
-
 	const unlinkItem = () => {
 		setAttributes( {
 			url: undefined,
@@ -65,12 +69,6 @@ function Controls( args ) {
 		[ setAttributes ]
 	);
 
-	useEffect( () => {
-		if ( isSelected && ! url ) {
-			setIsURLPickerOpen( true );
-		}
-	}, [ isSelected ] );
-
 	return (
 		<>
 			<BlockControls>
@@ -93,7 +91,8 @@ function Controls( args ) {
 				<ToolbarGroup>
 					<ToolbarButton
 						name="submenu"
-						icon="download"
+						icon={ hasDescendants ? 'download' : 'remove' }
+						className={ hasDescendants ? 'is-active' : '' }
 						title={ __( 'Add submenu' ) }
 						onClick={ toggleItemDropdown }
 					/>
@@ -104,7 +103,7 @@ function Controls( args ) {
 					position="top center"
 					onClose={ () => setIsURLPickerOpen( false ) }
 				>
-					<__experimentalLinkControl
+					<LinkControl
 						value={ {
 							url,
 							opensInNewTab: linkTarget === '_blank',
