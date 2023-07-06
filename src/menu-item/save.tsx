@@ -44,7 +44,10 @@ export default function save( { attributes } ) {
 					<a { ...blockProps }>
 						{ text }
 						{ menuItemHasChildrens && (
-							<Icon icon={ chevronDown } />
+							<Icon
+								icon={ chevronDown }
+								className="wp-block-megamenu-item__toggle"
+							/>
 						) }
 					</a>
 				</div>

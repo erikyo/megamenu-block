@@ -1,0 +1,7 @@
+{
+	"core": null,
+	"plugins": [
+		".",
+		"erikyo/OH-MY-SVG"
+	]
+}

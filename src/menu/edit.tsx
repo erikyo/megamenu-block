@@ -17,6 +17,7 @@ const ALLOWED_BLOCKS = [
 	'megamenu/menu-item',
 	'codekraft/oh-my-svg',
 	'core/group',
+	'core/site-logo',
 ];
 
 function MegaMenu( args ) {

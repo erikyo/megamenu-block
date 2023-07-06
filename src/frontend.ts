@@ -140,21 +140,19 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			const target = event.target as HTMLElement;
 			if ( target ) {
 				if (
-					target.classList.contains( 'wp-block-megamenu__toggle' )
+					target.classList.contains( 'has-children' )
 				) {
 					toggleMobileMenu( target, menu );
 				}
 
 				if (
 					target.classList.contains(
-						'wp-block-megamenu-item__toggle'
+						'has-children'
 					)
 				) {
 					const dropdown: HTMLElement | null | undefined = target
 						.closest( '.wp-block-megamenu-item' )
-						?.querySelector(
-							'.wp-block-megamenu-item__dropdown-swrapper'
-						);
+						?.querySelector( '.wp-block-megamenu-item__dropdown' );
 					if ( dropdown ) toggleMobileMenu( target, dropdown );
 				}
 			}
