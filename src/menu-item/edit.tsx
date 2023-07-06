@@ -169,7 +169,7 @@ export default function Edit( props ) {
 						minWidth: parentAttributes.menusMinWidth
 							? parentAttributes.menusMinWidth + 'px'
 							: 'auto',
-						justifyContent: parentAttributes.align
+						textAlign: parentAttributes.align
 							? parentAttributes.align
 							: 'left',
 					} }

@@ -1,9 +1,12 @@
 // 👇 the first element inside the component
-.wp-block-megamenu__content {
+.wp-block-megamenu {
 
 	.wp-block-megamenu-item {
 
 		&.is-opened {
+			overflow: visible;
+			height: auto;
+
 			.wp-block-megamenu-item__dropdown {
 				min-height: 50px;
 				overflow: visible;
@@ -15,6 +18,10 @@
 		&.has-child {
 			cursor: pointer;
 		}
+	}
+
+	.wp-block-megamenu__toggle-wrapper.is-close {
+		display: block;
 	}
 
 	.wp-block-megamenu-item__dropdown {

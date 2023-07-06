@@ -54,30 +54,8 @@
             box-shadow: 0 8px 5px 0 rgba(0, 0, 0, .05);
         }
 
-		&.is-opened {
-			.wp-block-megamenu__content {
-				visibility: visible;
-				z-index: 100;
-				overflow: visible;
-				min-height: 100%;
-			}
-
-			.wp-block-megamenu__toggle-wrapper.is-close {
-				display: block;
-			}
-		}
         .wp-block-megamenu-item {
             width: 100%;
-        }
-
-        .wp-block-megamenu-item__dropdown {
-			box-shadow: none;
-            position: static;
-
-            &.is-opened {
-                overflow: visible;
-                height: auto;
-            }
         }
     }
 }
