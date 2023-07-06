@@ -1,16 +1,6 @@
 .wp-block-megamenu {
-    position: relative;
-
-	.wp-block-megamenu-item__link {
-        display: flex;
-		align-items: flex-end;
-        list-style: none;
-		margin: 0;
-    }
-
-	.wp-block-megamenu {
-		margin: 0;
-    }
+	margin: 0;
+	position: relative;
 
     &__toggle-wrapper {
         &.is-hidden {

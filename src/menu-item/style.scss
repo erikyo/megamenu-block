@@ -1,5 +1,4 @@
 .wp-block-megamenu .wp-block-megamenu-item {
-	position: relative;
 
     &__dropdown {
 		position: absolute;
@@ -21,20 +20,21 @@
         }
     }
 
-	&.has-children {
-		.wp-block-megamenu-item__link a {
+    &__link {
+		a {
+			padding: 10px 15px;
+			display: block;
+		}
+    }
+
+	&.has-children .wp-block-megamenu-item__link {
+		a {
 			display: flex;
 		}
 	}
 
-    &__link {
-        a {
-            padding: 10px 15px;
-        }
-    }
-
     &__toggle {
-        display: inline-block;
+        display: block;
         padding: 0;
         background: transparent;
         border: 0;
@@ -42,11 +42,7 @@
         color: inherit;
         margin: 0;
         outline: none;
-
-        &:before,
-        &:after {
-            display: none;
-        }
+		vertical-align: middle;
 
         &:active,
         &:focus {

@@ -22,6 +22,10 @@ export default function save( { attributes } ) {
 	};
 
 	const blockProps = useBlockProps.save( {
+		style: {
+			minWidth: menusMinWidth ? menusMinWidth + 'px' : 'auto',
+			textAlign: align ? align : 'left',
+		},
 		linkProps,
 	} );
 
@@ -34,13 +38,7 @@ export default function save( { attributes } ) {
 						attributes.expandDropdown || menusMinWidth === 0,
 				} ) }
 			>
-				<div
-					className={ 'wp-block-megamenu-item__link' }
-					style={ {
-						minWidth: menusMinWidth ? menusMinWidth + 'px' : 'auto',
-						justifyContent: align ? align : 'left',
-					} }
-				>
+				<div className={ 'wp-block-megamenu-item__link' }>
 					<a { ...blockProps }>
 						{ text }
 						{ menuItemHasChildrens && (

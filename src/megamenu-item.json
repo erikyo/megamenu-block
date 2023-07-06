@@ -4,7 +4,8 @@
 	"category": "layout",
 	"icon": "link",
 	"parent": [
-		"megamenu/menu"
+		"megamenu/menu",
+		"core/group"
 	],
 	"attributes": {
 		"url": {

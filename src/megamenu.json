@@ -65,6 +65,7 @@
 			}
 		},
 		"reusable": false,
-		"lightBlockWrapper": false
+		"lightBlockWrapper": false,
+		"__experimentalSelector": ".wp-block-megamenu__content"
 	}
 }

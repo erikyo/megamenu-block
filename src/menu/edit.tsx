@@ -11,13 +11,26 @@ import classnames from 'classnames';
 import { Controls } from './controls';
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
-const TEMPLATE = [ [ 'megamenu/menu-item', {} ] ];
+const TEMPLATE = [
+	[
+		'core/group',
+		{
+			layout: {
+				type: 'flex',
+				flexWrap: 'nowrap',
+				verticalAlignment: 'stretch',
+			},
+		},
+		[ [ 'megamenu/menu-item', {} ] ],
+	],
+];
 
 const ALLOWED_BLOCKS = [
 	'megamenu/menu-item',
 	'codekraft/oh-my-svg',
 	'core/group',
 	'core/site-logo',
+	'core/social-link',
 ];
 
 function MegaMenu( args ) {
@@ -30,39 +43,39 @@ function MegaMenu( args ) {
 
 	const ref = useRef();
 
-	const menuClasses = classnames(
-		'wp-block-megamenu',
-		`activator-${ attributes.activator }`,
-		{
-			[ `has-full-width-dropdown` ]: attributes.expandDropdown,
-			[ `has-text-align-${ attributes.align }` ]: attributes.align,
-		}
-	);
-
 	return (
 		<>
 			<Controls { ...args } />
-			<nav className={ menuClasses }>
-				<div className="wp-block-megamenu__wrapper">
-					<div className="wp-block-megamenu__content">
-						<InnerBlocks
-							parentData={ attributes }
-							ref={ ref }
-							template={ TEMPLATE }
-							templateLock={ false }
-							allowedBlocks={ ALLOWED_BLOCKS }
-							templateInsertUpdatesSelection={ false }
-							renderAppender={
-								( isImmediateParentOfSelectedBlock &&
-									! selectedBlockHasDescendants ) ||
-								isSelected
-									? InnerBlocks.DefaultAppender
-									: false
-							}
-							__experimentalMoverDirection="horizontal"
-							orientation="horizontal"
-						/>
-					</div>
+			<nav
+				className={ classnames(
+					'wp-block-megamenu',
+					`activator-${ attributes.activator }`,
+					{
+						[ `has-full-width-dropdown` ]:
+							attributes.expandDropdown,
+						[ `has-text-align-${ attributes.align }` ]:
+							attributes.align,
+					}
+				) }
+			>
+				<div className="wp-block-megamenu__content">
+					<InnerBlocks
+						parentData={ attributes }
+						ref={ ref }
+						template={ TEMPLATE }
+						templateLock={ false }
+						allowedBlocks={ ALLOWED_BLOCKS }
+						templateInsertUpdatesSelection={ false }
+						renderAppender={
+							( isImmediateParentOfSelectedBlock &&
+								! selectedBlockHasDescendants ) ||
+							isSelected
+								? InnerBlocks.DefaultAppender
+								: false
+						}
+						__experimentalMoverDirection="horizontal"
+						orientation="horizontal"
+					/>
 				</div>
 			</nav>
 		</>

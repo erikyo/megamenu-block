@@ -7,7 +7,6 @@ import Controls from './controls';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	RichText,
-	useBlockProps,
 	useBlockEditContext,
 	InnerBlocks,
 	store as blockEditorStore,
@@ -91,7 +90,7 @@ export default function Edit( props ) {
 	const updateDropdownPosition = () => {
 		let newDropdownPosition = {};
 		let rootBlockNode;
-		const blockNode = menuItemRef.current;
+		const blockNode = menuItemRef.current as HTMLElement;
 
 		if ( ! blockNode ) {
 			return;
@@ -103,27 +102,30 @@ export default function Edit( props ) {
 			rootBlockNode = blockNode.closest( '.editor-styles-wrapper' );
 		} else {
 			rootBlockNode = blockNode
-				.closest( '[data-block="' + rootBlockClientId + '"]' )
-				.querySelector( '.wp-block-megamenu' );
+				?.closest( '[data-block="' + rootBlockClientId + '"]' )
+				?.querySelector( '.wp-block-megamenu' );
 		}
 
-		const rootCoords = rootBlockNode.getBoundingClientRect();
+		const rootCoords = rootBlockNode?.getBoundingClientRect();
 
-		let left = -( blockCoords.x - rootCoords.x );
+		if ( rootCoords ) {
+			let left = -( blockCoords.x - rootCoords.x );
 
-		if (
-			parentAttributes.dropdownMaxWidth &&
-			rootCoords.width > parentAttributes.dropdownMaxWidth
-		) {
-			left =
-				left +
-				( rootCoords.width - parentAttributes.dropdownMaxWidth ) / 2;
-		}
+			if (
+				parentAttributes.dropdownMaxWidth &&
+				rootCoords.width > parentAttributes.dropdownMaxWidth
+			) {
+				left =
+					left +
+					( rootCoords.width - parentAttributes.dropdownMaxWidth ) /
+						2;
+			}
 
-		newDropdownPosition = { left, width: rootCoords.width };
+			newDropdownPosition = { left, width: rootCoords.width };
 
-		if ( ! isEqual( newDropdownPosition, dropdownPosition ) ) {
-			setDropdownPosition( newDropdownPosition );
+			if ( ! isEqual( newDropdownPosition, dropdownPosition ) ) {
+				setDropdownPosition( newDropdownPosition );
+			}
 		}
 	};
 
@@ -142,8 +144,6 @@ export default function Edit( props ) {
 			);
 		}
 	}, [] );
-
-	const blockProps = useBlockProps();
 
 	return (
 		<>
@@ -174,7 +174,7 @@ export default function Edit( props ) {
 							: 'left',
 					} }
 				>
-					<a { ...blockProps }>
+					<a>
 						<RichText
 							placeholder={ __( 'Add a menu item' ) }
 							value={ text }

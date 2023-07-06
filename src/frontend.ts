@@ -97,7 +97,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		}
 		if ( contentWidth ) {
 			const dropdownContent: HTMLElement | null = menu.querySelector(
-				'.wp-block-megamenu-item__dropdown-content'
+				'.wp-block-megamenu-item__dropdown'
 			);
 			if ( dropdownContent )
 				dropdownContent.style.maxWidth = contentWidth;
@@ -180,7 +180,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	 */
 	function setMobileMenuPosition( menu: HTMLElement ) {
 		const dropdown: HTMLElement | null = menu.querySelector(
-			'.wp-block-megamenu__wrapper'
+			'.wp-block-megamenu__content'
 		);
 
 		if ( ! dropdown ) return;

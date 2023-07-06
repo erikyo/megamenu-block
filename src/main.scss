@@ -1,12 +1,5 @@
 // 👇 the first element inside the component
-.wp-block-megamenu__wrapper {
-	.wp-block-megamenu-item__toggle {
-		vertical-align: middle;
-	}
-
-	.wp-block-megamenu__content > .block-editor-inner-blocks > .block-editor-block-list__layout {
-		display: flex;
-	}
+.wp-block-megamenu__content {
 
 	.wp-block-megamenu-item {
 
@@ -14,7 +7,7 @@
 			.wp-block-megamenu-item__dropdown {
 				min-height: 50px;
 				overflow: visible;
-				height: 100%;
+				height: auto;
 				max-height: 100vh;
 			}
 		}
