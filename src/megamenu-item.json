@@ -5,7 +5,8 @@
 	"icon": "link",
 	"parent": [
 		"megamenu/menu",
-		"core/group"
+		"core/group",
+		"core/navigation"
 	],
 	"attributes": {
 		"url": {

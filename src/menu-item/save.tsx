@@ -16,39 +16,39 @@ export default function save( { attributes } ) {
 	} = attributes;
 
 	const linkProps = {
-		href: url ? url : false,
+		href: url ? url : '#',
 		...( linkTarget && { target: linkTarget } ),
 		...( rel && { rel } ),
 	};
 
 	const blockProps = useBlockProps.save( {
-		style: {
-			minWidth: menusMinWidth ? menusMinWidth + 'px' : 'auto',
-			textAlign: align ? align : 'left',
-		},
-		linkProps,
+		className: classnames( 'wp-block-megamenu-item', {
+			'has-children': menuItemHasChildrens || false,
+			'has-full-width-dropdown':
+				attributes.expandDropdown || menusMinWidth === 0,
+		} ),
 	} );
 
 	return (
 		<>
-			<div
-				className={ classnames( 'wp-block-megamenu-item', {
-					'has-children': menuItemHasChildrens || false,
-					'has-full-width-dropdown':
-						attributes.expandDropdown || menusMinWidth === 0,
-				} ) }
-			>
-				<div className={ 'wp-block-megamenu-item__link' }>
-					<a { ...blockProps }>
-						{ text }
-						{ menuItemHasChildrens && (
-							<Icon
-								icon={ chevronDown }
-								className="wp-block-megamenu-item__toggle"
-							/>
-						) }
-					</a>
-				</div>
+			<div { ...blockProps }>
+				<a
+					{ ...linkProps }
+					className={ 'wp-block-megamenu-item__link' }
+					style={ {
+						minWidth: menusMinWidth ? menusMinWidth + 'px' : 'auto',
+						justifyContent: align ? align : 'left',
+					} }
+				>
+					{ text }
+					{ menuItemHasChildrens && (
+						<Icon
+							color="var(--wp--preset--color--primary)"
+							icon={ chevronDown }
+							className="wp-block-megamenu-item__toggle"
+						/>
+					) }
+				</a>
 				<div className={ 'wp-block-megamenu-item__dropdown' }>
 					<InnerBlocks.Content />
 				</div>

@@ -9,7 +9,8 @@ class BlockRegister {
 	public function __construct() {
 		$this->load_blocks();
 		add_action( 'init', array( $this, 'register_blocks' ) );
-		add_action( 'enqueue_block_assets', array( $this, 'enqueue_assets' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+		add_action( 'enqueue_block_assets', array( $this, 'enqueue_style' ) );
 	}
 
 	private function register_blocks_assets() {
@@ -42,7 +43,9 @@ class BlockRegister {
 		$asset = include MEGAMENU_PATH . 'build/megamenu.asset.php';
 
 		wp_enqueue_script( 'megamenu-block', MEGAMENU_URL . 'build/megamenu.js', $asset['dependencies'], MEGAMENU_VERSION, true );
+	}
 
+	public function enqueue_style() {
 		wp_enqueue_style( 'megamenu-block', MEGAMENU_URL . 'build/style-megamenu.css', [], MEGAMENU_VERSION );
 	}
 }

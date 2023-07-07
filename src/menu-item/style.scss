@@ -20,17 +20,17 @@
         }
     }
 
-    &__link {
-		a {
-			padding: 10px 15px;
-			display: block;
-		}
-    }
+	&__link {
+		padding: 10px 15px;
+		min-height: 24px;
+		display: flex;
+		justify-content: center;
+		text-align: center;
+	}
 
 	&.has-children .wp-block-megamenu-item__link {
-		a {
-			display: flex;
-		}
+		display: flex;
+		align-items: center;
 	}
 
     &__toggle {

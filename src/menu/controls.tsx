@@ -24,9 +24,9 @@ import {
  * @param args.attributes
  */
 export function Controls( { setAttributes, attributes } ): JSX.Element {
-	function expandDropdown() {
+	function expandDropdown( doExpand ) {
 		setAttributes( {
-			expandDropdown: ! attributes.expandDropdown,
+			dropdownMaxWidth: doExpand ? 2000 : 0,
 		} );
 	}
 
@@ -62,17 +62,30 @@ export function Controls( { setAttributes, attributes } ): JSX.Element {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Styles' ) } initialOpen={ true }>
+				<PanelBody title={ __( 'Menu Dropdown Settings' ) } initialOpen={ true }>
 					<ToggleControl
 						label={ __( 'Expand dropdown' ) }
 						help={
-							attributes.expandDropdown
+							attributes.dropdownMaxWidth === 0
 								? __( 'Dropdown width same as window width.' )
 								: __( 'Dropdown width same as menu width.' )
 						}
-						checked={ attributes.expandDropdown }
-						onChange={ expandDropdown }
+						checked={ attributes.dropdownMaxWidth === 0 }
+						onChange={ ( checked ) => expandDropdown( ! checked ) }
 					/>
+					{ attributes.dropdownMaxWidth !== 0 && (
+						<RangeControl
+							label={ __(
+								'Maximum width of dropdown in pixels'
+							) }
+							value={ attributes.dropdownMaxWidth }
+							onChange={ ( dropdownMaxWidth ) =>
+								setAttributes( { dropdownMaxWidth } )
+							}
+							min={ 0 }
+							max={ 2000 }
+						/>
+					) }
 					<SelectControl
 						label={ __( 'Activator' ) }
 						value={ attributes.activator }
@@ -90,15 +103,6 @@ export function Controls( { setAttributes, attributes } ): JSX.Element {
 					title={ __( 'Menu Item Settings' ) }
 					initialOpen={ false }
 				>
-					<RangeControl
-						label={ __( 'Maximum width of dropdown in pixels' ) }
-						value={ attributes.dropdownMaxWidth }
-						onChange={ ( dropdownMaxWidth ) =>
-							setAttributes( { dropdownMaxWidth } )
-						}
-						min={ 0 }
-						max={ 2000 }
-					/>
 					<RangeControl
 						label={ __( 'Minimum Width' ) }
 						value={ attributes.menusMinWidth }

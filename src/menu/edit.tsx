@@ -6,10 +6,12 @@ import { compose } from '@wordpress/compose';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import classnames from 'classnames';
 import { Controls } from './controls';
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 
 const TEMPLATE = [
 	[
@@ -41,6 +43,8 @@ function MegaMenu( args ) {
 		attributes,
 	} = args;
 
+	const [ showResponsiveMenu, setShowResponsiveMenu ] = useState( false );
+
 	const ref = useRef();
 
 	return (
@@ -52,11 +56,13 @@ function MegaMenu( args ) {
 					`activator-${ attributes.activator }`,
 					{
 						[ `has-full-width-dropdown` ]:
-							attributes.expandDropdown,
-						[ `has-text-align-${ attributes.align }` ]:
-							attributes.align,
+							attributes.expandDropdown ||
+							attributes.dropdownMaxWidth === 0,
+						[ `is-collapsible` ]: attributes.collapseOnMobile,
 					}
 				) }
+				data-responsive-breakpoint={ attributes.responsiveBreakpoint }
+				data-dropdown-content-width={ attributes.dropdownMaxWidth }
 			>
 				<div className="wp-block-megamenu__content">
 					<InnerBlocks
@@ -78,6 +84,16 @@ function MegaMenu( args ) {
 					/>
 				</div>
 			</nav>
+			<div
+				className={ classnames( 'wp-block-megamenu__toggle-wrapper', {
+					'is-hidden': ! showResponsiveMenu,
+				} ) }
+			>
+				<Button className="wp-block-megamenu__toggle">
+					<span className="dashicons dashicons-menu"></span>
+					{ __( 'Menu', 'megamenu' ) }
+				</Button>
+			</div>
 		</>
 	);
 }

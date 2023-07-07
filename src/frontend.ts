@@ -1,6 +1,17 @@
 import './style.scss';
+import { calcNewPosition } from './utils';
+import { beforeEach } from 'node:test';
 
 const TIMEOUT: number = 500;
+
+function setDropdownStyle(
+	dropdown: { style: { left: string; width: string; maxWidth: string } },
+	{ left, width, maxWidth }: any
+) {
+	dropdown.style.left = `${ left }px`;
+	dropdown.style.width = `${ width }px`;
+	dropdown.style.maxWidth = `${ maxWidth }px`;
+}
 
 document.addEventListener( 'DOMContentLoaded', () => {
 	const menus = document.querySelectorAll(
@@ -15,14 +26,10 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	 */
 	function setDropdownsPosition( menu: HTMLElement ) {
 		if ( menu.classList.contains( 'is-mobile' ) ) {
-			const dropdownWrapper: HTMLElement | null = menu.querySelector(
+			const dropdown: HTMLElement | null = menu.querySelector(
 				'.wp-block-megamenu-item__dropdown'
 			);
-			if ( dropdownWrapper ) {
-				dropdownWrapper.style.left = '';
-				dropdownWrapper.style.width = '';
-				dropdownWrapper.style.maxWidth = '';
-			}
+			setDropdownStyle( dropdown, { left: '', width: '', maxWidth: '' } );
 			return;
 		}
 
@@ -42,6 +49,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 				menuItem.addEventListener( 'mouseenter', () => {
 					if ( ! menuLeft ) {
+						//TODO: check before if there are any dropdowns open
 						menuItem.classList.add( 'is-opened' );
 					}
 					clearTimeout( timeoutId );
@@ -61,47 +69,50 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			}
 		} );
 
-		const dropdowns: NodeListOf< HTMLElement > = menu.querySelectorAll(
-			'.wp-block-megamenu-item__dropdown'
+		const menuItems: NodeListOf< HTMLElement > = menu.querySelectorAll(
+			'.wp-block-megamenu-item'
 		);
-		const menuCoords = menu.getBoundingClientRect();
-		const maxWidth = Number( menu.dataset.dropdownWidth );
-		const width = menu.classList.contains( 'has-full-width-dropdown' )
-			? window.innerWidth
-			: menu.offsetWidth;
-		let left = menu.classList.contains( 'has-full-width-dropdown' )
-			? -menuCoords.left
-			: 0;
 
-		if ( maxWidth && maxWidth < width ) {
-			left = left + ( width - maxWidth ) / 2;
-		}
+		const megamenuRect = menu.getBoundingClientRect();
 
-		dropdowns.forEach( ( dropdown ) => {
-			dropdown.style.left = `${ left }px`;
-			dropdown.style.width = `${ width }px`;
-			dropdown.style.maxWidth = `${ maxWidth }px`;
-		} );
-	}
+		// the max width of the dropdown menu
+		const dropdownMaxWidth = Number( menu.dataset.dropdownWidth ) || 0;
 
-	/**
-	 * The function sets the maximum width of dropdown content elements in a menu based on a specified
-	 * data attribute.
-	 *
-	 * @param menu - A list of HTML elements that represent the dropdown menus.
-	 */
-	function setDropdownsContentWidth( menu: HTMLElement ) {
-		let contentWidth = menu.dataset.dropdownContentWidth;
-		if ( contentWidth === '0' ) {
-			contentWidth = '2000';
-		}
-		if ( contentWidth ) {
-			const dropdownContent: HTMLElement | null = menu.querySelector(
+		menuItems.forEach( ( menuItem ) => {
+			const dropdown: HTMLElement | null = menuItem.querySelector(
 				'.wp-block-megamenu-item__dropdown'
 			);
-			if ( dropdownContent )
-				dropdownContent.style.maxWidth = contentWidth;
-		}
+
+			if ( dropdown ) {
+				let newDropdownPosition: Partial< {
+					width: number;
+					left: number;
+				} > = {};
+
+				if ( menuItem.classList.contains( 'has-full-width-dropdown' ) ) {
+					setDropdownStyle( dropdown, {
+						...calcNewPosition(
+							{ width: window.innerWidth, x: 0 },
+							dropdown.getBoundingClientRect(),
+							dropdownMaxWidth
+						),
+						maxWidth: window.innerWidth,
+					} );
+				} else {
+					const dropdownRect = dropdown.getBoundingClientRect();
+					newDropdownPosition = calcNewPosition(
+						megamenuRect,
+						dropdownRect,
+						dropdownMaxWidth
+					);
+					setDropdownStyle( dropdown, {
+						width: newDropdownPosition.width,
+						left: newDropdownPosition.left,
+						maxWidth: dropdownMaxWidth,
+					} );
+				}
+			}
+		} );
 	}
 
 	/**
@@ -115,9 +126,8 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			return;
 		}
 		const breakpoint = Number( menu.dataset.responsiveBreakpoint );
-		const toggleButtonWrapper: HTMLElement | null = menu.querySelector(
-			'.wp-block-megamenu__toggle-wrapper'
-		);
+		const toggleButtonWrapper: HTMLElement | null =
+			menu.nextElementSibling as HTMLElement;
 
 		if ( toggleButtonWrapper ) {
 			if ( breakpoint >= window.innerWidth ) {
@@ -139,17 +149,11 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		menu.addEventListener( 'click', ( event ) => {
 			const target = event.target as HTMLElement;
 			if ( target ) {
-				if (
-					target.classList.contains( 'has-children' )
-				) {
+				if ( target.classList.contains( 'has-children' ) ) {
 					toggleMobileMenu( target, menu );
 				}
 
-				if (
-					target.classList.contains(
-						'has-children'
-					)
-				) {
+				if ( target.classList.contains( 'has-children' ) ) {
 					const dropdown: HTMLElement | null | undefined = target
 						.closest( '.wp-block-megamenu-item' )
 						?.querySelector( '.wp-block-megamenu-item__dropdown' );
@@ -205,7 +209,6 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		showMenuToggleButton( menu );
 		attachToggleActionToButtons( menu );
 		setDropdownsPosition( menu );
-		setDropdownsContentWidth( menu );
 		setMobileMenuPosition( menu );
 
 		window.addEventListener( 'resize', () => {

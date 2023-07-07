@@ -12,10 +12,6 @@
 			"type": "string",
 			"default": "hover"
 		},
-		"expandDropdown": {
-            "type": "boolean",
-            "default": true
-        },
 		"menusMinWidth": {
 			"type": "number",
 			"default": 0

@@ -1,6 +1,5 @@
 // 👇 the first element inside the component
 .wp-block-megamenu {
-
 	.wp-block-megamenu-item {
 
 		&.is-opened {
@@ -33,9 +32,9 @@
 		max-height: 0;
 		width: 100%;
 		background: #fff;
+	}
 
-		.block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
-			max-width: 100%;
-		}
+	.block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
+		max-width: 100%;
 	}
 }
