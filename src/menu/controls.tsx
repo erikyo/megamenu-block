@@ -22,8 +22,15 @@ import {
  * @param args
  * @param args.setAttributes
  * @param args.attributes
+ * @param args.showResponsiveMenu
+ * @param args.setShowResponsiveMenu
  */
-export function Controls( { setAttributes, attributes } ): JSX.Element {
+export function Controls( {
+	setAttributes,
+	attributes,
+	showResponsiveMenu,
+	setShowResponsiveMenu,
+} ): JSX.Element {
 	function expandDropdown( doExpand ) {
 		setAttributes( {
 			dropdownMaxWidth: doExpand ? 2000 : 0,
@@ -62,7 +69,10 @@ export function Controls( { setAttributes, attributes } ): JSX.Element {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Menu Dropdown Settings' ) } initialOpen={ true }>
+				<PanelBody
+					title={ __( 'Menu Dropdown Settings' ) }
+					initialOpen={ true }
+				>
 					<ToggleControl
 						label={ __( 'Expand dropdown' ) }
 						help={
@@ -136,6 +146,18 @@ export function Controls( { setAttributes, attributes } ): JSX.Element {
 						checked={ attributes.collapseOnMobile }
 						onChange={ ( collapseOnMobile ) =>
 							setAttributes( { collapseOnMobile } )
+						}
+					/>
+					<ToggleControl
+						label={ __( 'Show responsive Toggle' ) }
+						help={
+							showResponsiveMenu
+								? __( 'Show hamburger.' )
+								: __( 'Hide hamburger.' )
+						}
+						checked={ showResponsiveMenu }
+						onChange={ () =>
+							setShowResponsiveMenu( ! showResponsiveMenu )
 						}
 					/>
 				</PanelBody>

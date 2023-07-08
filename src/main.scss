@@ -1,7 +1,12 @@
-// 👇 the first element inside the component
+/**
+ *  The megamenu style
+ */
 .wp-block-megamenu {
-	.wp-block-megamenu-item {
 
+	/**
+	 *  Menu single item
+	 */
+	.wp-block-megamenu-item {
 		&.is-opened {
 			overflow: visible;
 			height: auto;
@@ -10,7 +15,8 @@
 				min-height: 50px;
 				overflow: visible;
 				height: auto;
-				max-height: 100vh;
+				max-height: 9999px;
+				opacity: 1;
 			}
 		}
 
@@ -19,21 +25,12 @@
 		}
 	}
 
-	.wp-block-megamenu__toggle-wrapper.is-close {
-		display: block;
+	/**
+	 * The editor style
+	 */
+	.block-editor-block-list__layout .block-editor-block-list__block {
+		position: unset;
 	}
-
-	.wp-block-megamenu-item__dropdown {
-		position: absolute;
-		top: 100%;
-		height: 0;
-		z-index: 10;
-		overflow: hidden;
-		max-height: 0;
-		width: 100%;
-		background: #fff;
-	}
-
 	.block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
 		max-width: 100%;
 	}

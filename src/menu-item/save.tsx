@@ -24,8 +24,6 @@ export default function save( { attributes } ) {
 	const blockProps = useBlockProps.save( {
 		className: classnames( 'wp-block-megamenu-item', {
 			'has-children': menuItemHasChildrens || false,
-			'has-full-width-dropdown':
-				attributes.expandDropdown || menusMinWidth === 0,
 		} ),
 	} );
 
@@ -40,10 +38,14 @@ export default function save( { attributes } ) {
 						justifyContent: align ? align : 'left',
 					} }
 				>
-					{ text }
+					<span className={ 'wp-block-megamenu-item__text' }>
+						{ text }
+					</span>
 					{ menuItemHasChildrens && (
 						<Icon
-							color="var(--wp--preset--color--primary)"
+							style={ {
+								fill: 'currentColor',
+							} }
 							icon={ chevronDown }
 							className="wp-block-megamenu-item__toggle"
 						/>

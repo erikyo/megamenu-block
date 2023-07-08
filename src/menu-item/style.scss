@@ -1,38 +1,49 @@
 .wp-block-megamenu .wp-block-megamenu-item {
 
+	/**
+	 *  Dropdown
+	 */
     &__dropdown {
 		position: absolute;
+		z-index: 1002;
+		top: 100%;
 		left: 0;
 		right: 0;
-		top: 100%;
-		height: auto;
-		max-height: 0;
-		overflow: hidden;
-		z-index: 1002;
-        box-shadow: 0 5px 30px -20px rgba(0, 0, 0, 1);
-        box-sizing: border-box;
 
-        &:after,
-        &:before {
-            display: table;
-            content: '';
-            clear: both;
-        }
+		overflow: hidden;
+		max-height: 0;
+		width: 100%;
+
+		opacity: 0;
+		height: auto;
+		background: var(--wp--preset--color--white);
+		box-shadow: 0 5px 30px -20px rgba(0, 0, 0, 1);
+		box-sizing: border-box;
+
+		&:after,
+		&:before {
+			display: table;
+			content: '';
+			clear: both;
+		}
     }
 
+
+	/**
+	 *  the menu item link (or text, if the menu has not a link)
+	 */
 	&__link {
 		padding: 10px 15px;
+		// the chevron icon is 24px height so we need to make the line-height at least 24px to avoid misalignment
 		min-height: 24px;
 		display: flex;
 		justify-content: center;
-		text-align: center;
-	}
-
-	&.has-children .wp-block-megamenu-item__link {
-		display: flex;
 		align-items: center;
 	}
 
+	/**
+	 * the chevron icon
+	 */
     &__toggle {
         display: block;
         padding: 0;
@@ -42,7 +53,6 @@
         color: inherit;
         margin: 0;
         outline: none;
-		vertical-align: middle;
 
         &:active,
         &:focus {

@@ -10,17 +10,17 @@ import {
 	useBlockEditContext,
 	InnerBlocks,
 	store as blockEditorStore,
+	useSetting,
 } from '@wordpress/block-editor';
-import { withDispatch, withSelect} from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { Icon } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import { calcNewPosition } from '../utils';
 import { compose } from '@wordpress/compose';
 
-/**
- * WordPress dependencies
- */
-const { isEqual } = lodash;
+type DropDownCoords =
+	| { left: number; width: number; maxWidth: number }
+	| DOMRect;
 
 /**
  * Internal dependencies
@@ -50,14 +50,17 @@ export function MenuItemEdit( props ) {
 	const menuItemHasChildrens = hasDescendants;
 
 	// the menu item ref
-	const menuItemRef = useRef( null );
+	const menuItemRef = useRef< HTMLDivElement >( null );
+	const dropdownRef = useRef< HTMLDivElement >( null );
 
 	const [ showDropdown, setShowDropdown ] = useState( false );
 
-	const [ dropdownPosition, setDropdownPosition ] = useState( {
-		left: 0,
-		width: '100%',
-	} );
+	const [ dropdownPosition, setDropdownPosition ]: [ DropDownCoords, any ] =
+		useState( {
+			left: 0,
+			width: 2000,
+			maxWidth: 2000,
+		} );
 
 	function setParentAttributes() {
 		setAttributes( {
@@ -78,35 +81,41 @@ export function MenuItemEdit( props ) {
 	const updateDropdownPosition = () => {
 		let newDropdownPosition = {};
 		let rootBlockNode;
-		const blockNode = menuItemRef.current as HTMLElement;
+		const blockNode = menuItemRef.current;
+		const dropdownEl = dropdownRef.current;
 
-		if ( ! blockNode ) {
+		if ( ! dropdownRef ) {
 			return;
 		}
 
-		if ( parentAttributes.expandDropdown ) {
-			rootBlockNode = blockNode.closest( '.editor-styles-wrapper' );
+		const dropDownCoords = dropdownEl?.getBoundingClientRect();
+
+		if ( parentAttributes.dropdownMaxWidth === 0 ) {
+			rootBlockNode = blockNode?.closest( '.editor-styles-wrapper' );
 		} else {
 			rootBlockNode = blockNode
 				?.closest( '[data-block="' + rootBlockClientId + '"]' )
 				?.querySelector( '.wp-block-megamenu' );
 		}
 
-		if ( rootBlockNode ) {
-			const rootCoords = rootBlockNode?.getBoundingClientRect();
-			const blockCoords = blockNode.getBoundingClientRect();
+		const rootCoords = rootBlockNode?.getBoundingClientRect();
+
+		if ( rootCoords && dropDownCoords ) {
+			const maxWidth =
+				parentAttributes.dropdownMaxWidth !== 0
+					? parentAttributes.dropdownMaxWidth
+					: rootCoords.width;
 
 			newDropdownPosition = calcNewPosition(
 				rootCoords,
-				blockCoords,
-				parentAttributes.menusMinWidth
+				dropDownCoords,
+				maxWidth
 			);
 
-			if ( ! isEqual( newDropdownPosition, dropdownPosition ) ) {
-				setDropdownPosition( newDropdownPosition );
-			}
-		} else {
-			console.log( 'rootBlockNode not found' );
+			setDropdownPosition( {
+				...newDropdownPosition,
+				maxWidth,
+			} );
 		}
 	};
 
@@ -140,8 +149,6 @@ export function MenuItemEdit( props ) {
 				className={ classnames( 'wp-block-megamenu-item', {
 					'has-children': menuItemHasChildrens,
 					'is-opened': showDropdown,
-					'has-full-width-dropdown':
-						parentAttributes.menusMinWidth === '0',
 				} ) }
 				ref={ menuItemRef }
 			>
@@ -156,32 +163,37 @@ export function MenuItemEdit( props ) {
 							: 'left',
 					} }
 				>
-					<RichText
-						placeholder={ __( 'Add a menu item' ) }
-						value={ text }
-						onChange={ ( value ) =>
-							setAttributes( { text: value } )
-						}
-						withoutInteractiveFormatting
-						onReplace={ onReplace }
-						onMerge={ mergeBlocks }
-						identifier="text"
-					/>
+					<span className={ 'wp-block-megamenu-item__text' }>
+						<RichText
+							placeholder={ __( 'Add a menu item' ) }
+							value={ text }
+							onChange={ ( value ) =>
+								setAttributes( { text: value } )
+							}
+							withoutInteractiveFormatting
+							onReplace={ onReplace }
+							onMerge={ mergeBlocks }
+							identifier="text"
+						/>
+					</span>
 					{ menuItemHasChildrens ? (
 						<Icon
 							icon={ chevronDown }
 							className="wp-block-megamenu-item__toggle"
+							style={ {
+								fill: 'currentColor',
+							} }
 						/>
 					) : null }
 				</a>
 				<div
+					ref={ dropdownRef }
 					className={ 'wp-block-megamenu-item__dropdown' }
 					style={ {
-						left: dropdownPosition.left,
-						width: dropdownPosition.width,
+						left: dropdownPosition?.left || 0,
+						width: dropdownPosition?.width || 2000,
 						maxWidth:
-							parentAttributes.dropdownMaxWidth ||
-							window.innerWidth,
+							dropdownPosition?.maxWidth || document.body.clientWidth,
 					} }
 				>
 					<InnerBlocks />
@@ -202,9 +214,13 @@ export default compose( [
 		const { clientId } = ownProps;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 		const hasDescendants = !! getBlockCount( clientId );
-		const rootBlockClientId = getBlockParentsByBlockName( clientId, 'megamenu/menu' )[0];
+		const rootBlockClientId = getBlockParentsByBlockName(
+			clientId,
+			'megamenu/menu'
+		)[ 0 ];
 
-		const parentAttributes = getBlock( rootBlockClientId ).attributes;
+		const parentBlock = getBlock( rootBlockClientId );
+		const parentAttributes = parentBlock.attributes;
 
 		return {
 			isParentOfSelectedBlock,

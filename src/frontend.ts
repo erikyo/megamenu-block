@@ -1,17 +1,6 @@
 import './style.scss';
-import { calcNewPosition } from './utils';
-import { beforeEach } from 'node:test';
-
-const TIMEOUT: number = 500;
-
-function setDropdownStyle(
-	dropdown: { style: { left: string; width: string; maxWidth: string } },
-	{ left, width, maxWidth }: any
-) {
-	dropdown.style.left = `${ left }px`;
-	dropdown.style.width = `${ width }px`;
-	dropdown.style.maxWidth = `${ maxWidth }px`;
-}
+import { calcNewPosition, setDropdownStyle } from './utils';
+import { TIMEOUT } from './utils/constants';
 
 document.addEventListener( 'DOMContentLoaded', () => {
 	const menus = document.querySelectorAll(
@@ -29,7 +18,12 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			const dropdown: HTMLElement | null = menu.querySelector(
 				'.wp-block-megamenu-item__dropdown'
 			);
-			setDropdownStyle( dropdown, { left: '', width: '', maxWidth: '' } );
+			if ( dropdown )
+				setDropdownStyle( dropdown, {
+					left: '',
+					width: '',
+					maxWidth: '',
+				} );
 			return;
 		}
 
@@ -87,16 +81,17 @@ document.addEventListener( 'DOMContentLoaded', () => {
 				let newDropdownPosition: Partial< {
 					width: number;
 					left: number;
+					maxWidth: number;
 				} > = {};
 
-				if ( menuItem.classList.contains( 'has-full-width-dropdown' ) ) {
+				if ( menu.classList.contains( 'has-full-width-dropdown' ) ) {
 					setDropdownStyle( dropdown, {
 						...calcNewPosition(
-							{ width: window.innerWidth, x: 0 },
+							{ width: document.body.clientWidth, x: 0 },
 							dropdown.getBoundingClientRect(),
 							dropdownMaxWidth
 						),
-						maxWidth: window.innerWidth,
+						maxWidth: document.body.clientWidth,
 					} );
 				} else {
 					const dropdownRect = dropdown.getBoundingClientRect();
@@ -130,7 +125,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			menu.nextElementSibling as HTMLElement;
 
 		if ( toggleButtonWrapper ) {
-			if ( breakpoint >= window.innerWidth ) {
+			if ( breakpoint >= document.body.clientWidth ) {
 				toggleButtonWrapper.classList.remove( 'is-hidden' );
 				menu.classList.add( 'is-mobile' );
 			} else {
@@ -146,13 +141,21 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	 * @param menu - The HTML element representing a collection of menu elements.
 	 */
 	function attachToggleActionToButtons( menu: HTMLElement ): void {
+		/**
+		 * the responsive toggle button element
+		 */
+		menu.nextElementSibling?.addEventListener( 'click', ( event ) => {
+			const target = event.target as HTMLElement;
+			if ( target.classList.contains( 'wp-block-megamenu__toggle' ) ) {
+				toggleMobileMenu( target, menu );
+			}
+		} );
+		/**
+		 * the dropdown element click handler
+		 */
 		menu.addEventListener( 'click', ( event ) => {
 			const target = event.target as HTMLElement;
 			if ( target ) {
-				if ( target.classList.contains( 'has-children' ) ) {
-					toggleMobileMenu( target, menu );
-				}
-
 				if ( target.classList.contains( 'has-children' ) ) {
 					const dropdown: HTMLElement | null | undefined = target
 						.closest( '.wp-block-megamenu-item' )
@@ -199,7 +202,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		const left = -menuCoords.left;
 
 		dropdown.style.left = `${ left }px`;
-		dropdown.style.width = `${ window.innerWidth }px`;
+		dropdown.style.width = `${ document.body.clientWidth }px`;
 	}
 
 	/**

@@ -8,6 +8,10 @@
 			"type": "string",
 			"default": "center"
 		},
+		"menuAlign": {
+			"type": "string",
+			"default": "right"
+		},
 		"activator": {
 			"type": "string",
 			"default": "hover"

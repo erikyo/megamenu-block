@@ -37,9 +37,8 @@ export default function save( { attributes } ): JSX.Element {
 					'is-hidden'
 				) }
 			>
-				<button className="wp-block-megamenu__toggle">
-					<span className="dashicons dashicons-menu"></span>
-					{ __( 'Menu', 'megamenu' ) }
+				<button className="wp-block-megamenu__toggle hamburger">
+					<div></div>
 				</button>
 			</div>
 		</>

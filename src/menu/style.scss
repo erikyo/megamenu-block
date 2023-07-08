@@ -1,43 +1,44 @@
+$burger-size: 50px;
+
 .wp-block-megamenu {
 	margin: 0;
-	position: relative;
+	max-width: 100%;
 
+	&,
+	&__toggle-wrapper {
+		position: relative;
+		&.is-hidden {
+			display: none;
+		}
+	}
+
+	/**
+	 * The responsive toggle button element
+	 *
+	 * TODO: provide a way to se the position of the toggle button
+	 */
     &__toggle-wrapper {
-        &.is-hidden {
-            display: none;
-        }
-
-        &.is-close {
-            display: none;
-            position: absolute;
-            top: 60px;
-            right: 20px;
-        }
+		height: $burger-size;
     }
 
-    &__toggle {
-        &:focus,
-        &:active {
-            text-decoration: none;
-        }
-
-        > * {
-            vertical-align: bottom;
-        }
-    }
-
-    &:not(.is-mobile) {
-        .wp-block-megamenu-item {
-            &.is-opened {
-                .wp-block-megamenu-item__dropdown-wrapper {
-                    height: auto;
-                    overflow: visible;
+	/**
+	 * The menu in desktop mode
+	 */
+	&:not(.is-mobile) {
+		.wp-block-megamenu-item {
+			&.is-opened {
+				.wp-block-megamenu-item__dropdown {
+					height: auto;
+					overflow: visible;
 					opacity: 1;
-                }
-            }
-        }
-    }
+				}
+			}
+		}
+	}
 
+	/**
+	 * The menu in mobile mode
+	 */
     &.is-mobile {
         .wp-block-megamenu-menu {
             visibility: hidden;
@@ -58,4 +59,44 @@
             width: 100%;
         }
     }
+}
+
+/**
+ * The responsive toggle button element
+ */
+.wp-block-megamenu__toggle.hamburger {
+	display: block;
+	width: $burger-size;
+	height: $burger-size;
+	background: transparent;
+	appearance: none;
+	border: none;
+	cursor: pointer;
+	margin: 0 0 0 auto;
+
+	&:before,
+	&:after,
+	& div {
+		background: black;
+		content: "";
+		display: block;
+		height: 4px;
+		border-radius: 3px;
+		margin: 7px 0;
+		transition: 0.5s;
+	}
+
+	 &.is-opened {
+		&:before {
+			transform: translateY(11px) rotate(135deg);
+		}
+
+		&:after {
+			transform: translateY(-11px) rotate(-135deg);
+		}
+
+		div {
+			transform: scale(0);
+		}
+	}
 }
