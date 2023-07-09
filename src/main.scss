@@ -78,3 +78,13 @@ $burger-size: 50px;
 		}
 	}
 }
+
+body.no-scroll {
+	height: 100vh;
+	height: -webkit-fill-available;
+	width: 100%;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	overflow-y: scroll;
+}

@@ -78,22 +78,28 @@ export function isMobile( breakpoint: number ): boolean {
 export const delay = ( ms: number ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, ms ) );
 
-function disableBodyScroll( scrollDisabled = true, megamenu: HTMLElement ) {
+/**
+ * The function `disableBodyScroll` is used to disable scrolling on the body element and apply
+ * transformations to the body and megamenu elements.
+ *
+ * @param               [scrollDisabled=false] - A boolean value indicating whether to disable scrolling or not. If
+ *                                             set to true, scrolling will be disabled. If set to false, scrolling will be enabled.
+ * @param {HTMLElement} megamenu               - The `megamenu` parameter is an HTMLElement that represents the mega
+ *                                             menu element in the HTML document.
+ */
+export function disableBodyScroll( scrollDisabled = false ) {
 	const scrollTop = window.scrollY;
-	if ( ! document.body.dataset.scrollTop ) {
+	if ( scrollDisabled ) {
 		document.body.dataset.scrollTop = scrollTop.toString();
 	}
 
 	if ( scrollDisabled ) {
+		window.scrollTo( { top: 0 } );
 		document.body.classList.add( 'no-scroll' );
 		document.body.style.transform = `translateY(-${ scrollTop.toString() }px)`;
-		megamenu.classList.add( 'no-animations' );
-		megamenu.style.transform = `translateY(${ scrollTop.toString() }px)`;
 	} else {
-		document.body.classList.remove( 'top', 'no-scroll' );
-		document.body.style.transform = '';
-		megamenu.classList.remove( 'no-animations' );
-		megamenu.style.removeProperty( 'transform' );
+		document.body.classList.remove( 'no-scroll' );
+		document.body.style.removeProperty( 'transform' );
 		window.scrollTo( { top: scrollTop } );
 		document.body.removeAttribute( 'dataset-scroll-top' );
 	}

@@ -1,5 +1,3 @@
-
-
 .wp-block-megamenu {
 	margin: 0;
 	max-width: 100%;
@@ -42,35 +40,47 @@
 	 * The menu in mobile mode
 	 */
 	&.is-mobile {
-		position: absolute;
-		top: 0;
-		left: 0;
-		z-index: 1005;
-		display: flex;
-		width: 100vw;
-		align-items: center;
-		justify-content: center;
-		pointer-events: none;
+
+		&,
+		.wp-block-megamenu-item__dropdown {
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 1005;
+			display: flex;
+			width: 100vw;
+			align-items: center;
+			justify-content: center;
+			pointer-events: none;
+			overflow: hidden;
+
+			> div {
+				width: 100%;
+				height: 100vh;
+				max-width: 100vw;
+				box-sizing: border-box;
+				padding: ($burger-size * 1.5) $burger-size ($burger-size * .5) var(--wp--style--root--padding-left) !important;
+				opacity: 0;
+				transition: 350ms;
+				transform: translateX(100%);
+			}
+		}
+
+		.wp-block-megamenu-item__dropdown > div {
+			transform: translateX(100%);
+		}
+
 
 		.wp-block-megamenu-item {
 			width: 100%;
 		}
 
-		> div {
-			width: 100%;
-			height: 100vh;
-			max-width: 100vw;
-			opacity: 0;
-			transition: 350ms;
-			transform: translateX(100%);
-		}
-
 		&.is-opened {
 			pointer-events: all;
-			background: white;
 			> div {
 				opacity: 1;
 				transform: translateX(0);
+				background: white;
 			}
 		}
     }

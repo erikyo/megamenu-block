@@ -7,10 +7,8 @@ import Controls from './controls';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	RichText,
-	useBlockEditContext,
 	InnerBlocks,
 	store as blockEditorStore,
-	useSetting,
 } from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Icon } from '@wordpress/components';
@@ -75,7 +73,6 @@ export function MenuItemEdit( props ) {
 	};
 
 	const updateDropdownPosition = () => {
-		const newDropdownPosition = {};
 		const megamenuItem = menuItemRef.current;
 		const megamenu = megamenuItem
 			?.closest( '[data-block="' + rootBlockClientId + '"]' )
@@ -196,10 +193,10 @@ export default compose( [
 		const { clientId } = ownProps;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 		const hasDescendants = !! getBlockCount( clientId );
-		const rootBlockClientId = getBlockParentsByBlockName(
-			clientId,
-			'megamenu/menu'
-		)[ 0 ];
+		const rootBlockClientId = getBlockParentsByBlockName( clientId, [
+			'megamenu/menu',
+			'core/navigation',
+		] )[ 0 ];
 
 		const parentBlock = getBlock( rootBlockClientId );
 		const parentAttributes = parentBlock.attributes;

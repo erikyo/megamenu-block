@@ -2,7 +2,6 @@
 	"name": "megamenu/menu-item",
 	"title": "Menu Item",
 	"category": "layout",
-	"icon": "link",
 	"parent": [
 		"megamenu/menu",
 		"core/group",
