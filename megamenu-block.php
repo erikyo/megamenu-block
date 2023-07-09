@@ -20,8 +20,6 @@ define( 'MEGAMENU_FILE', __FILE__ );
 define( 'MEGAMENU_PATH', plugin_dir_path( MEGAMENU_FILE ) );
 define( 'MEGAMENU_URL', plugin_dir_url( MEGAMENU_FILE ) );
 
-define( 'MEGAMENU_RESPONSIVE_BREAKPOINT', 600 );
-
 if ( ! function_exists( 'megamenu_init' ) && function_exists( 'register_block_type' ) ) {
 	function megamenu_init() {
 		include_once MEGAMENU_PATH . 'includes/BlockRegister.php';

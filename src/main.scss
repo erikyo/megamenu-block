@@ -35,3 +35,46 @@
 		max-width: 100%;
 	}
 }
+
+
+/**
+ * The responsive toggle button element
+ */
+$burger-size: 50px;
+
+.wp-block-megamenu__toggle.hamburger {
+	display: block;
+	width: $burger-size;
+	height: $burger-size;
+	background: transparent;
+	appearance: none;
+	border: none;
+	cursor: pointer;
+	margin: 0 0 0 auto;
+
+	&:before,
+	&:after,
+	& div {
+		background: var(--wp--preset--color--menu-toggle, black);
+		content: "";
+		display: block;
+		height: 4px;
+		border-radius: 3px;
+		margin: 7px 0;
+		transition: 0.5s;
+	}
+
+	&.is-opened {
+		&:before {
+			transform: translateY(11px) rotate(135deg);
+		}
+
+		&:after {
+			transform: translateY(-11px) rotate(-135deg);
+		}
+
+		div {
+			transform: scale(0);
+		}
+	}
+}

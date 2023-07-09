@@ -8,7 +8,6 @@ import edit from './edit';
 registerBlockType( blockMeta.name, {
 	...blockMeta,
 	title: __( 'Menu Item', 'megamenu' ),
-	icon: 'link',
 	edit,
 	save,
 } );

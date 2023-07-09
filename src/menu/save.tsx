@@ -6,7 +6,9 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 
 export default function save( { attributes } ): JSX.Element {
-	const saveBlockProps = useBlockProps.save();
+	const saveBlockProps = useBlockProps.save( {
+		className: classnames( 'wp-block-megamenu__content' ),
+	} );
 
 	return (
 		<>
@@ -24,10 +26,7 @@ export default function save( { attributes } ): JSX.Element {
 				data-responsive-breakpoint={ attributes.responsiveBreakpoint }
 				data-dropdown-width={ attributes.dropdownMaxWidth }
 			>
-				<div
-					className="wp-block-megamenu__content"
-					{ ...saveBlockProps }
-				>
+				<div { ...saveBlockProps }>
 					<InnerBlocks.Content />
 				</div>
 			</nav>

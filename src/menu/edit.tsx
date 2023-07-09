@@ -68,7 +68,7 @@ function MegaMenu( args ) {
 				data-responsive-breakpoint={ attributes.responsiveBreakpoint }
 				data-dropdown-content-width={ attributes.dropdownMaxWidth }
 			>
-				<div className="wp-block-megamenu__content">
+				<div className={ 'wp-block-megamenu__content' }>
 					<InnerBlocks
 						parentData={ attributes }
 						ref={ ref }
