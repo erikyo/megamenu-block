@@ -64,7 +64,7 @@ $burger-size: 50px;
 		transition: 0.5s;
 	}
 
-	&.is-opened {
+	.is-opened & {
 		&:before {
 			transform: translateY(11px) rotate(135deg);
 		}

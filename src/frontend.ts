@@ -210,8 +210,6 @@ function initResponsiveMenu( megamenu: HTMLElement ) {
  * @param {HTMLElement} megamenu - The `megamenu` parameter is an HTML element that represents the
  *                               megamenu container. It is the element that contains all the menu items and dropdowns of the
  *                               megamenu.
- * @return If the megamenu has no content (no child nodes), the function will return nothing
- * (undefined).
  */
 function initMegamenu( megamenu: HTMLElement ) {
 	// The megamenu has no content.

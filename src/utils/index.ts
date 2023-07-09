@@ -77,3 +77,24 @@ export function isMobile( breakpoint: number ): boolean {
  */
 export const delay = ( ms: number ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, ms ) );
+
+function disableBodyScroll( scrollDisabled = true, megamenu: HTMLElement ) {
+	const scrollTop = window.scrollY;
+	if ( ! document.body.dataset.scrollTop ) {
+		document.body.dataset.scrollTop = scrollTop.toString();
+	}
+
+	if ( scrollDisabled ) {
+		document.body.classList.add( 'no-scroll' );
+		document.body.style.transform = `translateY(-${ scrollTop.toString() }px)`;
+		megamenu.classList.add( 'no-animations' );
+		megamenu.style.transform = `translateY(${ scrollTop.toString() }px)`;
+	} else {
+		document.body.classList.remove( 'top', 'no-scroll' );
+		document.body.style.transform = '';
+		megamenu.classList.remove( 'no-animations' );
+		megamenu.style.removeProperty( 'transform' );
+		window.scrollTo( { top: scrollTop } );
+		document.body.removeAttribute( 'dataset-scroll-top' );
+	}
+}

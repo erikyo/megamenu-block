@@ -41,12 +41,8 @@ export function MenuItemEdit( props ) {
 		parentAttributes,
 	} = props;
 
-	// get the menu id
-	const { clientId } = useBlockEditContext();
-
 	const { text } = attributes;
 
-	const isMenuItemSelected = isSelected || isParentOfSelectedBlock;
 	const menuItemHasChildrens = hasDescendants;
 
 	// the menu item ref
@@ -58,8 +54,8 @@ export function MenuItemEdit( props ) {
 	const [ dropdownPosition, setDropdownPosition ]: [ DropDownCoords, any ] =
 		useState( {
 			left: 0,
-			width: 2000,
-			maxWidth: 2000,
+			width: 0,
+			maxWidth: document.body.clientWidth,
 		} );
 
 	function setParentAttributes() {
@@ -79,43 +75,26 @@ export function MenuItemEdit( props ) {
 	};
 
 	const updateDropdownPosition = () => {
-		let newDropdownPosition = {};
-		let rootBlockNode;
-		const blockNode = menuItemRef.current;
-		const dropdownEl = dropdownRef.current;
+		const newDropdownPosition = {};
+		const megamenuItem = menuItemRef.current;
+		const megamenu = megamenuItem
+			?.closest( '[data-block="' + rootBlockClientId + '"]' )
+			?.querySelector( '.wp-block-megamenu' );
 
-		if ( ! dropdownRef ) {
-			return;
-		}
+		const rootBlockNode = megamenu?.ownerDocument.body;
 
-		const dropDownCoords = dropdownEl?.getBoundingClientRect();
-
-		if ( parentAttributes.dropdownMaxWidth === 0 ) {
-			rootBlockNode = blockNode?.closest( '.editor-styles-wrapper' );
-		} else {
-			rootBlockNode = blockNode
-				?.closest( '[data-block="' + rootBlockClientId + '"]' )
-				?.querySelector( '.wp-block-megamenu' );
-		}
-
+		const blockCoords = megamenu?.getBoundingClientRect();
 		const rootCoords = rootBlockNode?.getBoundingClientRect();
 
-		if ( rootCoords && dropDownCoords ) {
+		if ( rootCoords && blockCoords ) {
 			const maxWidth =
 				parentAttributes.dropdownMaxWidth !== 0
 					? parentAttributes.dropdownMaxWidth
 					: rootCoords.width;
 
-			newDropdownPosition = calcNewPosition(
-				rootCoords,
-				dropDownCoords,
-				maxWidth
+			setDropdownPosition(
+				calcNewPosition( rootCoords, blockCoords, maxWidth )
 			);
-
-			setDropdownPosition( {
-				...newDropdownPosition,
-				maxWidth,
-			} );
 		}
 	};
 
@@ -190,10 +169,13 @@ export function MenuItemEdit( props ) {
 					ref={ dropdownRef }
 					className={ 'wp-block-megamenu-item__dropdown' }
 					style={ {
-						left: dropdownPosition?.left || 0,
-						width: dropdownPosition?.width || 2000,
+						left: ( dropdownPosition?.left || 0 ) + 'px',
+						width:
+							( dropdownPosition?.width ||
+								document.body.clientWidth ) + 'px',
 						maxWidth:
-							dropdownPosition?.maxWidth || document.body.clientWidth,
+							( dropdownPosition?.maxWidth ||
+								document.body.clientWidth ) + 'px',
 					} }
 				>
 					<InnerBlocks />
