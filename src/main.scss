@@ -2,29 +2,6 @@
  *  The megamenu style
  */
 .wp-block-megamenu {
-
-	/**
-	 *  Menu single item
-	 */
-	.wp-block-megamenu-item {
-		&.is-opened {
-			overflow: visible;
-			height: auto;
-
-			.wp-block-megamenu-item__dropdown {
-				min-height: 50px;
-				overflow: visible;
-				height: auto;
-				max-height: 9999px;
-				opacity: 1;
-			}
-		}
-
-		&.has-child {
-			cursor: pointer;
-		}
-	}
-
 	/**
 	 * The editor style
 	 */
@@ -36,49 +13,6 @@
 	}
 }
 
-
-/**
- * The responsive toggle button element
- */
-$burger-size: 50px;
-
-.wp-block-megamenu__toggle.hamburger {
-	display: block;
-	width: $burger-size;
-	height: $burger-size;
-	background: transparent;
-	appearance: none;
-	border: none;
-	cursor: pointer;
-	margin: 0 0 0 auto;
-
-	&:before,
-	&:after,
-	& div {
-		background: var(--wp--preset--color--menu-toggle, black);
-		content: "";
-		display: block;
-		height: 4px;
-		border-radius: 3px;
-		margin: 7px 0;
-		transition: 0.5s;
-	}
-
-	.is-opened & {
-		&:before {
-			transform: translateY(11px) rotate(135deg);
-		}
-
-		&:after {
-			transform: translateY(-11px) rotate(-135deg);
-		}
-
-		div {
-			transform: scale(0);
-		}
-	}
-}
-
 body.no-scroll {
 	height: 100vh;
 	height: -webkit-fill-available;
@@ -86,5 +20,4 @@ body.no-scroll {
 	position: fixed;
 	top: 0;
 	bottom: 0;
-	overflow-y: scroll;
 }

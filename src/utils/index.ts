@@ -84,8 +84,6 @@ export const delay = ( ms: number ) =>
  *
  * @param               [scrollDisabled=false] - A boolean value indicating whether to disable scrolling or not. If
  *                                             set to true, scrolling will be disabled. If set to false, scrolling will be enabled.
- * @param {HTMLElement} megamenu               - The `megamenu` parameter is an HTMLElement that represents the mega
- *                                             menu element in the HTML document.
  */
 export function disableBodyScroll( scrollDisabled = false ) {
 	const scrollTop = window.scrollY;

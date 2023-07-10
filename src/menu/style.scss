@@ -1,6 +1,6 @@
 .wp-block-megamenu {
 	margin: 0;
-	max-width: 100%;
+	max-width: 100vw;
 
 	&,
 	&__toggle-wrapper {
@@ -18,70 +18,64 @@
     + .wp-block-megamenu__toggle-wrapper {
 		height: $burger-size;
 		margin-left: auto;
-		z-index: 1006;
+		z-index: 1005;
     }
+}
 
-	/**
-	 * The menu in desktop mode
-	 */
-	&:not(.is-mobile) {
-		.wp-block-megamenu-item {
-			&.is-opened {
-				+ .wp-block-megamenu-item__dropdown {
-					height: auto;
-					overflow: visible;
-					opacity: 1;
-				}
-			}
+/**
+ * The responsive toggle button element
+ */
+.wp-block-megamenu__toggle.hamburger {
+	display: block;
+	width: $burger-size;
+	height: $burger-size;
+	background: transparent;
+	appearance: none;
+	border: none;
+	cursor: pointer;
+	margin: var( --megamenu--responsive--toggle-icon--position, 0 0 0 auto );
+
+	&:before,
+	&:after,
+	& div {
+		background: var(--wp--preset--color--menu-toggle, black);
+		content: "";
+		display: block;
+		height: $burger-size * 0.05;
+		border-radius: 3px;
+		margin: 7px 0;
+		transition: 0.5s;
+	}
+
+	.is-opened & {
+		&:before {
+			transform: translateY($burger-size * 0.21) rotate(135deg);
+		}
+
+		&:after {
+			transform: translateY(-$burger-size * 0.21) rotate(-135deg);
+		}
+
+		div {
+			transform: scale(0);
 		}
 	}
 
-	/**
-	 * The menu in mobile mode
-	 */
-	&.is-mobile {
 
-		&,
-		.wp-block-megamenu-item__dropdown {
-			position: absolute;
-			top: 0;
-			left: 0;
-			z-index: 1005;
-			display: flex;
-			width: 100vw;
-			align-items: center;
-			justify-content: center;
-			pointer-events: none;
-			overflow: hidden;
-
-			> div {
-				width: 100%;
-				height: 100vh;
-				max-width: 100vw;
-				box-sizing: border-box;
-				padding: ($burger-size * 1.5) $burger-size ($burger-size * .5) var(--wp--style--root--padding-left) !important;
-				opacity: 0;
-				transition: 350ms;
-				transform: translateX(100%);
-			}
+	.is-back & {
+		&:before {
+			transform: translate(-10px, 4px) rotate(135deg);
+			margin: 7px;
 		}
 
-		.wp-block-megamenu-item__dropdown > div {
-			transform: translateX(100%);
+		&:after {
+			transform: translate(-10px, -4px) rotate(-135deg);
+			margin: 7px;
 		}
 
-
-		.wp-block-megamenu-item {
-			width: 100%;
+		div {
+			transform: scalex(1);
+			transform-origin: right;
 		}
-
-		&.is-opened {
-			pointer-events: all;
-			> div {
-				opacity: 1;
-				transform: translateX(0);
-				background: white;
-			}
-		}
-    }
+	}
 }

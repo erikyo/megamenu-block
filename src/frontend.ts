@@ -28,6 +28,10 @@ function openMenuItem( event: MouseEvent | TouchEvent ) {
 
 	if ( ! menuItem ) return;
 
+	const toggleButton = document.querySelector(
+		'.wp-block-megamenu__toggle-wrapper'
+	) as HTMLButtonElement;
+
 	if ( event.type === 'click' || event.type === 'mouseenter' ) {
 		// get all the parent elements that are opened and close them
 		menuItem.parentElement
@@ -38,8 +42,10 @@ function openMenuItem( event: MouseEvent | TouchEvent ) {
 			} );
 		menuItem.classList.add( 'is-opened' );
 		menuItem.classList.remove( 'is-left' );
+		toggleButton.classList.add( 'is-back' );
 	} else if ( event.type === 'mouseleave' ) {
 		menuItem.classList.remove( 'is-opened' );
+		toggleButton.classList.remove( 'is-back' );
 	}
 }
 
@@ -52,14 +58,16 @@ function openMenuItem( event: MouseEvent | TouchEvent ) {
  * @param hamburgerIconEl - The hamburgerIconEl parameter is the element that represents the hamburger
  *                        icon in your HTML. It is the element that you want to toggle the "is-opened" class on to show or
  *                        hide the menu.
+ * @param force           - A boolean value indicating whether to force the menu to be toggled or not.
  */
 function toggleResponsiveMenu(
 	megamenu: HTMLElement,
-	hamburgerIconEl: HTMLElement
+	hamburgerIconEl: HTMLElement,
+	force: boolean | undefined = undefined
 ) {
-	megamenu.classList.toggle( 'is-opened' );
+	megamenu.classList.toggle( 'is-opened', force );
 
-	hamburgerIconEl.classList.toggle( 'is-opened' );
+	hamburgerIconEl.classList.toggle( 'is-opened', force );
 
 	disableBodyScroll( megamenu.classList.contains( 'is-opened' ) );
 }
@@ -79,26 +87,29 @@ function handleUserEvents(
 		let timeoutId: NodeJS.Timeout;
 
 		if ( activator === 'click' ) {
-			menuItem.addEventListener( 'click', openMenuItem );
-			menuItem.addEventListener( 'touchend', openMenuItem );
+			menuItem.onclick = ( ev: MouseEvent ) => openMenuItem( ev );
+			menuItem.ontouchend = ( ev: TouchEvent ) => openMenuItem( ev );
+			menuItem.onmouseenter = null;
 		} else {
-			menuItem.addEventListener( 'mouseenter', ( ev ) => {
+			menuItem.onmouseenter = ( ev ) => {
 				clearTimeout( timeoutId );
 				openMenuItem( ev );
-			} );
+			};
+			menuItem.onclick = null;
+			menuItem.ontouchend = null;
 		}
 
-		menuItem.addEventListener( 'mouseleave', ( event ) => {
-			const target = event.target as HTMLElement;
+		menuItem.onmouseleave = ( ev: MouseEvent ) => {
+			const target = ev.target as HTMLElement;
 			// add the is-left class that will be checked in a while to handle menu re-focusing
 			target.classList.add( 'is-left' );
 
 			timeoutId = setTimeout( () => {
 				if ( target.classList.contains( 'is-left' ) ) {
-					openMenuItem( event );
+					openMenuItem( ev );
 				}
 			}, TIMEOUT );
-		} );
+		};
 	} );
 }
 
@@ -128,6 +139,8 @@ function updateResponsiveMenu(
 
 	// reset the dropdown position for each item
 	if ( isResponsive ) {
+		toggleResponsiveMenu( megamenu, hamburgerIconEl, false );
+
 		Array.from( menuItems )
 			.map( ( menuItem ) =>
 				menuItem.querySelector( '.wp-block-megamenu-item__dropdown' )
@@ -255,7 +268,7 @@ function initResponsiveMenu( megamenu: HTMLElement ) {
  *                               megamenu.
  */
 function initMegamenu( megamenu: HTMLElement ) {
-	// The megamenu has no content.
+	// Return immediately if the  megamenu has no content.
 	if ( ! megamenu.childNodes.length ) return;
 
 	// The megamenu has items, collect the menu items that need to be interactive.
@@ -263,14 +276,17 @@ function initMegamenu( megamenu: HTMLElement ) {
 		'.wp-block-megamenu-item.has-children'
 	);
 
+	// Attach the window/responsive related events to the megamenu
+	updateResponsiveMenu( megamenu, menuItems );
+
 	// Attach the events to the menu items.
 	handleUserEvents(
 		menuItems,
-		megamenu.classList.contains( 'activator-click' ) ? 'click' : 'hover'
+		megamenu.classList.contains( 'activator-click' ) ||
+			megamenu.classList.contains( 'is-mobile' )
+			? 'click'
+			: 'hover'
 	);
-
-	// Attach the window/responsive related events to the megamenu
-	updateResponsiveMenu( megamenu, menuItems );
 
 	// Initialize the responsive menu toggle menu visibility.
 	initResponsiveMenu( megamenu );
@@ -281,6 +297,15 @@ function initMegamenu( megamenu: HTMLElement ) {
 	window.addEventListener( 'resize', () => {
 		updateResponsiveMenu( megamenu, menuItems );
 		updateDropdownsPosition( megamenu, menuItems );
+
+		// Attach the events to the menu items.
+		handleUserEvents(
+			menuItems,
+			megamenu.classList.contains( 'activator-click' ) ||
+				megamenu.classList.contains( 'is-mobile' )
+				? 'click'
+				: 'hover'
+		);
 	} );
 }
 
