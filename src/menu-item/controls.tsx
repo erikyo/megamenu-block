@@ -91,7 +91,7 @@ function Controls( args ) {
 				<ToolbarGroup>
 					<ToolbarButton
 						name="submenu"
-						icon={ hasDescendants ? 'download' : 'remove' }
+						icon={ hasDescendants ? 'remove' : 'download' }
 						className={ hasDescendants ? 'is-active' : '' }
 						title={ __( 'Add submenu' ) }
 						onClick={ toggleItemDropdown }

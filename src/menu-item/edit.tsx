@@ -10,6 +10,7 @@ import {
 	InnerBlocks,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Icon } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
@@ -41,6 +42,7 @@ export function MenuItemEdit( props ) {
 
 	const { text } = attributes;
 
+	// TODO: handle with effect
 	const menuItemHasChildrens = hasDescendants;
 
 	// the menu item ref
@@ -211,10 +213,14 @@ export default compose( [
 	withDispatch( ( dispatch, { clientId } ) => {
 		return {
 			updateInnerBlocks() {
-				dispatch( blockEditorStore ).replaceInnerBlocks(
-					clientId,
-					[],
-					false
+				const block = createBlock( 'core/group', {
+					className: 'dropdown-inner',
+					layout: { type: 'constrained' },
+				} );
+				dispatch( blockEditorStore ).insertBlock(
+					block,
+					undefined,
+					clientId
 				);
 			},
 		};
