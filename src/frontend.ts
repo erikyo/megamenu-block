@@ -32,7 +32,11 @@ function openMenuItem( event: MouseEvent | TouchEvent ) {
 		'.wp-block-megamenu__toggle-wrapper'
 	) as HTMLButtonElement;
 
-	if ( event.type === 'click' || event.type === 'mouseenter' ) {
+	if (
+		event.type === 'click' ||
+		event.type === 'touchend' ||
+		event.type === 'mouseenter'
+	) {
 		// get all the parent elements that are opened and close them
 		menuItem.parentElement
 			?.querySelectorAll( '.is-opened' )
@@ -78,10 +82,12 @@ function toggleResponsiveMenu(
  *
  * @param menuItems - A NodeList of HTMLElements representing the menu items.
  * @param activator - The activator parameter is a string that represents the type of event that triggered
+ * @param isMobile
  */
 function handleUserEvents(
 	menuItems: NodeListOf< HTMLElement >,
-	activator: 'hover' | 'click' = 'hover'
+	activator: 'hover' | 'click' = 'hover',
+	isMobile: boolean = false
 ) {
 	menuItems.forEach( ( menuItem ) => {
 		let timeoutId: NodeJS.Timeout;
@@ -98,6 +104,8 @@ function handleUserEvents(
 			menuItem.onclick = null;
 			menuItem.ontouchend = null;
 		}
+
+		if ( isMobile ) return;
 
 		menuItem.onmouseleave = ( ev: MouseEvent ) => {
 			const target = ev.target as HTMLElement;
@@ -168,8 +176,8 @@ function updateDropdownsPosition(
 ) {
 	// check if current device is under the menu breakpoint
 	const breakpoint = Number( megamenu.dataset.responsiveBreakpoint );
-	const isResponsive = isMobile( breakpoint );
-	if ( isResponsive ) return;
+	console.log( breakpoint );
+	if ( isMobile( breakpoint ) ) return;
 
 	const megamenuRect = megamenu.getBoundingClientRect();
 
@@ -285,7 +293,8 @@ function initMegamenu( megamenu: HTMLElement ) {
 		megamenu.classList.contains( 'activator-click' ) ||
 			megamenu.classList.contains( 'is-mobile' )
 			? 'click'
-			: 'hover'
+			: 'hover',
+		megamenu.classList.contains( 'is-mobile' )
 	);
 
 	// Initialize the responsive menu toggle menu visibility.
@@ -304,7 +313,8 @@ function initMegamenu( megamenu: HTMLElement ) {
 			megamenu.classList.contains( 'activator-click' ) ||
 				megamenu.classList.contains( 'is-mobile' )
 				? 'click'
-				: 'hover'
+				: 'hover',
+			megamenu.classList.contains( 'is-mobile' )
 		);
 	} );
 }

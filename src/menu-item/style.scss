@@ -177,7 +177,7 @@
 			opacity: 1;
 		}
 
-		& .wp-block-megamenu-item.is-opened {
+		.wp-block-megamenu-item.is-opened {
 			.wp-block-megamenu-item__dropdown {
 				z-index: 1003;
 				transform: translateX(0);
@@ -185,6 +185,11 @@
 				min-height: 100%;
 				max-height: inherit;
 			}
+		}
+
+		.wp-block-megamenu-item__dropdown .wp-block-group {
+			overflow: scroll;
+			width: 100%;
 		}
 
 		// fill the height of the menu witht the content

@@ -82,8 +82,8 @@ export const delay = ( ms: number ) =>
  * The function `disableBodyScroll` is used to disable scrolling on the body element and apply
  * transformations to the body and megamenu elements.
  *
- * @param               [scrollDisabled=false] - A boolean value indicating whether to disable scrolling or not. If
- *                                             set to true, scrolling will be disabled. If set to false, scrolling will be enabled.
+ * @param [scrollDisabled=false] - A boolean value indicating whether to disable scrolling or not. If
+ *                               set to true, scrolling will be disabled. If set to false, scrolling will be enabled.
  */
 export function disableBodyScroll( scrollDisabled = false ) {
 	const scrollTop = window.scrollY;
@@ -94,11 +94,9 @@ export function disableBodyScroll( scrollDisabled = false ) {
 	if ( scrollDisabled ) {
 		window.scrollTo( { top: 0 } );
 		document.body.classList.add( 'no-scroll' );
-		document.body.style.transform = `translateY(-${ scrollTop.toString() }px)`;
 	} else {
 		document.body.classList.remove( 'no-scroll' );
-		document.body.style.removeProperty( 'transform' );
 		window.scrollTo( { top: scrollTop } );
-		document.body.removeAttribute( 'dataset-scroll-top' );
+		document.body.removeAttribute( 'data-scroll-top' );
 	}
 }
