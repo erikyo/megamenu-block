@@ -69,6 +69,15 @@ function toggleResponsiveMenu(
 	hamburgerIconEl: HTMLElement,
 	force: boolean | undefined = undefined
 ) {
+	if ( hamburgerIconEl.classList.contains( 'is-back' ) ) {
+		hamburgerIconEl.classList.remove( 'is-back' );
+		megamenu
+			.querySelectorAll( '.has-children.is-opened' )
+			.forEach( ( el ) => {
+				el.classList.remove( 'is-opened' );
+			} );
+		return;
+	}
 	megamenu.classList.toggle( 'is-opened', force );
 
 	hamburgerIconEl.classList.toggle( 'is-opened', force );
@@ -80,14 +89,14 @@ function toggleResponsiveMenu(
  * The function handles user events for menu items, such as click, touch, mouse enter, and mouse leave,
  * to open the corresponding menu item.
  *
- * @param menuItems - A NodeList of HTMLElements representing the menu items.
- * @param activator - The activator parameter is a string that represents the type of event that triggered
- * @param isMobile
+ * @param menuItems    - A NodeList of HTMLElements representing the menu items.
+ * @param activator    - The activator parameter is a string that represents the type of event that triggered
+ * @param isResponsive - A boolean value indicating whether the menu is responsive or not.
  */
 function handleUserEvents(
 	menuItems: NodeListOf< HTMLElement >,
 	activator: 'hover' | 'click' = 'hover',
-	isMobile: boolean = false
+	isResponsive: boolean = false
 ) {
 	menuItems.forEach( ( menuItem ) => {
 		let timeoutId: NodeJS.Timeout;
@@ -105,7 +114,7 @@ function handleUserEvents(
 			menuItem.ontouchend = null;
 		}
 
-		if ( isMobile ) return;
+		if ( isResponsive ) return;
 
 		menuItem.onmouseleave = ( ev: MouseEvent ) => {
 			const target = ev.target as HTMLElement;
@@ -176,7 +185,6 @@ function updateDropdownsPosition(
 ) {
 	// check if current device is under the menu breakpoint
 	const breakpoint = Number( megamenu.dataset.responsiveBreakpoint );
-	console.log( breakpoint );
 	if ( isMobile( breakpoint ) ) return;
 
 	const megamenuRect = megamenu.getBoundingClientRect();

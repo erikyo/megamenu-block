@@ -3,7 +3,6 @@
  */
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 import classnames from 'classnames';
-import { __ } from '@wordpress/i18n';
 
 export default function save( { attributes } ): JSX.Element {
 	const saveBlockProps = useBlockProps.save( {
@@ -35,6 +34,7 @@ export default function save( { attributes } ): JSX.Element {
 					'wp-block-megamenu__toggle-wrapper',
 					'is-hidden'
 				) }
+				aria-label="Toggle megamenu"
 			>
 				<button className="wp-block-megamenu__toggle hamburger">
 					<div></div>

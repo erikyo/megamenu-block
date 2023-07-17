@@ -48,6 +48,7 @@ export default function save( { attributes } ) {
 							} }
 							icon={ chevronDown }
 							className="wp-block-megamenu-item__toggle"
+							aria-hidden="true"
 						/>
 					) }
 				</a>

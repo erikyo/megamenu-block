@@ -10,7 +10,6 @@ import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 import {
-	alignJustify,
 	alignLeft,
 	alignCenter,
 	alignRight,

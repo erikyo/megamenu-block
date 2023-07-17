@@ -2,12 +2,14 @@
  *  The megamenu style
  */
 .wp-block-megamenu {
+
 	/**
 	 * The editor style
 	 */
 	.block-editor-block-list__layout .block-editor-block-list__block {
 		position: unset;
 	}
+
 	.block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
 		max-width: 100%;
 	}

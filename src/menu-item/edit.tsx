@@ -158,6 +158,7 @@ export function MenuItemEdit( props ) {
 						<Icon
 							icon={ chevronDown }
 							className="wp-block-megamenu-item__toggle"
+							aria-hidden="true"
 							style={ {
 								fill: 'currentColor',
 							} }

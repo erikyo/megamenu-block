@@ -74,29 +74,28 @@ function Controls( args ) {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						name="link"
 						icon="admin-links"
 						title={ __( 'Edit Link' ) }
 						onClick={ openLinkControl }
 						isActive={ isURLSet }
 					/>
 					<ToolbarButton
-						name="unlink"
 						icon="editor-unlink"
 						title={ __( 'Unlink' ) }
 						onClick={ unlinkItem }
 						isDisabled={ ! isURLSet }
 					/>
 				</ToolbarGroup>
-				<ToolbarGroup>
-					<ToolbarButton
-						name="submenu"
-						icon={ hasDescendants ? 'remove' : 'download' }
-						className={ hasDescendants ? 'is-active' : '' }
-						title={ __( 'Add submenu' ) }
-						onClick={ toggleItemDropdown }
-					/>
-				</ToolbarGroup>
+				{ ! hasDescendants && (
+					<ToolbarGroup>
+						<ToolbarButton
+							icon={ 'download' }
+							className={ hasDescendants ? 'is-active' : '' }
+							title={ __( 'Add submenu' ) }
+							onClick={ toggleItemDropdown }
+						/>
+					</ToolbarGroup>
+				) }
 			</BlockControls>
 			{ isURLPickerOpen && (
 				<Popover

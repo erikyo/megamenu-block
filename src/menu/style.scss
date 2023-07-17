@@ -5,6 +5,7 @@
 	&,
 	&__toggle-wrapper {
 		position: relative;
+
 		&.is-hidden {
 			display: none;
 		}
@@ -15,11 +16,11 @@
 	 *
 	 * TODO: provide a way to se the position of the toggle button
 	 */
-    + .wp-block-megamenu__toggle-wrapper {
+	+ .wp-block-megamenu__toggle-wrapper {
 		height: $burger-size;
 		margin-left: auto;
 		z-index: 1005;
-    }
+	}
 }
 
 /**
@@ -33,11 +34,11 @@
 	appearance: none;
 	border: none;
 	cursor: pointer;
-	margin: var( --megamenu--responsive--toggle-icon--position, 0 0 0 auto );
+	margin: var(--megamenu--responsive--toggle-icon--position, 0 0 0 auto);
 
-	&:before,
-	&:after,
-	& div {
+	&::before,
+	&::after,
+	div {
 		background: var(--wp--preset--color--menu-toggle, black);
 		content: "";
 		display: block;
@@ -48,11 +49,12 @@
 	}
 
 	.is-opened & {
-		&:before {
+
+		&::before {
 			transform: translateY($burger-size * 0.21) rotate(135deg);
 		}
 
-		&:after {
+		&::after {
 			transform: translateY(-$burger-size * 0.21) rotate(-135deg);
 		}
 
@@ -63,18 +65,19 @@
 
 
 	.is-back & {
-		&:before {
+
+		&::before {
 			transform: translate(-10px, 4px) rotate(135deg);
 			margin: 7px;
 		}
 
-		&:after {
+		&::after {
 			transform: translate(-10px, -4px) rotate(-135deg);
 			margin: 7px;
 		}
 
 		div {
-			transform: scalex(1);
+			transform: scaleX(1);
 			transform-origin: right;
 		}
 	}
