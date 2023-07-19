@@ -107,50 +107,77 @@
 	 */
 	&.is-mobile {
 
+		> .wp-block-megamenu-menu {
+			transition: 500ms box-shadow;
+			box-shadow: 0 0 0 -120px rgb(0, 0, 0, 0), -2px 0 16px -6px rgb(0, 0, 0, 0);
+		}
+
 		&,
 		.wp-block-megamenu-item__dropdown {
 			position: absolute;
 			top: 0;
 			left: 0;
-			right: 0;
 			z-index: 1002;
 			display: flex;
+			height: 100vh;
+			max-height: 100vh;
 			align-items: center;
 			justify-content: center;
-			pointer-events: none;
 			overflow: hidden;
+			transition: 350ms transform, 100ms opacity;
+			box-shadow: inherit;
 
 			.wp-block-megamenu-menu {
-				width: 100vw;
+				width: calc(100vw - var(--megamenu--hamburger-width) * 2.5);
 				position: absolute;
-				transform: translateX(100%);
 				top: 0;
 				left: 0;
-				right: 0;
 				bottom: 0;
 				justify-content: center;
 				box-sizing: border-box;
-				padding: var(--megamenu--responsive--internal-padding, ($burger-size * 2) ($burger-size * 1.5) ($burger-size * 0.5) var(--wp--style--root--padding-left)) !important;
-				opacity: 0;
-				transition: 350ms transform, 100ms opacity;
+				padding: var(--megamenu--responsive--internal-padding) !important;
 			}
 		}
 
+		.vsge-product-categories-list--depth-1,
+		.wp-block-megamenu-item__dropdown {
+			pointer-events: none;
+			z-index: 1006;
+			width: calc(100vw - var(--megamenu--hamburger-width) * 2.5);
+			max-width: 100%;
+			overflow: visible;
+			opacity: 0;
+			transform: translateX(-100%);
+			background: var(--megamenu--background-color, #fff);
+		}
+
+		// the megamenu is opened
 		&.is-opened {
 			overflow: visible;
 
-			.wp-block-megamenu-menu {
-				height: 100vh;
-				transform: translateX(0);
-				opacity: 1;
+			.wp-block-megamenu-item > .wp-block-megamenu-item__dropdown {
+				pointer-events: auto;
 			}
 
-			.wp-block-megamenu-item__dropdown {
-				z-index: 1003;
-				width: 100vw;
-				height: 100vh;
-				max-height: 100vh;
-				overflow: visible;
+			> .wp-block-megamenu-menu {
+				box-shadow: 80px 0 150px -120px rgb(0, 0, 0), -2px 0 16px -6px rgba(0, 0, 0, 0.8);
+			}
+		}
+
+		// the megamenu item is opened
+		.is-opened {
+			> .wp-block-megamenu-item__dropdown {
+				transform: translateX(0);
+				opacity: 1;
+				pointer-events: auto;
+			}
+		}
+
+		.vsge-product-categories .vsge-product-categories-list-item.has-children.is-opened {
+			> .vsge-product-categories-list--depth-1 {
+				transform: translateX(0);
+				opacity: 1;
+				pointer-events: auto;
 			}
 		}
 
@@ -166,11 +193,11 @@
 		.wp-block-megamenu-menu > .is-layout-flex {
 			height: 100%;
 			align-content: space-between;
+			flex-direction: column;
 		}
 
 		.wp-block-megamenu-item {
 			width: 100%;
-			pointer-events: all;
 		}
 	}
 }

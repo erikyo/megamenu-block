@@ -1,6 +1,11 @@
 /**
  *  The megamenu style
  */
+header {
+	--megamenu--hamburger-width: 42px;
+	--megamenu--responsive--internal-padding: calc(var(--megamenu--hamburger-width) * 2) var(--megamenu--hamburger-width);
+}
+
 .wp-block-megamenu {
 
 	/**

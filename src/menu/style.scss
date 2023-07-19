@@ -17,68 +17,70 @@
 	 * TODO: provide a way to se the position of the toggle button
 	 */
 	+ .wp-block-megamenu__toggle-wrapper {
-		height: $burger-size;
+		height: var(--megamenu--hamburger-width);
 		margin-left: auto;
 		z-index: 1005;
 	}
-}
 
-/**
- * The responsive toggle button element
- */
-.wp-block-megamenu__toggle.hamburger {
-	display: block;
-	width: $burger-size;
-	height: $burger-size;
-	background: transparent;
-	appearance: none;
-	border: none;
-	cursor: pointer;
-	margin: var(--megamenu--responsive--toggle-icon--position, 0 0 0 auto);
-
-	&::before,
-	&::after,
-	div {
-		background: var(--wp--preset--color--menu-toggle, black);
-		content: "";
+	/**
+	 * The responsive toggle button element
+	 */
+	&__toggle.hamburger {
 		display: block;
-		height: $burger-size * 0.05;
-		border-radius: 3px;
-		margin: 7px 0;
-		transition: 0.5s;
-	}
+		width: var(--megamenu--hamburger-width);
+		height: var(--megamenu--hamburger-width);
+		background: transparent;
+		appearance: none;
+		border: none;
+		cursor: pointer;
+		margin: var(--megamenu--responsive--toggle-icon--position, 0 0 0 auto);
 
-	.is-opened & {
-
-		&::before {
-			transform: translateY($burger-size * 0.21) rotate(135deg);
-		}
-
-		&::after {
-			transform: translateY(-$burger-size * 0.21) rotate(-135deg);
-		}
-
+		&::before,
+		&::after,
 		div {
-			transform: scale(0);
+			background: var(--wp--preset--color--menu-toggle, black);
+			content: "";
+			display: block;
+			height: 2px;
+			border-radius: 3px;
+			margin: 7px 0;
+			transition: 0.5s;
+		}
+
+		.is-opened & {
+
+			&::before {
+				transform: translateY(9px) rotate(135deg);
+			}
+
+			&::after {
+				transform: translateY(-9px) rotate(-135deg);
+			}
+
+			div {
+				transform: scale(0);
+			}
+		}
+
+
+		.is-back & {
+
+			&::before {
+				transform: translate(-10px, 4px) rotate(135deg);
+				margin: 7px;
+			}
+
+			&::after {
+				transform: translate(-10px, -4px) rotate(-135deg);
+				margin: 7px;
+			}
+
+			div {
+				transform: scaleX(1);
+				transform-origin: right;
+			}
 		}
 	}
 
-
-	.is-back & {
-
-		&::before {
-			transform: translate(-10px, 4px) rotate(135deg);
-			margin: 7px;
-		}
-
-		&::after {
-			transform: translate(-10px, -4px) rotate(-135deg);
-			margin: 7px;
-		}
-
-		div {
-			transform: scaleX(1);
-			transform-origin: right;
-		}
-	}
 }
+

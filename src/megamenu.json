@@ -30,7 +30,7 @@
         },
         "responsiveBreakpoint": {
             "type": "number",
-            "default": 768
+            "default": 1023
         }
     },
 	"supports": {
