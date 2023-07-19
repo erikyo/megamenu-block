@@ -52,9 +52,11 @@ export default function save( { attributes } ) {
 						/>
 					) }
 				</a>
-				<div className={ 'wp-block-megamenu-item__dropdown' }>
-					<InnerBlocks.Content />
-				</div>
+				{ menuItemHasChildrens && (
+					<div className={ 'wp-block-megamenu-item__dropdown' }>
+						<InnerBlocks.Content />
+					</div>
+				) }
 			</div>
 		</>
 	);

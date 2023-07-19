@@ -16,40 +16,52 @@ import { TIMEOUT } from './utils/constants';
  *                                        represents the event that triggered the function. It can be either a mouse event or a touch event.
  */
 function openMenuItem( event: MouseEvent | TouchEvent ) {
-	event.preventDefault();
 	// the event target could be the clicked item or the menu item
-	const target =
-		( event.currentTarget as HTMLElement ) ||
-		( event.target as HTMLElement );
-	// the menu item
-	const menuItem = target.classList.contains( 'wp-block-megamenu-item' )
-		? target
-		: target.closest( '.wp-block-megamenu-item' );
+	let target = event.target as HTMLElement;
 
-	if ( ! menuItem ) return;
+	if ( target.parentElement?.classList.contains( 'menu-item-link' ) ) {
+		return;
+	}
+
+	event.preventDefault();
+	event.stopImmediatePropagation();
+
+	console.log(target.parentElement)
+
+	// the menu item, in case of root menu item fallbacks to wp-block-megamenu-item
+	const menuItem = target.classList.contains( 'has-children' )
+		? target
+		: target.closest( '.has-children' );
 
 	const toggleButton = document.querySelector(
 		'.wp-block-megamenu__toggle-wrapper'
 	) as HTMLButtonElement;
 
-	if (
-		event.type === 'click' ||
-		event.type === 'touchend' ||
-		event.type === 'mouseenter'
-	) {
+	if ( event.type === 'click' || event.type === 'mouseenter' ) {
 		// get all the parent elements that are opened and close them
-		menuItem.parentElement
+		menuItem?.parentElement
 			?.querySelectorAll( '.is-opened' )
 			.forEach( ( el ) => {
 				el.classList.remove( 'is-opened' );
 				el.classList.remove( 'is-left' );
 			} );
-		menuItem.classList.add( 'is-opened' );
-		menuItem.classList.remove( 'is-left' );
+		menuItem?.classList.add( 'is-opened' );
+		menuItem?.classList.remove( 'is-left' );
 		toggleButton.classList.add( 'is-back' );
 	} else if ( event.type === 'mouseleave' ) {
-		menuItem.classList.remove( 'is-opened' );
+		menuItem?.classList.remove( 'is-opened' );
 		toggleButton.classList.remove( 'is-back' );
+	}
+}
+
+function closeLastChildren( megamenu: HTMLElement ): void {
+	const openedItems = Array.from(
+		megamenu.querySelectorAll( '.has-children.is-opened' )
+	);
+
+	if ( openedItems.length > 0 ) {
+		const lastOpenedItem = openedItems[ openedItems.length - 1 ];
+		lastOpenedItem.classList.remove( 'is-opened' );
 	}
 }
 
@@ -71,12 +83,7 @@ function toggleResponsiveMenu(
 ) {
 	if ( hamburgerIconEl.classList.contains( 'is-back' ) ) {
 		hamburgerIconEl.classList.remove( 'is-back' );
-		megamenu
-			.querySelectorAll( '.has-children.is-opened' )
-			.forEach( ( el ) => {
-				el.classList.remove( 'is-opened' );
-			} );
-		return;
+		return closeLastChildren( megamenu );
 	}
 	megamenu.classList.toggle( 'is-opened', force );
 
@@ -103,7 +110,6 @@ function handleUserEvents(
 
 		if ( activator === 'click' ) {
 			menuItem.onclick = ( ev: MouseEvent ) => openMenuItem( ev );
-			menuItem.ontouchend = ( ev: TouchEvent ) => openMenuItem( ev );
 			menuItem.onmouseenter = null;
 		} else {
 			menuItem.onmouseenter = ( ev ) => {
@@ -111,9 +117,9 @@ function handleUserEvents(
 				openMenuItem( ev );
 			};
 			menuItem.onclick = null;
-			menuItem.ontouchend = null;
 		}
 
+		// avoid focus out the menu on mobile devices
 		if ( isResponsive ) return;
 
 		menuItem.onmouseleave = ( ev: MouseEvent ) => {
@@ -143,6 +149,8 @@ function updateResponsiveMenu(
 	megamenu: HTMLElement,
 	menuItems: NodeListOf< HTMLElement >
 ) {
+	const originalState = megamenu.classList.contains( 'is-mobile' );
+
 	// check if current device is under the menu breakpoint
 	const breakpoint = Number( megamenu.dataset.responsiveBreakpoint );
 	const isResponsive = isMobile( breakpoint );
@@ -156,19 +164,23 @@ function updateResponsiveMenu(
 
 	// reset the dropdown position for each item
 	if ( isResponsive ) {
-		toggleResponsiveMenu( megamenu, hamburgerIconEl, false );
+		if ( originalState !== isResponsive ) {
+			toggleResponsiveMenu( megamenu, hamburgerIconEl, false );
 
-		Array.from( menuItems )
-			.map( ( menuItem ) =>
-				menuItem.querySelector( '.wp-block-megamenu-item__dropdown' )
-			)
-			.forEach( ( dropdown ) => {
-				setNewPosition( dropdown as HTMLElement, {
-					left: '',
-					width: '',
-					maxWidth: '',
+			Array.from( menuItems )
+				.map( ( menuItem ) =>
+					menuItem.querySelector(
+						'.wp-block-megamenu-item__dropdown'
+					)
+				)
+				.forEach( ( dropdown ) => {
+					setNewPosition( dropdown as HTMLElement, {
+						left: '',
+						width: '',
+						maxWidth: '',
+					} );
 				} );
-			} );
+		}
 	}
 }
 
@@ -271,8 +283,16 @@ function initResponsiveMenu( megamenu: HTMLElement ) {
 
 	hamburgerIconEl.onclick = () =>
 		toggleResponsiveMenu( megamenu, hamburgerIconEl );
-	hamburgerIconEl.ontouchend = () =>
-		toggleResponsiveMenu( megamenu, hamburgerIconEl );
+}
+
+function getInteractiveItems(
+	menuItems: NodeListOf< HTMLElement >,
+	megamenu: HTMLElement
+): NodeListOf< HTMLElement > {
+	if ( megamenu && megamenu.classList.contains( 'is-mobile' ) ) {
+		return megamenu.querySelectorAll( '.has-children' );
+	}
+	return menuItems;
 }
 
 /**
@@ -287,6 +307,8 @@ function initMegamenu( megamenu: HTMLElement ) {
 	// Return immediately if the  megamenu has no content.
 	if ( ! megamenu.childNodes.length ) return;
 
+	let interactiveItems;
+
 	// The megamenu has items, collect the menu items that need to be interactive.
 	const menuItems: NodeListOf< HTMLElement > = megamenu.querySelectorAll(
 		'.wp-block-megamenu-item.has-children'
@@ -295,9 +317,11 @@ function initMegamenu( megamenu: HTMLElement ) {
 	// Attach the window/responsive related events to the megamenu
 	updateResponsiveMenu( megamenu, menuItems );
 
+	interactiveItems = getInteractiveItems( menuItems, megamenu );
+
 	// Attach the events to the menu items.
 	handleUserEvents(
-		menuItems,
+		interactiveItems,
 		megamenu.classList.contains( 'activator-click' ) ||
 			megamenu.classList.contains( 'is-mobile' )
 			? 'click'
@@ -315,9 +339,11 @@ function initMegamenu( megamenu: HTMLElement ) {
 		updateResponsiveMenu( megamenu, menuItems );
 		updateDropdownsPosition( megamenu, menuItems );
 
+		interactiveItems = getInteractiveItems( menuItems, megamenu );
+
 		// Attach the events to the menu items.
 		handleUserEvents(
-			menuItems,
+			interactiveItems,
 			megamenu.classList.contains( 'activator-click' ) ||
 				megamenu.classList.contains( 'is-mobile' )
 				? 'click'
