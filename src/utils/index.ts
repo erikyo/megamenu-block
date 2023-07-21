@@ -53,6 +53,10 @@ export function setNewPosition(
 	el.style.maxWidth = `${ style.maxWidth }px`;
 }
 
+export function removeStyles( el: HTMLElement, stylesToRemove: string[] ) {
+	stylesToRemove.forEach( ( style ) => el.style.removeProperty( style ) );
+}
+
 /**
  * The function checks if the current viewport width is less than a specified breakpoint to determine
  * if the device is a mobile device.

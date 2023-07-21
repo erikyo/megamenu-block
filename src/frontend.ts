@@ -4,6 +4,7 @@ import {
 	delay,
 	disableBodyScroll,
 	isMobile,
+	removeStyles,
 	setNewPosition,
 } from './utils';
 import { TIMEOUT } from './utils/constants';
@@ -17,7 +18,7 @@ import { TIMEOUT } from './utils/constants';
  */
 function openMenuItem( event: MouseEvent | TouchEvent ) {
 	// the event target could be the clicked item or the menu item
-	let target = event.target as HTMLElement;
+	const target = event.target as HTMLElement;
 
 	if ( target.parentElement?.classList.contains( 'menu-item-link' ) ) {
 		return;
@@ -26,7 +27,7 @@ function openMenuItem( event: MouseEvent | TouchEvent ) {
 	event.preventDefault();
 	event.stopImmediatePropagation();
 
-	console.log(target.parentElement)
+	console.log( target.parentElement );
 
 	// the menu item, in case of root menu item fallbacks to wp-block-megamenu-item
 	const menuItem = target.classList.contains( 'has-children' )
@@ -63,6 +64,32 @@ function closeLastChildren( megamenu: HTMLElement ): void {
 		const lastOpenedItem = openedItems[ openedItems.length - 1 ];
 		lastOpenedItem.classList.remove( 'is-opened' );
 	}
+}
+
+/**
+ * The function initializes a responsive menu by adding a click event listener to a hamburger icon
+ * element, which toggles the visibility of the mega menu element.
+ *
+ * @param {HTMLElement} megamenu - The `megamenu` parameter is an HTML element that represents the main
+ *                               menu container.
+ */
+function initResponsiveMenu( megamenu: HTMLElement ) {
+	// the hamburger icon
+	const hamburgerIconEl: HTMLElement | null =
+		megamenu.nextElementSibling as HTMLElement;
+
+	hamburgerIconEl.onclick = () =>
+		toggleResponsiveMenu( megamenu, hamburgerIconEl );
+}
+
+function getInteractiveItems(
+	menuItems: NodeListOf< HTMLElement >,
+	megamenu: HTMLElement
+): NodeListOf< HTMLElement > {
+	if ( megamenu && megamenu.classList.contains( 'is-mobile' ) ) {
+		return megamenu.querySelectorAll( '.has-children' );
+	}
+	return menuItems;
 }
 
 /**
@@ -167,19 +194,15 @@ function updateResponsiveMenu(
 		if ( originalState !== isResponsive ) {
 			toggleResponsiveMenu( megamenu, hamburgerIconEl, false );
 
-			Array.from( menuItems )
+			Array.from( menuItems as NodeListOf< HTMLElement > )
 				.map( ( menuItem ) =>
 					menuItem.querySelector(
 						'.wp-block-megamenu-item__dropdown'
 					)
 				)
-				.forEach( ( dropdown ) => {
-					setNewPosition( dropdown as HTMLElement, {
-						left: '',
-						width: '',
-						maxWidth: '',
-					} );
-				} );
+				.forEach( ( dropdown ) =>
+					removeStyles( dropdown, [ 'left', 'width', 'maxWidth' ] )
+				);
 		}
 	}
 }
@@ -267,32 +290,6 @@ function showMenuToggleButton(
 			megamenu.classList.remove( 'is-mobile', 'is-opened' );
 		}
 	}
-}
-
-/**
- * The function initializes a responsive menu by adding a click event listener to a hamburger icon
- * element, which toggles the visibility of the mega menu element.
- *
- * @param {HTMLElement} megamenu - The `megamenu` parameter is an HTML element that represents the main
- *                               menu container.
- */
-function initResponsiveMenu( megamenu: HTMLElement ) {
-	// the hamburger icon
-	const hamburgerIconEl: HTMLElement | null =
-		megamenu.nextElementSibling as HTMLElement;
-
-	hamburgerIconEl.onclick = () =>
-		toggleResponsiveMenu( megamenu, hamburgerIconEl );
-}
-
-function getInteractiveItems(
-	menuItems: NodeListOf< HTMLElement >,
-	megamenu: HTMLElement
-): NodeListOf< HTMLElement > {
-	if ( megamenu && megamenu.classList.contains( 'is-mobile' ) ) {
-		return megamenu.querySelectorAll( '.has-children' );
-	}
-	return menuItems;
 }
 
 /**
