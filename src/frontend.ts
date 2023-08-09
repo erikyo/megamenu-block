@@ -27,8 +27,6 @@ function openMenuItem( event: MouseEvent | TouchEvent ) {
 	event.preventDefault();
 	event.stopImmediatePropagation();
 
-	console.log( target.parentElement );
-
 	// the menu item, in case of root menu item fallbacks to wp-block-megamenu-item
 	const menuItem = target.classList.contains( 'has-children' )
 		? target
@@ -331,6 +329,9 @@ function initMegamenu( megamenu: HTMLElement ) {
 
 	// Update the position of the dropdowns based on the width of the parent menu.
 	updateDropdownsPosition( megamenu, menuItems );
+
+	// finally, add the "is-active" class to the megamenu container
+	megamenu.classList.add( 'is-initialized' );
 
 	window.addEventListener( 'resize', () => {
 		updateResponsiveMenu( megamenu, menuItems );

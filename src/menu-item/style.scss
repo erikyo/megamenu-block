@@ -1,5 +1,16 @@
 .wp-block-megamenu {
 
+	.show-on.mobile {
+		display: none;
+	}
+
+	&.is-mobile {
+
+		.show-on.mobile {
+			display: block;
+		}
+	}
+
 	.wp-block-megamenu-item {
 
 		&.has-child {
@@ -135,7 +146,7 @@
 			box-shadow: inherit;
 
 			.wp-block-megamenu-menu {
-				width: calc(100vw - var(--megamenu--hamburger-width) * 2.5);
+				width: calc(100vw - var(--megamenu--hamburger-width) * 1.8);
 				position: absolute;
 				top: 0;
 				left: 0;
@@ -150,12 +161,13 @@
 		.wp-block-megamenu-item__dropdown {
 			pointer-events: none;
 			z-index: 1006;
-			width: calc(100vw - var(--megamenu--hamburger-width) * 2.5);
+			width: calc(100vw - var(--megamenu--hamburger-width) * 1.8);
 			max-width: 100%;
 			overflow: visible;
 			opacity: 0;
 			transform: translateX(-100%);
 			background: var(--megamenu--background-color, #fff);
+			transition: 350ms transform, 100ms opacity;
 		}
 
 		// the megamenu is opened
@@ -173,6 +185,7 @@
 
 		// the megamenu item is opened
 		.is-opened {
+
 			> .wp-block-megamenu-item__dropdown {
 				transform: translateX(0);
 				opacity: 1;
@@ -181,6 +194,7 @@
 		}
 
 		.vsge-product-categories .vsge-product-categories-list-item.has-children.is-opened {
+
 			> .vsge-product-categories-list--depth-1 {
 				transform: translateX(0);
 				opacity: 1;
