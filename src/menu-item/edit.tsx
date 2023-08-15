@@ -26,7 +26,7 @@ type DropDownCoords =
  *
  * @param props
  */
-export function MenuItemEdit( props ) {
+function Edit( props ) {
 	const {
 		attributes,
 		setAttributes,
@@ -48,6 +48,15 @@ export function MenuItemEdit( props ) {
 	// the menu item ref
 	const menuItemRef = useRef< HTMLDivElement >( null );
 	const dropdownRef = useRef< HTMLDivElement >( null );
+
+	// Enhanced withDispatch function
+	const enhancedUpdateInnerBlocks = () => {
+		const block = createBlock('core/group', {
+			className: 'dropdown-inner',
+			layout: { type: 'constrained' },
+		});
+		props.dispatch(blockEditorStore).insertBlock(block, undefined, props.clientId);
+	};
 
 	const [ showDropdown, setShowDropdown ] = useState( false );
 
@@ -98,11 +107,13 @@ export function MenuItemEdit( props ) {
 	};
 
 	useEffect( () => {
-		updateDropdownPosition();
-		setParentAttributes();
-		setShowDropdown(
-			( isSelected || isParentOfSelectedBlock ) && menuItemHasChildrens
-		);
+		if (isSelected === true)	{
+			updateDropdownPosition();
+			setParentAttributes();
+			setShowDropdown(
+				( isSelected === true || isParentOfSelectedBlock === true ) && menuItemHasChildrens
+			);
+		}
 	}, [ isSelected ] );
 
 	useEffect( () => {
@@ -185,7 +196,7 @@ export function MenuItemEdit( props ) {
 	);
 }
 
-export default compose( [
+const InnerEdit = compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
 			hasSelectedInnerBlock,
@@ -226,4 +237,6 @@ export default compose( [
 			},
 		};
 	} ),
-] as any )( MenuItemEdit );
+] as any )( Edit );
+
+export default InnerEdit;
