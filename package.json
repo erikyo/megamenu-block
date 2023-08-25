@@ -12,16 +12,14 @@
     "@wordpress/data": "^9.9.0",
     "@wordpress/element": "^5.16.0",
     "@wordpress/i18n": "^4.39.0",
-    "@wordpress/scripts": "^26.10.0"
+    "@wordpress/scripts": "^26.10.0",
+    "classnames": "^2.3.2"
   },
   "scripts": {
     "start": "wp-scripts start",
     "build": "wp-scripts build",
     "format:js": "wp-scripts format-js",
     "lint:js": "wp-scripts lint-js"
-  },
-  "dependencies": {
-    "classnames": "^2.3.2"
   },
   "browserslist": [
     "extends @wordpress/browserslist-config"

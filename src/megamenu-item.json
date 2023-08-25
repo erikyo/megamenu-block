@@ -1,4 +1,6 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
 	"name": "megamenu/menu-item",
 	"title": "Menu Item",
 	"category": "layout",
@@ -31,7 +33,7 @@
 			"type": "string"
 		},
 		"parentAttributes": {
-			"type": "Object",
+			"type": "object",
 			"default": {}
 		},
 		"showDropdown": {
