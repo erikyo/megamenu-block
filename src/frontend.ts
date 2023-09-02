@@ -231,9 +231,11 @@ function updateDropdownsPosition(
 		);
 
 		if ( dropdown ) {
-			// The fullwidth dropdown
-			if ( megamenu.classList.contains( 'has-full-width-dropdown' ) ) {
-				delay( 200 ).then( () => {
+			delay( 400 ).then( () => {
+				// The fullwidth dropdown
+				if (
+					megamenu.classList.contains( 'has-full-width-dropdown' )
+				) {
 					dropdown.style.left = '0';
 					setNewPosition(
 						dropdown,
@@ -243,19 +245,19 @@ function updateDropdownsPosition(
 							document.body.clientWidth
 						)
 					);
-				} );
-			} else {
-				// the custom width dropdown
-				const dropdownRect = dropdown.getBoundingClientRect();
-				setNewPosition(
-					dropdown,
-					calcNewPosition(
-						megamenuRect,
-						dropdownRect,
-						dropdownMaxWidth
-					)
-				);
-			}
+				} else {
+					// the custom width dropdown
+					const dropdownRect = dropdown.getBoundingClientRect();
+					setNewPosition(
+						dropdown,
+						calcNewPosition(
+							megamenuRect,
+							dropdownRect,
+							dropdownMaxWidth
+						)
+					);
+				}
+			} );
 		}
 	} );
 }
