@@ -34,9 +34,11 @@ export default function save( { attributes } ): JSX.Element {
 					'wp-block-megamenu__toggle-wrapper',
 					'is-hidden'
 				) }
-				aria-label="Toggle megamenu"
 			>
-				<button className="wp-block-megamenu__toggle hamburger">
+				<button
+					className="wp-block-megamenu__toggle hamburger"
+					aria-label="Toggle megamenu"
+				>
 					<div></div>
 				</button>
 			</div>
