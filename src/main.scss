@@ -3,7 +3,7 @@
  */
 header {
 	--megamenu--hamburger-width: 42px;
-	--megamenu--responsive--internal-padding: calc(var(--megamenu--hamburger-width) * 2) var(--megamenu--hamburger-width);
+	--megamenu--responsive--internal-padding: var(--megamenu--hamburger-width) calc(var(--megamenu--hamburger-width) * 0.5);
 }
 
 .wp-block-megamenu {

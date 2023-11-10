@@ -1,3 +1,8 @@
+$mq__tablet-portrait: "(max-width : 768px)";
+$mq__smallphone: "(max-width : 376px)";
+$mq__smaller-than-tablet: "(max-width : 1023px)";
+$mq__responsive_breakpoint: $mq__smaller-than-tablet;
+
 .wp-block-megamenu {
 
 	.show-on.mobile {
@@ -91,6 +96,19 @@
 		}
 	}
 
+	.wp-block-megamenu-subitem {
+		overflow-y: auto;
+		box-sizing: border-box;
+		max-width: 100%;
+		padding: 4px 0;
+		line-height: 48px;
+		width: 100%;
+		margin: 0;
+		break-inside: avoid;
+		text-overflow: ellipsis;
+		text-align: center;
+	}
+
 	/**
 	 * The menu in desktop mode
 	 */
@@ -146,6 +164,7 @@
 			box-shadow: inherit;
 
 			.wp-block-megamenu-menu {
+				overflow-y: scroll;
 				width: calc(100vw - var(--megamenu--hamburger-width) * 1.8);
 				position: absolute;
 				top: 0;
@@ -215,6 +234,7 @@
 			height: 100%;
 			align-content: space-between;
 			flex-direction: column;
+			flex-wrap: nowrap;
 		}
 
 		.wp-block-megamenu-item {
