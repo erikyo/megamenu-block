@@ -313,7 +313,7 @@ export default class MegaMenu {
 
 				if ( dropdown ) {
 					dropdown.style.left = '0';
-					dropdown.style.maxWidth = null;
+					dropdown.style.removeProperty( 'max-width' );
 				}
 			} );
 			return;
