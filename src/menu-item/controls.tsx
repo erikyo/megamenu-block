@@ -17,7 +17,7 @@ import {
 /**
  * WordPress dependencies
  */
-const { escape } = lodash;
+import { escape } from 'lodash';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
