@@ -69,7 +69,7 @@ export function removeStyles( el: HTMLElement, stylesToRemove: string[] ) {
  * breakpoint.
  */
 export function isMobile( breakpoint: number ): boolean {
-	return document.body.clientWidth < breakpoint;
+	return breakpoint !== 0 && document.body.clientWidth < breakpoint;
 }
 
 /**
