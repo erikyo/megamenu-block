@@ -104,3 +104,24 @@ export function disableBodyScroll( scrollDisabled = false ) {
 		document.body.removeAttribute( 'data-scroll-top' );
 	}
 }
+
+/**
+ * Converts the characters "&", "<", ">", '"', and "'" in a string to their corresponding HTML entities.
+ *
+ * @param inputString The string to be converted.
+ * @return The converted string with special characters replaced by HTML entities.
+ */
+export function escapeHtml( inputString: string ): string {
+	const htmlEntities: Record< string, string > = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&apos;',
+	};
+
+	// Regular expression to match any of the special characters
+	const regex = /[&<>"']/g;
+
+	return inputString.replace( regex, ( match ) => htmlEntities[ match ] );
+}
