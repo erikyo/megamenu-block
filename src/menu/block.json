@@ -1,11 +1,20 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
     "name": "megamenu/menu",
     "title": "Mega Menu",
     "category": "layout",
 	"icon": "menu",
-    "attributes": {
+	"allowedBlocks": [
+		"megamenu/menu-item",
+		"codekraft/oh-my-svg",
+		"core/group",
+		"core/heading",
+		"core/paragraph",
+		"core/site-logo",
+		"core/social-link"
+	],
+	"attributes": {
 		"align": {
 			"type": "string",
 			"default": "center"
@@ -33,7 +42,11 @@
         "responsiveBreakpoint": {
             "type": "number",
             "default": 1023
-        }
+        },
+		"expandDropdown": {
+			"type": "boolean",
+			"default": true
+		}
 	},
 	"supports": {
 		"align": true,
@@ -79,7 +92,7 @@
 		"lightBlockWrapper": false
 	},
 	"editorScript": "file:./index.js",
-	"style": "file:./style-index.css",
-	"editorStyle": "file:./style-editor.css",
-	"script": "file:./view.js"
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-view.css",
+	"viewScript": "file:./view.js"
 }
