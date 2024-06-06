@@ -32,8 +32,10 @@ export function Controls( {
 	setAttributes,
 	attributes,
 	showResponsiveMenu,
-	setShowResponsiveMenu,
+	setShowResponsiveMenu
 }: {
+	showResponsiveMenu: boolean;
+	setShowResponsiveMenu: Function;
 	setAttributes: Function;
 	attributes: {
 		menusMinWidth: number;
@@ -44,15 +46,16 @@ export function Controls( {
 		dropdownMaxWidth: number;
 		align: string;
 	};
-	showResponsiveMenu: boolean;
-	setShowResponsiveMenu: Function;
 } ): JSX.Element {
-	function expandDropdown( doExpand ) {
-		setAttributes( {
-			dropdownMaxWidth: doExpand ? 2000 : 0,
-		} );
-	}
-
+	const {
+		menusMinWidth,
+		activator,
+		expandDropdown,
+		collapseOnMobile,
+		responsiveBreakpoint,
+		dropdownMaxWidth,
+		align,
+	} = attributes;
 	function setAlignment( newValue: string ) {
 		setAttributes( {
 			align: newValue,
@@ -67,21 +70,21 @@ export function Controls( {
 						icon={ alignLeft }
 						label="Left"
 						title={ __( 'Justify items left' ) }
-						isActive={ 'left' === attributes.align }
+						isActive={ 'left' === align }
 						onClick={ () => setAlignment( 'left' ) }
 					/>
 					<ToolbarButton
 						icon={ alignCenter }
 						label="Center"
 						title={ __( 'Justify items center' ) }
-						isActive={ 'center' === attributes.align }
+						isActive={ 'center' === align }
 						onClick={ () => setAlignment( 'center' ) }
 					/>
 					<ToolbarButton
 						icon={ alignRight }
 						label="Right"
 						title={ __( 'Justify items right' ) }
-						isActive={ 'right' === attributes.align }
+						isActive={ 'right' === align }
 						onClick={ () => setAlignment( 'right' ) }
 					/>
 				</Toolbar>
@@ -94,21 +97,25 @@ export function Controls( {
 					<ToggleControl
 						label={ __( 'Expand dropdown' ) }
 						help={
-							attributes.dropdownMaxWidth === 0
+							expandDropdown
 								? __( 'Dropdown width same as window width.' )
 								: __( 'Dropdown width same as menu width.' )
 						}
-						checked={ attributes.dropdownMaxWidth === 0 }
-						onChange={ ( checked ) => expandDropdown( ! checked ) }
+						checked={ expandDropdown }
+						onChange={ ( value ) =>
+							setAttributes( {
+								expandDropdown: value,
+							} )
+						}
 					/>
-					{ attributes.dropdownMaxWidth !== 0 && (
+					{ dropdownMaxWidth !== 0 && (
 						<RangeControl
 							label={ __(
 								'Maximum width of dropdown in pixels'
 							) }
-							value={ attributes.dropdownMaxWidth }
-							onChange={ ( dropdownMaxWidth ) =>
-								setAttributes( { dropdownMaxWidth } )
+							value={ dropdownMaxWidth }
+							onChange={ ( newWidth ) =>
+								setAttributes( { newWidth } )
 							}
 							min={ 0 }
 							max={ 2000 }
@@ -116,7 +123,7 @@ export function Controls( {
 					) }
 					<SelectControl
 						label={ __( 'Activator' ) }
-						value={ attributes.activator }
+						value={ activator }
 						options={ [
 							{ label: __( 'Click' ), value: 'click' },
 							{ label: __( 'Hover' ), value: 'hover' },
@@ -133,7 +140,7 @@ export function Controls( {
 				>
 					<RangeControl
 						label={ __( 'Minimum Width' ) }
-						value={ attributes.menusMinWidth }
+						value={ menusMinWidth }
 						onChange={ ( value ) =>
 							setAttributes( { menusMinWidth: value } )
 						}
@@ -147,7 +154,7 @@ export function Controls( {
 				>
 					<RangeControl
 						label={ __( 'Mobile device breakpoint in pixels' ) }
-						value={ attributes.responsiveBreakpoint }
+						value={ responsiveBreakpoint }
 						onChange={ ( responsiveBreakpoint ) =>
 							setAttributes( { responsiveBreakpoint } )
 						}
@@ -157,11 +164,11 @@ export function Controls( {
 					<ToggleControl
 						label={ __( 'Collapse on mobile?' ) }
 						help={
-							attributes.collapseOnMobile
+							collapseOnMobile
 								? __( 'Menu will be transformed to burger.' )
 								: __( 'Menu will be as it is.' )
 						}
-						checked={ attributes.collapseOnMobile }
+						checked={ collapseOnMobile }
 						onChange={ ( collapseOnMobile ) =>
 							setAttributes( { collapseOnMobile } )
 						}
@@ -183,22 +190,3 @@ export function Controls( {
 		</>
 	);
 }
-
-export default compose( [
-	withDispatch( ( dispatch, ownProps, registry ) => ( {
-		updateChildBlocksAttributes( attributes ) {
-			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
-			const { getBlocksByClientId } =
-				registry.select( 'core/block-editor' );
-
-			const menuItems = getBlocksByClientId( ownProps.clientId )[ 0 ]
-				.innerBlocks;
-
-			menuItems.forEach( ( menuItem ) => {
-				updateBlockAttributes( menuItem.clientId, {
-					...attributes,
-				} );
-			} );
-		},
-	} ) ),
-] as any )( Controls );
