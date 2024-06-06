@@ -246,19 +246,3 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 		}
 	}
 }
-
-/**
- * Fix: hide the submenu until the menu is full initialized
- */
-.wp-block-megamenu {
-	&.is-initialized {
-		.wp-block-megamenu-item__dropdown,
-		.show-on.mobile{
-			display: block;
-		}
-	}
-	.wp-block-megamenu-item__dropdown,
-	.show-on.mobile {
-		display: none;
-	}
-}
