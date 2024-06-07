@@ -1,20 +1,8 @@
-import { useCallback, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import {
-	BlockControls,
-	InspectorControls,
-	__experimentalLinkControl as LinkControl,
-} from '@wordpress/block-editor';
-import {
-	PanelBody,
-	Popover,
-	TextControl,
-	ToggleControl,
-	Toolbar,
-	ToolbarButton,
-	ToolbarGroup,
-} from '@wordpress/components';
-import { escapeHtml } from '../utils';
+import {useCallback, useState} from '@wordpress/element';
+import {__} from '@wordpress/i18n';
+import {__experimentalLinkControl as LinkControl, BlockControls, InspectorControls,} from '@wordpress/block-editor';
+import {PanelBody, Popover, TextControl, ToggleControl, Toolbar, ToolbarButton,} from '@wordpress/components';
+import {escapeHtml} from '../utils';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
@@ -41,7 +29,7 @@ function Controls( props ) {
 	};
 
 	const onToggleOpenInNewTab = useCallback(
-		( value: boolean ) => {
+		( value ) => {
 			const newLinkTarget = value ? '_blank' : undefined;
 
 			let updatedRel = rel;
@@ -60,7 +48,7 @@ function Controls( props ) {
 	);
 
 	const onSetLinkRel = useCallback(
-		( value: string ) => {
+		( value ) => {
 			setAttributes( { rel: value } );
 		},
 		[ setAttributes ]
@@ -82,16 +70,12 @@ function Controls( props ) {
 						onClick={ unlinkItem }
 						isDisabled={ ! isURLSet }
 					/>
-					{ ! hasDescendants && (
-						<ToolbarGroup>
-							<ToolbarButton
-								icon={ 'download' }
-								className={ hasDescendants ? 'is-active' : '' }
-								title={ __( 'Add submenu' ) }
-								onClick={ toggleItemDropdown }
-							/>
-						</ToolbarGroup>
-					) }
+					<ToolbarButton
+						icon={ 'download' }
+						disabled={ hasDescendants }
+						title={ __( 'Add submenu' ) }
+						onClick={ toggleItemDropdown }
+					/>
 				</Toolbar>
 			</BlockControls>
 			{ isURLPickerOpen && (
