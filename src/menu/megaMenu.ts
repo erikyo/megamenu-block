@@ -10,10 +10,10 @@ import { TIMEOUT } from '../utils/constants';
 
 export default class MegaMenu {
 	private megamenu: HTMLElement;
-	private menuItems: NodeListOf< Element >;
+	private readonly menuItems: NodeListOf< Element >;
 	private interactiveItems: NodeListOf< Element >;
 	public hamburgerIconEl: HTMLElement;
-	private originalState: boolean;
+	private readonly originalState: boolean;
 	public breakpoint: number;
 	private isResponsive: boolean;
 	private currentLevel: number;
@@ -39,9 +39,10 @@ export default class MegaMenu {
 		);
 
 		// Update the position of the dropdowns based on the width of the parent menu.
-		this.updateDropdownsPosition();
-
-		this.interactiveItems = this.getInteractiveItems();
+		this.interactiveItems = [];
+		this.updateDropdownsPosition().then( () => {
+			this.interactiveItems = this.getInteractiveItems();
+		} );
 
 		// Add event listeners
 		window.addEventListener( 'DOMContentLoaded', this.init.bind( this ) );
