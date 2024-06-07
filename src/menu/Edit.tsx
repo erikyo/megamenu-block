@@ -12,8 +12,6 @@ import { Button } from '@wordpress/components';
 import type { BlockAttributes } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { MegaMenuAttributes, TEMPLATE } from './constants';
-import { withInstanceId } from '@wordpress/compose';
-import useInstanceId from '@wordpress/compose/src/hooks/use-instance-id';
 
 /**
  * The `MegaMenu` edit component.
@@ -45,40 +43,45 @@ export default function Edit( args: {
 		setAttributes,
 	} = args;
 
-	useSelect( ( select, {} ) => {
-		const {
-			getClientIdsOfDescendants,
-			hasSelectedInnerBlock,
-			getSelectedBlockClientId,
-			getBlocksByClientId,
-		}: {
-			withInstanceId: string;
-			getClientIdsOfDescendants: Function;
-			hasSelectedInnerBlock: Function;
-			getSelectedBlockClientId: Function;
-			getBlocksByClientId: Function;
-			getBlock: Function;
-		} = select( 'core/block-editor' );
-		const clientId = args.clientId;
-		// Returns true if one of the block’s inner blocks is selected.
-		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
-			clientId,
-			false
-		);
-		const selectedBlockId = getSelectedBlockClientId();
-		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
-			selectedBlockId,
-		] )?.length;
-		const menuItems = getBlocksByClientId( clientId )[ 0 ].innerBlocks;
-
-		return {
-			isImmediateParentOfSelectedBlock,
-			selectedBlockHasDescendants,
-			menuItems,
-		};
-	}, [] );
-
+	/**
+	 * Will display the responsive menu if true
+	 */
 	const [ showResponsiveMenu, setShowResponsiveMenu ] = useState( false );
+
+	useSelect(
+		( select, {} ) => {
+			const {
+				getClientIdsOfDescendants,
+				hasSelectedInnerBlock,
+				getSelectedBlockClientId,
+				getBlocksByClientId,
+			}: {
+				withInstanceId: string;
+				getClientIdsOfDescendants: Function;
+				hasSelectedInnerBlock: Function;
+				getSelectedBlockClientId: Function;
+				getBlocksByClientId: Function;
+				getBlock: Function;
+			} = select( 'core/block-editor' );
+			// Returns true if one of the block’s inner blocks is selected.
+			const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
+				clientId,
+				false
+			);
+			const selectedBlockId = getSelectedBlockClientId();
+			const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
+				selectedBlockId,
+			] )?.length;
+			const menuItems = getBlocksByClientId( clientId )[ 0 ].innerBlocks;
+
+			return {
+				isImmediateParentOfSelectedBlock,
+				selectedBlockHasDescendants,
+				menuItems,
+			};
+		},
+		[ clientId ]
+	);
 
 	return (
 		<div>
