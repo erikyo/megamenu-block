@@ -4,7 +4,7 @@
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 import classnames from 'classnames';
 
-export default function save( {
+export default function Save( {
 	attributes,
 }: {
 	attributes: {
@@ -15,29 +15,26 @@ export default function save( {
 		dropdownMaxWidth: number;
 	};
 } ): JSX.Element {
-	const saveBlockProps = useBlockProps.save( {
-		className: classnames( 'wp-block-megamenu__content' ),
-	} );
-
 	return (
 		<>
 			<nav
-				className={ classnames(
-					'wp-block-megamenu',
-					`activator-${ attributes.activator }`,
-					{
-						[ `has-full-width-dropdown` ]:
-							attributes.expandDropdown ||
-							attributes.dropdownMaxWidth === 0,
-						[ `is-collapsible` ]: attributes.collapseOnMobile,
-					}
-				) }
+				{ ...useBlockProps.save( {
+					className: classnames(
+						'wp-block-megamenu__content',
+						'wp-block-megamenu',
+						`activator-${ attributes.activator }`,
+						{
+							[ `has-full-width-dropdown` ]:
+								attributes.expandDropdown ||
+								attributes.dropdownMaxWidth === 0,
+							[ `is-collapsible` ]: attributes.collapseOnMobile,
+						}
+					),
+				} ) }
 				data-responsive-breakpoint={ attributes.responsiveBreakpoint }
 				data-dropdown-width={ attributes.dropdownMaxWidth }
 			>
-				<div { ...saveBlockProps }>
-					<InnerBlocks.Content />
-				</div>
+				<InnerBlocks.Content />
 			</nav>
 			<div
 				className={ classnames(
