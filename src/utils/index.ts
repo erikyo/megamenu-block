@@ -1,35 +1,87 @@
+import { DropDownCoords } from '../menu-item/constants';
+
 /**
  * The `calcNewPosition` function calculates the left position, width, and maxWidth of a dropdown menu
  * based on the position and width of the root block node and a maximum width value.
  *
- * @param {{ x: number; width: number } | DOMRect} rootBlockNode           An object that represents the root
- *                                                                         block node. It has two properties: "x" which represents the x-coordinate of the root block node, and
- *                                                                         "width" which represents the width of the root block node.
- * @param {{ x: number } | DOMRect}                blockNode               The `blockNode` parameter represents the position and
- *                                                                         dimensions of a specific block element. It has a property `x` which represents the horizontal
- *                                                                         position of the block.
- * @param {number}                                 [dropdownMaxWidth=2000] The `dropdownMaxWidth` parameter is the maximum width that
- *                                                                         the dropdown can have. If the width of the `rootBlockNode` is greater than `dropdownMaxWidth`, the
- *                                                                         dropdown will be centered within the `rootBlockNode` by adjusting the `left` value.
+ * @param {{ x: number; width: number } | DOMRect} rootBBox           An object that represents the root
+ *                                                                    block node. It has two properties: "x" which represents the x-coordinate of the root block node, and
+ *                                                                    "width" which represents the width of the root block node.
+ * @param {{ x: number } | DOMRect}                blockCoords        The `blockNode` parameter represents the position and
+ *                                                                    dimensions of a specific block element. It has a property `x` which represents the horizontal
+ *                                                                    position of the block.
+ * @param                                          dropdownEl
+ * @param                                          items
+ * @param                                          items.editorBBox
+ * @param {number}                                 [dropdownMaxWidth] The `dropdownMaxWidth` parameter is the maximum width that
+ *                                                                    the dropdown can have. If the width of the `rootBlockNode` is greater than `dropdownMaxWidth`, the
+ * @param                                          items.blockBBox
+ *                                                                    dropdown will be centered within the `rootBlockNode` by adjusting the `left` value.
+ * @param                                          fit
+ * @param                                          items.dropdownBBox
+ * @param                                          items.megamenuBBox
  * @return an object with three properties: "left", "width", and "maxWidth". The values of these
  * properties are converted to strings and are based on the calculations performed in the function.
  */
 export function calcNewPosition(
-	rootBlockNode: { x: number; width: number } | DOMRect,
-	blockNode: { x: number } | DOMRect,
-	dropdownMaxWidth: number = 2000
-): { left: string; width: string; maxWidth: string } {
-	let left = -( blockNode.x - rootBlockNode.x );
-
-	if ( dropdownMaxWidth && rootBlockNode.width > dropdownMaxWidth ) {
-		left = left + ( rootBlockNode.width - dropdownMaxWidth ) / 2;
+	items: {
+		editorBBox: DOMRect;
+		blockBBox: DOMRect;
+		dropdownBBox: DOMRect;
+		megamenuBBox: DOMRect;
+	},
+	dropdownMaxWidth?: number,
+	fit: boolean = true
+): DropDownCoords {
+	const { editorBBox, blockBBox, dropdownBBox, megamenuBBox } = items;
+	if ( fit ) {
+		// the distance from the left edge of the root block node to the left edge of the dropdown block node
+		return {
+			left: `${ ( blockBBox.x - editorBBox.x ) * -1 }px`,
+			width: `${ editorBBox.width }px`,
+			maxWidth: `${ editorBBox.width }px`,
+		};
 	}
 
+	// Center the dropdown
+	const blockCenter = blockBBox.x + blockBBox.width / 2;
+	const dropdownLeft = blockCenter - dropdownBBox.width / 2;
+
+	// Ensure the dropdown stays within the bounds of the editor
+	const clampedLeft = Math.max(
+		0,
+		Math.min( dropdownLeft, editorBBox.width - dropdownBBox.width )
+	);
+
 	return {
-		left: left.toString(),
-		width: rootBlockNode.width.toString(),
-		maxWidth: dropdownMaxWidth.toString(),
+		left: `${ clampedLeft }px`,
+		width: 'auto',
+		maxWidth: `${ editorBBox.width }px`,
 	};
+}
+
+/**
+ * Returns the lowest number in an array of numbers.
+ * It returns `undefined` if all numbers are `undefined` or `0`.
+ *
+ * @param args the args parameter is an array of numbers
+ * @return the lowest number in the array
+ */
+export function getLowestWidth(
+	...args: ( number | undefined )[]
+): number | undefined {
+	// Filter out undefined values
+	const filteredArgs = args.filter(
+		( num ): num is number => num !== undefined && num !== 0
+	);
+
+	// If all values were undefined, return undefined
+	if ( filteredArgs.length === 0 ) {
+		return undefined;
+	}
+
+	// Return the minimum value
+	return Math.min( ...filteredArgs );
 }
 
 /**
