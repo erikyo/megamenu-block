@@ -1,8 +1,11 @@
-import { BlockAttributes } from '@wordpress/blocks';
+import { InnerBlockTemplate, BlockAttributes } from '@wordpress/blocks';
 
-export type DropDownCoords =
-	| { left: number; width: number; maxWidth: number }
-	| DOMRect;
+export const TEMPLATE: InnerBlockTemplate = [
+	'core/group',
+	{ layout: { type: 'constrained' } },
+];
+
+export type DropDownCoords = { left: string; width: string; maxWidth: string };
 
 export interface MenuItemAttributes extends BlockAttributes {
 	text: string;
@@ -11,5 +14,9 @@ export interface MenuItemAttributes extends BlockAttributes {
 	id: number;
 	opensInNewTab: boolean;
 	dropdownWrapperStyle: string;
-	parentAttributes: string;
+	parentAttributes: {
+		hasDescendants: boolean;
+		menusMinWidth: string;
+		align: string;
+	};
 }

@@ -1,4 +1,5 @@
 import {
+	CheckboxControl,
 	PanelBody,
 	RangeControl,
 	SelectControl,
@@ -11,6 +12,8 @@ import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 import { alignLeft, alignCenter, alignRight } from '@wordpress/icons';
+import { MenuItemAttributes } from '../menu-item/constants';
+import { MegaMenuAttributes } from './constants';
 
 /**
  * The Megamenu editor controls
@@ -32,20 +35,12 @@ export function Controls( {
 	setAttributes,
 	attributes,
 	showResponsiveMenu,
-	setShowResponsiveMenu
+	setShowResponsiveMenu,
 }: {
 	showResponsiveMenu: boolean;
 	setShowResponsiveMenu: Function;
 	setAttributes: Function;
-	attributes: {
-		menusMinWidth: number;
-		activator: string;
-		expandDropdown: boolean;
-		collapseOnMobile: boolean;
-		responsiveBreakpoint: number;
-		dropdownMaxWidth: number;
-		align: string;
-	};
+	attributes: MegaMenuAttributes;
 } ): JSX.Element {
 	const {
 		menusMinWidth,
@@ -55,6 +50,7 @@ export function Controls( {
 		responsiveBreakpoint,
 		dropdownMaxWidth,
 		align,
+		dropdownSize,
 	} = attributes;
 	function setAlignment( newValue: string ) {
 		setAttributes( {

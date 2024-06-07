@@ -16,6 +16,7 @@ export const TEMPLATE = [
 		[ [ 'megamenu/menu-item', {} ] ],
 	],
 ] as Template[];
+
 export const ALLOWED_BLOCKS = [
 	'megamenu/menu-item',
 	'codekraft/oh-my-svg',
