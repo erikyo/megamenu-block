@@ -3,126 +3,177 @@
  */
 import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
-import Controls from './controls';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import Controls from './Controls';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	RichText,
-	InnerBlocks,
-	store as blockEditorStore, useBlockProps,
+	store as blockEditorStore,
+	useBlockProps,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { type BlockInstance, InnerBlockTemplate } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { Icon } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
-import { calcNewPosition } from '../utils';
-import { compose } from '@wordpress/compose';
-
-type DropDownCoords =
-	| { left: number; width: number; maxWidth: number }
-	| DOMRect;
+import { calcNewPosition, getLowestWidth } from '../utils';
+import type { DropDownCoords, MenuItemAttributes } from './constants';
 
 /**
  * Internal dependencies
  *
  * @param props
+ * @param props.attributes
+ * @param props.setAttributes
+ * @param props.isSelected
+ * @param props.onReplace
+ * @param props.mergeBlocks
+ * @param props.isParentOfSelectedBlock
+ * @param props.hasDescendants
+ * @param props.updateInnerBlocks
+ * @param props.rootBlockClientId
+ * @param props.parentAttributes
+ * @param props.dispatch
+ * @param props.clientId
  */
-function Edit( props ) {
+export default function Edit( props: {
+	attributes: MenuItemAttributes;
+	setAttributes: Function;
+	isSelected: boolean;
+	onReplace: ( blocks: BlockInstance< { [ k: string ]: any } >[] ) => void;
+	mergeBlocks: ( forward: boolean ) => void;
+	clientId: string;
+} ): JSX.Element {
 	const {
+		clientId,
 		attributes,
 		setAttributes,
 		isSelected,
 		onReplace,
 		mergeBlocks,
-		isParentOfSelectedBlock,
-		hasDescendants,
-		updateInnerBlocks,
-		rootBlockClientId,
-		parentAttributes,
 	} = props;
-
-	const { text, url, linkTarget, rel } = attributes;
-
-	// TODO: handle with effect
-	const menuItemHasChildrens = hasDescendants;
-
+	// the menu item anchor data
+	const { text, linkTarget, rel } = attributes;
 	const linkProps = {
 		...( linkTarget && { target: linkTarget } ),
 		...( rel && { rel } ),
 	};
 
+	const [ showDropdown, setShowDropdown ] = useState( false );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+
 	// the menu item ref
 	const menuItemRef = useRef< HTMLDivElement | null >( null );
 	const dropdownRef = useRef< HTMLDivElement | null >( null );
 
-	// Enhanced withDispatch function
-	const block = () => {
-		const newBlock = createBlock( 'core/group', {
-			className: 'dropdown-inner',
-			layout: { type: 'constrained' },
-		} );
-		props
-			.dispatch( blockEditorStore )
-			.insertBlock( newBlock, undefined, props.clientId );
+	const updateInnerBlocks = ( content: InnerBlockTemplate[] = [] ) => {
+		return replaceInnerBlocks( clientId, content, false );
 	};
 
-	const [ showDropdown, setShowDropdown ] = useState( false );
+	const {
+		isParentOfSelectedBlock,
+		hasDescendants,
+		parentAttributes,
+	}: {
+		isParentOfSelectedBlock: boolean;
+		hasDescendants: boolean;
+		parentAttributes: any;
+	} = useSelect( ( select, {} ) => {
+		const {
+			hasSelectedInnerBlock,
+			getBlockCount,
+			getBlockParentsByBlockName,
+			getBlock,
+		} = select( blockEditorStore ) as any;
+		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
+		const hasDescendants = !! getBlockCount( clientId );
+		const rootBlockClientId = getBlockParentsByBlockName( clientId, [
+			'megamenu/menu',
+		] )[ 0 ];
 
-	const [ dropdownPosition, setDropdownPosition ]: [ DropDownCoords, any ] =
-		useState( {
-			left: 0,
-			width: 0,
-			maxWidth: document.body.clientWidth,
-		} );
+		const parentBlock = getBlock( rootBlockClientId );
+		const parentAttributes = parentBlock.attributes;
+
+		return {
+			isParentOfSelectedBlock,
+			hasDescendants,
+			parentAttributes,
+		};
+	}, [] );
+
+	const [ dropdownPosition, setDropdownPosition ]: [
+		DropDownCoords,
+		Function,
+	] = useState( {
+		left: 0,
+		width: 0,
+		maxWidth: document.body.clientWidth,
+	} );
 
 	function setParentAttributes() {
 		setAttributes( {
 			parentAttributes: {
 				align: parentAttributes.align,
 				menusMinWidth: parentAttributes.menusMinWidth,
-				menuItemHasChildrens,
+				hasDescendants,
 			},
 		} );
 	}
 
 	const addMenuItemDropdown = () => {
-		updateInnerBlocks();
+		if ( ! hasDescendants ) {
+			// if there are no descendants, we can just replace the inner blocks
+			updateInnerBlocks();
+		}
 		// then open the dropdown
 		setShowDropdown( true );
 	};
 
-	const updateDropdownPosition = () => {
+	const updateDropdownPosition = useCallback( () => {
 		const megamenuItem = menuItemRef.current;
-		const megamenu = megamenuItem
-			?.closest( '[data-block="' + rootBlockClientId + '"]' )
-			?.querySelector( '.wp-block-megamenu' );
 
-		const rootBlockNode = megamenu?.ownerDocument.body;
+		const editorIframe: HTMLIFrameElement | null = document.querySelector(
+			'.edit-site-visual-editor__editor-canvas'
+		);
+		const editorEl = editorIframe?.contentWindow?.document?.body;
 
-		const blockCoords = megamenu?.getBoundingClientRect();
-		const rootCoords = rootBlockNode?.getBoundingClientRect();
+		/** The block editor sizes */
+		const megamenuBBox = (
+			megamenuItem?.closest( '.wp-block-megamenu' ) as HTMLDivElement
+		 )?.getBoundingClientRect();
+		const blockBBox = megamenuItem?.getBoundingClientRect() as DOMRect;
+		const dropdownEl = dropdownRef.current as HTMLDivElement;
 
-		if ( rootCoords && blockCoords ) {
-			const maxWidth =
-				parentAttributes.dropdownMaxWidth !== 0
-					? parentAttributes.dropdownMaxWidth
-					: rootCoords.width;
+		/* will return the size we can fit the dropdown in */
+		const maxWidth = getLowestWidth(
+			editorEl?.clientWidth,
+			parentAttributes.dropdownMaxWidth
+		);
 
-			setDropdownPosition(
-				calcNewPosition( rootCoords, blockCoords, maxWidth )
-			);
-		}
-	};
+		const newPosition = calcNewPosition(
+			{
+				editorBBox: editorEl?.getBoundingClientRect() as DOMRect,
+				dropdownBBox: dropdownEl?.getBoundingClientRect(),
+				blockBBox,
+				megamenuBBox,
+			},
+			maxWidth,
+			parentAttributes.expandDropdown
+		);
+
+		setDropdownPosition( newPosition );
+	}, [] );
 
 	useEffect( () => {
-		if ( isSelected === true ) {
+		if ( isSelected || isParentOfSelectedBlock ) {
 			updateDropdownPosition();
 			setParentAttributes();
 			setShowDropdown(
-				( isSelected === true || isParentOfSelectedBlock === true ) &&
-					menuItemHasChildrens
+				( isSelected || isParentOfSelectedBlock ) && hasDescendants
 			);
+			return;
 		}
-	}, [ isSelected ] );
+		setShowDropdown( false );
+	}, [ isSelected, isParentOfSelectedBlock ] );
 
 	useEffect( () => {
 		const blockNode: HTMLElement | null = menuItemRef.current;
@@ -135,116 +186,67 @@ function Edit( props ) {
 		}
 	}, [] );
 
-	const blockProps = useBlockProps( );
+	const blockProps = useBlockProps();
+	const innerBlockProps = useInnerBlocksProps( {
+		className: 'wp-block-megamenu-item__dropdown',
+		style: {
+			left: ( dropdownPosition?.left || 0 ) + 'px',
+			width:
+				( dropdownPosition?.width || document.body.clientWidth ) + 'px',
+			maxWidth:
+				( dropdownPosition?.maxWidth || document.body.clientWidth ) +
+				'px',
+		},
+		ref: dropdownRef,
+	} );
 
 	return (
-		<>
-			<div
-				className={ classnames( 'wp-block-megamenu-item', {
-					'has-children': menuItemHasChildrens,
-					'is-opened': showDropdown,
-				} ) }
-				ref={ menuItemRef }
+		<div
+			ref={ menuItemRef }
+			className={ classnames( 'wp-block-megamenu-item', {
+				'has-children': hasDescendants,
+				'is-opened': showDropdown,
+			} ) }
+		>
+			<Controls toggleItemDropdown={ addMenuItemDropdown } { ...props } />
+			<a
+				{ ...linkProps }
+				className={ 'wp-block-megamenu-item__link' }
+				style={ {
+					minWidth: parentAttributes.menusMinWidth
+						? parentAttributes.menusMinWidth + 'px'
+						: 'auto',
+					justifyContent: parentAttributes.align
+						? parentAttributes.align
+						: 'left',
+				} }
 			>
-				<a
-					{ ...linkProps }
-					className={ 'wp-block-megamenu-item__link' }
-					style={ {
-						minWidth: parentAttributes.menusMinWidth
-							? parentAttributes.menusMinWidth + 'px'
-							: 'auto',
-						justifyContent: parentAttributes.align
-							? parentAttributes.align
-							: 'left',
-					} }
-				>
-					<span className={ 'wp-block-megamenu-item__text' }>
-						<RichText
-							placeholder={ __( 'Add a menu item' ) }
-							value={ text }
-							onChange={ ( value ) =>
-								setAttributes( { text: value } )
-							}
-							{ ...blockProps }
-							onReplace={ onReplace }
-							onMerge={ mergeBlocks }
-							identifier="content"
-							tagName="span"
-							withoutInteractiveFormatting
-							preserveWhiteSpace
-						/>
-					</span>
-					{ menuItemHasChildrens ? (
-						<Icon
-							icon={ chevronDown }
-							className="wp-block-megamenu-item__toggle"
-							aria-hidden="true"
-							style={ {
-								fill: 'currentColor',
-							} }
-						/>
-					) : null }
-				</a>
-				<div
-					ref={ dropdownRef }
-					className={ 'wp-block-megamenu-item__dropdown' }
-					style={ {
-						left: ( dropdownPosition?.left || 0 ) + 'px',
-						width:
-							( dropdownPosition?.width ||
-								document.body.clientWidth ) + 'px',
-						maxWidth:
-							( dropdownPosition?.maxWidth ||
-								document.body.clientWidth ) + 'px',
-					} }
-				>
-					<InnerBlocks />
-				</div>
-			</div>
-			<Controls
-				{ ...props }
-				toggleItemDropdown={ addMenuItemDropdown }
-				hasDescendants={ menuItemHasChildrens }
-			/>
-		</>
+				<span className={ 'wp-block-megamenu-item__text' }>
+					<RichText
+						{ ...blockProps }
+						placeholder={ __( 'Add a menu item' ) }
+						value={ text }
+						onChange={ ( value ) =>
+							setAttributes( { text: value } )
+						}
+						onReplace={ onReplace }
+						onMerge={ mergeBlocks }
+						identifier="content"
+						tagName="span"
+					/>
+				</span>
+				{ hasDescendants ? (
+					<Icon
+						icon={ chevronDown }
+						className="wp-block-megamenu-item__toggle"
+						aria-hidden="true"
+						style={ {
+							fill: 'currentColor',
+						} }
+					/>
+				) : null }
+			</a>
+			{ showDropdown && <div { ...innerBlockProps } /> }
+		</div>
 	);
 }
-
-export default compose( [
-	withSelect( ( select, ownProps ) => {
-		const {
-			hasSelectedInnerBlock,
-			getBlockCount,
-			getBlockParentsByBlockName,
-			getBlock,
-		} = select( blockEditorStore );
-		const { clientId } = ownProps;
-		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
-		const hasDescendants = !! getBlockCount( clientId );
-		const rootBlockClientId = getBlockParentsByBlockName(
-			clientId,
-			'megamenu/menu'
-		)[ 0 ];
-
-		const parentBlock = getBlock( rootBlockClientId );
-		const parentAttributes = parentBlock.attributes;
-
-		return {
-			isParentOfSelectedBlock,
-			hasDescendants,
-			rootBlockClientId,
-			parentAttributes,
-		};
-	} ),
-	withDispatch( ( dispatch, { clientId } ) => {
-		return {
-			updateInnerBlocks() {
-				dispatch( 'core/block-editor' ).replaceInnerBlocks(
-					clientId,
-					[],
-					false
-				);
-			},
-		};
-	} ),
-] as any )( Edit );
