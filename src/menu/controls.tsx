@@ -16,20 +16,18 @@ import { MenuItemAttributes } from '../menu-item/constants';
 import { MegaMenuAttributes } from './constants';
 
 /**
- * The Megamenu editor controls
+ * Renders the controls for the MegaMenu block.
  *
- * @param args
- * @param args.setAttributes
- * @param args.attributes
- * @param args.showResponsiveMenu
- * @param args.setShowResponsiveMenu
- * @param args.attributes.menusMinWidth
- * @param args.attributes.activator
- * @param args.attributes.expandDropdown
- * @param args.attributes.collapseOnMobile
- * @param args.attributes.responsiveBreakpoint
- * @param args.attributes.dropdownMaxWidth
- * @param args.attributes.align
+ * @param {Object} props                       - The props object containing the following properties:
+ *                                             - setAttributes: A function to set the attributes of the block.
+ *                                             - attributes: The attributes of the block.
+ *                                             - showResponsiveMenu: A boolean indicating whether the responsive menu toggle is shown.
+ *                                             - setShowResponsiveMenu: A function to toggle the visibility of the responsive menu toggle.
+ * @param          props.showResponsiveMenu
+ * @param          props.setShowResponsiveMenu
+ * @param          props.setAttributes
+ * @param          props.attributes
+ * @return {JSX.Element} The rendered controls.
  */
 export function Controls( {
 	setAttributes,
@@ -50,7 +48,6 @@ export function Controls( {
 		responsiveBreakpoint,
 		dropdownMaxWidth,
 		align,
-		dropdownSize,
 	} = attributes;
 	function setAlignment( newValue: string ) {
 		setAttributes( {
@@ -151,8 +148,8 @@ export function Controls( {
 					<RangeControl
 						label={ __( 'Mobile device breakpoint in pixels' ) }
 						value={ responsiveBreakpoint }
-						onChange={ ( responsiveBreakpoint ) =>
-							setAttributes( { responsiveBreakpoint } )
+						onChange={ ( newValue ) =>
+							setAttributes( { newValue } )
 						}
 						min={ 0 }
 						max={ 2000 }
@@ -165,9 +162,7 @@ export function Controls( {
 								: __( 'Menu will be as it is.' )
 						}
 						checked={ collapseOnMobile }
-						onChange={ ( collapseOnMobile ) =>
-							setAttributes( { collapseOnMobile } )
-						}
+						onChange={ ( val ) => setAttributes( { val } ) }
 					/>
 					<ToggleControl
 						label={ __( 'Show responsive Toggle' ) }

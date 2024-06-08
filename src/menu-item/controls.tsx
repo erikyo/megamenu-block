@@ -1,16 +1,26 @@
-import {useCallback, useState} from '@wordpress/element';
-import {__} from '@wordpress/i18n';
-import {__experimentalLinkControl as LinkControl, BlockControls, InspectorControls,} from '@wordpress/block-editor';
-import {PanelBody, Popover, TextControl, ToggleControl, Toolbar, ToolbarButton,} from '@wordpress/components';
-import {escapeHtml} from '../utils';
+import { useCallback, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import {
+	__experimentalLinkControl as LinkControl,
+	BlockControls,
+	InspectorControls,
+} from '@wordpress/block-editor';
+import {
+	PanelBody,
+	Popover,
+	TextControl,
+	ToggleControl,
+	Toolbar,
+	ToolbarButton,
+} from '@wordpress/components';
+import { escapeHtml } from '../utils';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
 function Controls( props ) {
-	const { attributes, setAttributes, toggleItemDropdown, hasDescendants } =
-		props;
+	const { attributes, setAttributes, toggleItemDropdown } = props;
 
-	const { linkTarget, rel, text, url } = attributes;
+	const { linkTarget, rel, text, url, hasDescendants } = attributes;
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 
 	const isURLSet = ! ( url === undefined || url.trim().length === 0 );
