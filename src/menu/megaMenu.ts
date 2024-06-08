@@ -342,6 +342,7 @@ export default class MegaMenu {
 	 */
 	async updateDropdownsPosition() {
 		const breakpoint = Number( this.megamenu.dataset.responsiveBreakpoint );
+
 		if ( isMobile( breakpoint ) ) {
 			this.menuItems.forEach( ( menuItem ) => {
 				const dropdown = menuItem.querySelector(
@@ -355,9 +356,9 @@ export default class MegaMenu {
 			return;
 		}
 
-		const megamenuRect = this.megamenu.getBoundingClientRect();
-		const dropdownMaxWidth =
-			Number( this.megamenu.dataset.dropdownWidth ) || 0;
+		const megamenu = this.megamenu;
+		const megamenuRect = megamenu.getBoundingClientRect();
+		const dropdownMaxWidth = Number( megamenu.dataset.dropdownWidth ) || 0;
 
 		for ( const menuItem of this.menuItems ) {
 			const dropdown: HTMLElement | null = menuItem.querySelector(
@@ -368,31 +369,34 @@ export default class MegaMenu {
 				continue;
 			}
 
-			await delay( 310 );
+			const MegaMenuData = {
+				blockBBox: menuItem.getBoundingClientRect(),
+				dropdownBBox: dropdown?.getBoundingClientRect(),
+				megamenuBBox: megamenuRect,
+			};
 
 			if (
 				this.megamenu.classList.contains( 'has-full-width-dropdown' )
 			) {
-				( dropdown as HTMLElement ).style.cssText = 'left: 0;';
+				dropdown.style.cssText = 'left: 0; right: 0;';
 				setNewPosition(
 					dropdown,
-					calcNewPosition(
-						{ width: document.body.clientWidth, x: 0 },
-						dropdown.getBoundingClientRect(),
-						document.body.clientWidth
-					)
+					calcNewPosition( MegaMenuData, dropdownMaxWidth || 0, true )
 				);
 			} else {
-				const dropdownRect = dropdown.getBoundingClientRect();
 				setNewPosition(
 					dropdown,
 					calcNewPosition(
-						megamenuRect,
-						dropdownRect,
-						dropdownMaxWidth
+						MegaMenuData,
+						dropdownMaxWidth || 0,
+						this.megamenu.classList.contains(
+							'has-full-width-dropdown'
+						)
 					)
 				);
 			}
+
+			await delay( 310 );
 		}
 	}
 
