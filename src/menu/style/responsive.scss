@@ -1,0 +1,133 @@
+
+.wp-block-megamenu:not(.is-mobile) {
+	.wp-block-megamenu-item {
+		.wp-block-megamenu-item__dropdown {
+			max-height: var(--full-height);
+			// lower the padding whenever the screen in a small screen
+			@media screen and (max-height: 820px) {
+				& > .wp-block-group {
+					padding-top: var(--wp--preset--spacing--60) !important;
+					padding-bottom: var(--wp--preset--spacing--60) !important;
+
+					li {
+						font-size: 95%;
+						line-height: 1.7;
+					}
+
+					ul {
+						margin: 0 0 var(--wp--preset--spacing--60);
+					}
+				}
+			}
+		}
+	}
+}
+
+/**
+ * The mobile style for the category plugin @vsge-importer
+ *
+ * TODO: make this more generic
+ */
+.wp-block-megamenu.is-mobile {
+	.vsge-product-categories-list-item__name {
+		font-weight: var(--typography--font--default--regular);
+	}
+
+	.alignwide {
+		max-width: 100%;
+		max-height: 100%;
+	}
+
+	.wp-block-megamenu-item {
+		li.vsge-product-categories-list-item a {
+			width: 100%;
+			text-align: left;
+			display: block;
+		}
+
+		.wp-block-megamenu-item__dropdown {
+			.wp-block-woocommerce-product-categories {
+				width: 100%;
+			}
+
+			// the category icons are in position x -60px
+			.vsge-product-categories-list {
+				overflow-y: auto;
+				padding-left: 96px;
+				padding-right: 24px;
+				box-sizing: border-box;
+
+				li {
+					box-sizing: border-box;
+					max-width: 100%;
+					padding: 4px 0;
+					line-height: 48px;
+
+					li {
+						padding-left: 36px;
+					}
+				}
+
+				@media #{$mq__responsive_breakpoint} {
+					overflow-x: visible;
+					padding-left: 64px;
+				}
+
+				@media #{$mq__tablet-portrait} {
+					.vsge-product-categories-list-item__image {
+						display: flex;
+						height: 48px;
+						width: 48px;
+						justify-content: center;
+						align-items: center;
+
+						img {
+							object-fit: contain;
+							width: 30px !important;
+							height: 30px !important;
+						}
+					}
+				}
+
+				@media #{$mq__smallphone} {
+					padding-left: 24px;
+
+					li li {
+						padding-left: 0;
+					}
+
+					.vsge-product-categories-list-item__image {
+						align-items: center;
+						display: none;
+					}
+				}
+
+				&.vsge-product-categories-list--depth-1 {
+					position: absolute;
+					z-index: 1007;
+					top: 0;
+					left: 0;
+					bottom: 0;
+					opacity: 0;
+					height: 100vh;
+					width: calc(100vw - var(--megamenu--hamburger-width) * 2.5);
+					max-width: inherit;
+					box-sizing: border-box;
+
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					flex-direction: column;
+
+					text-align: center;
+					padding: 0 24px;
+
+					transition:
+						350ms transform ease-out,
+						100ms opacity;
+					pointer-events: none;
+				}
+			}
+		}
+	}
+}
