@@ -14,6 +14,11 @@
 		"core/site-logo",
 		"core/social-link"
 	],
+	"providesContext": {
+		"megamenu/align": "align",
+		"megamenu/menusMinWidth": "menusMinWidth",
+		"megamenu/expandDropdown": "expandDropdown"
+	},
 	"attributes": {
 		"align": {
 			"type": "string",
