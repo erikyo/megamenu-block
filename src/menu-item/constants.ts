@@ -1,11 +1,29 @@
 import { InnerBlockTemplate, BlockAttributes } from '@wordpress/blocks';
 
-export const TEMPLATE: InnerBlockTemplate = [
-	'core/group',
-	{ layout: { type: 'constrained' } },
+export const TEMPLATE: InnerBlockTemplate[] = [
+	[
+		'core/group',
+		{
+			layout: { type: 'constrained', tags: 'nav' },
+			className: 'wp-block-megamenu-item',
+			children: [],
+		},
+	],
 ];
 
-export type DropDownCoords = { left: string; width: string; maxWidth: string };
+export type DropDownCoords = {
+	left?: string;
+	right?: string;
+	width?: string;
+	maxWidth?: string;
+	minHeight?: string;
+};
+
+export type ParentAttributes = {
+	align: string;
+	menusMinWidth: number;
+	expandDropdown: boolean;
+};
 
 export interface MenuItemAttributes extends BlockAttributes {
 	text: string;
@@ -14,9 +32,10 @@ export interface MenuItemAttributes extends BlockAttributes {
 	id: number;
 	opensInNewTab: boolean;
 	dropdownWrapperStyle: string;
+	hasDescendants: boolean;
 	parentAttributes: {
-		hasDescendants: boolean;
 		menusMinWidth: string;
+		expandDropdown: boolean;
 		align: string;
 	};
 }

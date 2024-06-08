@@ -1,7 +1,7 @@
 /**
  * Style for the editor
  */
-import { BlockAttributes, Template } from '@wordpress/blocks';
+import type { BlockAttributes, Template } from '@wordpress/blocks';
 
 export const TEMPLATE = [
 	[
