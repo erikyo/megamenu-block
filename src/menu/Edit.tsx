@@ -16,14 +16,18 @@ import { MegaMenuAttributes, TEMPLATE } from './constants';
 /**
  * The `MegaMenu` edit component.
  * @param args
- * @param args.selectedBlockHasDescendants
  * @param args.isImmediateParentOfSelectedBlock
  * @param args.isSelected
  * @param args.attributes
  * @param args.setAttributes
  * @param args.clientId
+ * @param props
+ * @param props.isSelected
+ * @param props.attributes
+ * @param props.setAttributes
+ * @param props.clientId
  */
-export default function Edit( args: {
+export default function Edit( props: {
 	isSelected: boolean;
 	attributes: MegaMenuAttributes;
 	setAttributes: ( attributes: BlockAttributes ) => void;
@@ -41,7 +45,7 @@ export default function Edit( args: {
 		},
 		isSelected: boolean,
 		setAttributes,
-	} = args;
+	} = props;
 
 	/**
 	 * Will display the responsive menu if true
@@ -88,7 +92,7 @@ export default function Edit( args: {
 			<Controls
 				showResponsiveMenu={ showResponsiveMenu }
 				setShowResponsiveMenu={ setShowResponsiveMenu }
-				attributes={ args.attributes }
+				attributes={ props.attributes }
 				setAttributes={ setAttributes }
 			/>
 			<nav
