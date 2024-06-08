@@ -1,64 +1,8 @@
-import { DropDownCoords } from '../menu-item/constants';
-
-/**
- * The `calcNewPosition` function calculates the left position, width, and maxWidth of a dropdown menu
- * based on the position and width of the root block node and a maximum width value.
- *
- * @param {{ x: number; width: number } | DOMRect} rootBBox           An object that represents the root
- *                                                                    block node. It has two properties: "x" which represents the x-coordinate of the root block node, and
- *                                                                    "width" which represents the width of the root block node.
- * @param {{ x: number } | DOMRect}                blockCoords        The `blockNode` parameter represents the position and
- *                                                                    dimensions of a specific block element. It has a property `x` which represents the horizontal
- *                                                                    position of the block.
- * @param                                          dropdownEl
- * @param                                          items
- * @param                                          items.editorBBox
- * @param {number}                                 [dropdownMaxWidth] The `dropdownMaxWidth` parameter is the maximum width that
- *                                                                    the dropdown can have. If the width of the `rootBlockNode` is greater than `dropdownMaxWidth`, the
- * @param                                          items.blockBBox
- *                                                                    dropdown will be centered within the `rootBlockNode` by adjusting the `left` value.
- * @param                                          fit
- * @param                                          items.dropdownBBox
- * @param                                          items.megamenuBBox
- * @return an object with three properties: "left", "width", and "maxWidth". The values of these
- * properties are converted to strings and are based on the calculations performed in the function.
- */
-export function calcNewPosition(
-	items: {
-		editorBBox: DOMRect;
-		blockBBox: DOMRect;
-		dropdownBBox: DOMRect;
-		megamenuBBox: DOMRect;
-	},
-	dropdownMaxWidth?: number,
-	fit: boolean = true
-): DropDownCoords {
-	const { editorBBox, blockBBox, dropdownBBox, megamenuBBox } = items;
-	if ( fit ) {
-		// the distance from the left edge of the root block node to the left edge of the dropdown block node
-		return {
-			left: `${ ( blockBBox.x - editorBBox.x ) * -1 }px`,
-			width: `${ editorBBox.width }px`,
-			maxWidth: `${ editorBBox.width }px`,
-		};
-	}
-
-	// Center the dropdown
-	const blockCenter = blockBBox.x + blockBBox.width / 2;
-	const dropdownLeft = blockCenter - dropdownBBox.width / 2;
-
-	// Ensure the dropdown stays within the bounds of the editor
-	const clampedLeft = Math.max(
-		0,
-		Math.min( dropdownLeft, editorBBox.width - dropdownBBox.width )
-	);
-
-	return {
-		left: `${ clampedLeft }px`,
-		width: 'auto',
-		maxWidth: `${ editorBBox.width }px`,
-	};
-}
+import {
+	DropDownCoords,
+	type MenuItemAttributes,
+} from '../menu-item/constants';
+import { MegaMenuAttributes } from '../menu/constants';
 
 /**
  * Returns the lowest number in an array of numbers.
@@ -96,13 +40,11 @@ export function getLowestWidth(
  * @param               style.width
  * @param               style.maxWidth
  */
-export function setNewPosition(
-	el: HTMLElement,
-	style: { left: string; width: string; maxWidth: string }
-) {
-	el.style.left = `${ style.left }px`;
-	el.style.width = `${ style.width }px`;
-	el.style.maxWidth = `${ style.maxWidth }px`;
+export function setNewPosition( el: HTMLElement, style: DropDownCoords ) {
+	el.style.left = `${ style?.left }px`;
+	el.style.right = `${ style?.right }px`;
+	el.style.width = `${ style?.width }px`;
+	el.style.maxWidth = `${ style?.maxWidth }px`;
 }
 
 export function removeStyles( el: HTMLElement, stylesToRemove: string[] ) {
@@ -176,4 +118,119 @@ export function escapeHtml( inputString: string ): string {
 	const regex = /[&<>"']/g;
 
 	return inputString.replace( regex, ( match ) => htmlEntities[ match ] );
+}
+
+/**
+ * The `calcNewPosition` function calculates the left position, width, and maxWidth of a dropdown menu
+ * based on the position and width of the root block node and a maximum width value.
+ *
+ * @param {{ x: number; width: number } | DOMRect} rootBBox           An object that represents the root
+ *                                                                    block node. It has two properties: "x" which represents the x-coordinate of the root block node, and
+ *                                                                    "width" which represents the width of the root block node.
+ * @param {{ x: number } | DOMRect}                blockCoords        The `blockNode` parameter represents the position and
+ *                                                                    dimensions of a specific block element. It has a property `x` which represents the horizontal
+ *                                                                    position of the block.
+ * @param                                          dropdownEl
+ * @param                                          items
+ * @param                                          items.editorBBox
+ * @param {number}                                 [dropdownMaxWidth] The `dropdownMaxWidth` parameter is the maximum width that
+ *                                                                    the dropdown can have. If the width of the `rootBlockNode` is greater than `dropdownMaxWidth`, the
+ * @param                                          items.blockBBox
+ *                                                                    dropdown will be centered within the `rootBlockNode` by adjusting the `left` value.
+ * @param                                          fit
+ * @param                                          items.dropdownBBox
+ * @param                                          items.megamenuBBox
+ * @return an object with three properties: "left", "width", and "maxWidth". The values of these
+ * properties are converted to strings and are based on the calculations performed in the function.
+ */
+export function calcNewPosition(
+	items: {
+		blockBBox: DOMRect;
+		dropdownBBox: DOMRect;
+		megamenuBBox: DOMRect;
+	},
+	dropdownMaxWidth: number,
+	fit: boolean = true
+): DropDownCoords {
+	/**
+	 * TO FIT the dropdown inside megamenu we need only left: 0; right: 0; width 100%
+	 */
+	const { blockBBox, dropdownBBox, megamenuBBox } = items;
+
+	if ( fit ) {
+		// the distance from the left edge of the root block node to the left edge of the dropdown block node
+		return {
+			left: `${ megamenuBBox.x * -1 }px`,
+			width: `${ dropdownMaxWidth }px`,
+			maxWidth: `${ dropdownMaxWidth }px`,
+		};
+	}
+
+	const center = blockBBox.width / 2 - dropdownBBox.width / 2;
+	const margins = {
+		left: dropdownMaxWidth - megamenuBBox.left,
+		right: dropdownMaxWidth - megamenuBBox.right,
+	};
+	console.log( center, 'margins', margins );
+
+	if ( dropdownBBox.right > dropdownMaxWidth ) {
+		return {
+			right: `-${ margins.right }px`,
+			maxWidth: `${ dropdownMaxWidth }px`,
+		};
+	}
+	if ( dropdownBBox.left < 0 ) {
+		return {
+			left: `-${ margins.left }px`,
+			maxWidth: `${ dropdownMaxWidth }px`,
+		};
+	}
+
+	return {
+		left: `-${ center }px`,
+		maxWidth: `${ dropdownMaxWidth }px`,
+	};
+}
+
+/**
+ * Calculates the position of a dropdown menu based on the position and size of a megamenu item and its parent attributes.
+ *
+ * @param {HTMLElement}        megamenuItem                      - The megamenu item element.
+ * @param {HTMLDivElement}     dropdown                          - The dropdown element.
+ * @param {MenuItemAttributes} parentAttributes                  - The attributes of the parent menu item.
+ * @param                      parentAttributes.dropdownMaxWidth
+ * @param                      parentAttributes.expandDropdown
+ * @return {DropDownCoords} The calculated position of the dropdown menu.
+ */
+export function calcPosition(
+	megamenuItem: HTMLElement,
+	dropdown?: HTMLElement,
+	parentAttributes?: {
+		expandDropdown: boolean;
+	}
+): DropDownCoords {
+	const { expandDropdown } = parentAttributes ?? {
+		expandDropdown: false,
+	};
+
+	const editorIframe: HTMLIFrameElement | null = document.querySelector(
+		'.edit-site-visual-editor__editor-canvas'
+	);
+	const editorEl = editorIframe?.contentWindow?.document?.body;
+	const dropdownEl = dropdown ?? megamenuItem.closest( '.wp-block-megamenu' );
+
+	const items = {
+		blockBBox: megamenuItem?.getBoundingClientRect() as DOMRect,
+		dropdownBBox: dropdownEl?.getBoundingClientRect() as DOMRect,
+		megamenuBBox: (
+			megamenuItem?.closest( '.wp-block-megamenu' ) as HTMLDivElement
+		 )?.getBoundingClientRect(),
+	};
+
+	return calcNewPosition(
+		items,
+		editorEl?.clientWidth ??
+			( editorEl?.getBoundingClientRect()?.width as number ),
+		expandDropdown
+	);
 }
