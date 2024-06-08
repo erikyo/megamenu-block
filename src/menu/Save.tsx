@@ -3,18 +3,20 @@
  */
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 import classnames from 'classnames';
+import { MegaMenuAttributes } from './constants';
 
 export default function Save( {
 	attributes,
 }: {
-	attributes: {
-		activator: string;
-		expandDropdown: boolean;
-		collapseOnMobile: boolean;
-		responsiveBreakpoint: number;
-		dropdownMaxWidth: number;
-	};
+	attributes: MegaMenuAttributes;
 } ): JSX.Element {
+	const {
+		activator,
+		expandDropdown,
+		collapseOnMobile,
+		responsiveBreakpoint,
+		dropdownMaxWidth,
+	} = attributes;
 	return (
 		<>
 			<nav
@@ -22,17 +24,15 @@ export default function Save( {
 					className: classnames(
 						'wp-block-megamenu__content',
 						'wp-block-megamenu',
-						`activator-${ attributes.activator }`,
+						`activator-${ activator }`,
 						{
-							[ `has-full-width-dropdown` ]:
-								attributes.expandDropdown ||
-								attributes.dropdownMaxWidth === 0,
-							[ `is-collapsible` ]: attributes.collapseOnMobile,
+							[ `has-full-width-dropdown` ]: expandDropdown,
+							[ `is-collapsible` ]: collapseOnMobile,
 						}
 					),
 				} ) }
-				data-responsive-breakpoint={ attributes.responsiveBreakpoint }
-				data-dropdown-width={ attributes.dropdownMaxWidth }
+				data-responsive-breakpoint={ responsiveBreakpoint }
+				data-dropdown-width={ dropdownMaxWidth }
 			>
 				<InnerBlocks.Content />
 			</nav>
