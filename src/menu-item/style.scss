@@ -10,10 +10,15 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 	}
 
 	&.is-mobile {
+		position: relative;
 
 		.show-on.mobile {
 			display: block;
 		}
+	}
+
+	&.has-full-width-dropdown {
+		position: relative;
 	}
 
 	.wp-block-megamenu-item {
@@ -29,11 +34,11 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 			position: absolute;
 			z-index: 1001;
 			top: 100%;
-			left: 0;
-			right: 0;
 
 			overflow: hidden;
-			width: 100%;
+			min-width: 80px;
+			min-height: 60px;
+			max-width: 100%;
 
 			height: auto;
 			background: var(--wp--preset--color--white);
@@ -120,15 +125,15 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 				height: 0;
 				opacity: 0;
 				box-shadow: 0 8px 40px -30px rgba(0, 0, 0, 1);
-				transform: scale(0.99) translateY(-0.75em);
 				transform-origin: top;
-				transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+				transform: scale(0.99), translateY(-0.75em);
+				transition-delay: 0.03s;
 				transition-duration: 500ms;
 				transition-property: opacity, transform;
+				transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 			}
 
 			&.is-opened {
-
 				.wp-block-megamenu-item__dropdown {
 					height: auto;
 					transform: scale(1) translateY(0);
