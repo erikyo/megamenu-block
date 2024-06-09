@@ -1,53 +1,39 @@
 import {
 	calcNewPosition,
-	delay,
 	disableBodyScroll,
-	isMobile,
+	getLowestWidth,
 	removeStyles,
 	setNewPosition,
 } from '../utils';
 import { TIMEOUT } from '../utils/constants';
 
 export default class MegaMenu {
-	private megamenu: HTMLElement;
-	private readonly menuItems: NodeListOf< Element >;
-	private interactiveItems: NodeListOf< Element >;
-	public hamburgerIconEl: HTMLElement;
+	private readonly megamenu: HTMLElement;
+	private readonly interactiveItems: NodeListOf< HTMLElement >;
 	private readonly originalState: boolean;
-	public breakpoint: number;
+	private menuItems: NodeListOf< HTMLElement >;
+	public hamburgerIconEl: HTMLElement;
+	public breakpoint: number | undefined;
 	private isResponsive: boolean;
-	private currentLevel: number;
+	private activator: 'click' | 'hover' = 'hover';
+	private currentLevel: number = 0;
 
 	constructor( megamenu: HTMLElement ) {
 		this.megamenu = megamenu;
-		this.menuItems = this.megamenu.querySelectorAll(
-			'.wp-block-megamenu-item.has-children'
-		);
 
-		this.originalState = megamenu.classList.contains( 'is-mobile' );
-
-		// check if current device is under the menu breakpoint
-		this.breakpoint = Number( megamenu.dataset.responsiveBreakpoint );
-		this.isResponsive = isMobile( this.breakpoint );
-		this.currentLevel = 0;
+		this.originalState = this.megamenu.classList.contains( 'is-mobile' );
 
 		// The hamburger icon
 		this.hamburgerIconEl = this.megamenu?.nextElementSibling as HTMLElement;
+
+		// check if current device is under the menu breakpoint
+		this.updateBreakpoint();
+		this.isResponsive = this.isMobile() ?? false;
+
 		// The megamenu has items, collect the menu items that need to be interactive.
-		this.menuItems = this.megamenu.querySelectorAll(
-			'.wp-block-megamenu-item.has-children'
-		);
+		this.interactiveItems = this.getInteractiveItems();
 
-		// Update the position of the dropdowns based on the width of the parent menu.
-		this.interactiveItems = [];
-		this.updateDropdownsPosition().then( () => {
-			this.interactiveItems = this.getInteractiveItems();
-		} );
-
-		// Add event listeners
-		window.addEventListener( 'DOMContentLoaded', this.init.bind( this ) );
-
-		window.addEventListener( 'resize', this.resize.bind( this ) );
+		this.init();
 	}
 
 	/**
@@ -55,23 +41,23 @@ export default class MegaMenu {
 	 * and updating the position of dropdowns based on the width of the parent menu.
 	 */
 	init() {
-		// Return immediately if the  megamenu has no content.
+		// Update the position of the dropdowns based on the width of the parent menu.
+		this.updateDropdownsPosition();
+
+		// Add event listeners
+		window.addEventListener( 'DOMContentLoaded', this.init.bind( this ) );
+
+		window.addEventListener( 'resize', this.resize.bind( this ) );
+
+		// Returns immediately whenever the megamenu has no inner nodes.
 		if ( ! this.megamenu.childNodes.length ) {
 			return;
 		}
-
 		// Attach the window/responsive related events to the megamenu
 		this.updateResponsiveMenu();
 
 		// Attach the events to the menu items.
-		this.handleUserEvents(
-			this.getInteractiveItems(),
-			this.megamenu.classList.contains( 'activator-click' ) ||
-				this.megamenu.classList.contains( 'is-mobile' )
-				? 'click'
-				: 'hover',
-			this.megamenu.classList.contains( 'is-mobile' )
-		);
+		this.handleUserEvents();
 
 		/**
 		 * The function initializes a responsive menu by adding a click event listener to a hamburger icon
@@ -83,23 +69,56 @@ export default class MegaMenu {
 		this.megamenu.classList.add( 'is-initialized' );
 	}
 
+	/**
+	 * The function updates the activator based on the dataset attribute of the megamenu element.
+	 *
+	 * @param {string} activator The activator parameter is a string that represents the type of event that triggered
+	 */
+	updateActivator = ( activator?: 'click' | 'hover' ) => {
+		if ( activator ) {
+			this.activator = activator;
+			return;
+		}
+		this.activator =
+			this.megamenu.classList.contains( 'activator-click' ) ||
+			this.megamenu.classList.contains( 'is-mobile' )
+				? 'click'
+				: 'hover';
+	};
+
+	/**
+	 * The function updates the breakpoint based on the dataset attribute of the megamenu element.
+	 */
+	updateBreakpoint() {
+		this.breakpoint = Number( this.megamenu.dataset.responsiveBreakpoint );
+	}
+
+	/**
+	 * The function checks if the current viewport width is less than a specified breakpoint to determine
+	 * if the device is a mobile device.
+	 * @return A boolean value indicating whether the current viewport width is less than the specified
+	 * breakpoint.
+	 */
+	isMobile(): boolean {
+		return (
+			this.breakpoint !== undefined &&
+			this.breakpoint !== 0 &&
+			document.body.clientWidth < this.breakpoint
+		);
+	}
+
 	resize() {
 		// update the flag that holds if the current device is under the menu breakpoint
-		this.isResponsive = isMobile( this.breakpoint );
+		this.isResponsive = this.isMobile();
 
 		// update the responsive menu and dropdowns
 		this.updateResponsiveMenu();
 		this.updateDropdownsPosition();
+		this.menuItems = this.getInteractiveItems();
+		this.updateActivator();
 
 		// Attach the events to the menu items.
-		this.handleUserEvents(
-			this.getInteractiveItems(),
-			this.megamenu.classList.contains( 'activator-click' ) ||
-				this.megamenu.classList.contains( 'is-mobile' )
-				? 'click'
-				: 'hover',
-			this.megamenu.classList.contains( 'is-mobile' )
-		);
+		this.handleUserEvents();
 	}
 
 	/**
@@ -169,21 +188,13 @@ export default class MegaMenu {
 	/**
 	 * The function handles user events for menu items, such as click, touch, mouse enter, and mouse leave,
 	 * to open the corresponding menu item.
-	 *
-	 * @param menuItems
-	 * @param activator    - The activator parameter is a string that represents the type of event that triggered
-	 * @param isResponsive - A boolean value indicating whether the menu is responsive or not.
 	 */
-	handleUserEvents(
-		menuItems: NodeListOf< Element >,
-		activator: 'hover' | 'click' = 'hover',
-		isResponsive: boolean = false
-	) {
-		( menuItems as NodeListOf< HTMLElement > ).forEach( ( menuItem ) => {
+	handleUserEvents() {
+		this.menuItems.forEach( ( menuItem ) => {
 			let timeoutId: NodeJS.Timeout;
 
 			/* Handle click / hover */
-			if ( activator === 'click' ) {
+			if ( this.activator === 'click' ) {
 				menuItem.onclick = ( ev: MouseEvent ) =>
 					this.openMenuItem( ev );
 				menuItem.onmouseenter = null;
@@ -196,7 +207,7 @@ export default class MegaMenu {
 			}
 
 			/* Avoid focus out the menu on mobile devices */
-			if ( isResponsive ) {
+			if ( this.isResponsive ) {
 				return;
 			}
 
@@ -340,10 +351,8 @@ export default class MegaMenu {
 	 * The function sets the position and width of dropdown menus based on the width of the parent menu
 	 * element.
 	 */
-	async updateDropdownsPosition() {
-		const breakpoint = Number( this.megamenu.dataset.responsiveBreakpoint );
-
-		if ( isMobile( breakpoint ) ) {
+	updateDropdownsPosition() {
+		if ( this.isResponsive ) {
 			this.menuItems.forEach( ( menuItem ) => {
 				const dropdown = menuItem.querySelector(
 					'.wp-block-megamenu-item__dropdown'
@@ -359,10 +368,14 @@ export default class MegaMenu {
 		const megamenu = this.megamenu;
 		const megamenuRect = megamenu.getBoundingClientRect();
 		const dropdownMaxWidth = Number( megamenu.dataset.dropdownWidth ) || 0;
+		const bodySize = document.body.scrollWidth;
 
 		for ( const menuItem of this.menuItems ) {
 			const dropdown: HTMLElement | null = menuItem.querySelector(
 				'.wp-block-megamenu-item__dropdown'
+			);
+			const hasFullWidthDropdown = this.megamenu.classList.contains(
+				'has-full-width-dropdown'
 			);
 
 			if ( ! dropdown ) {
@@ -375,28 +388,18 @@ export default class MegaMenu {
 				megamenuBBox: megamenuRect,
 			};
 
-			if (
-				this.megamenu.classList.contains( 'has-full-width-dropdown' )
-			) {
+			if ( hasFullWidthDropdown ) {
 				dropdown.style.cssText = 'left: 0; right: 0;';
-				setNewPosition(
-					dropdown,
-					calcNewPosition( MegaMenuData, dropdownMaxWidth || 0, true )
-				);
-			} else {
-				setNewPosition(
-					dropdown,
-					calcNewPosition(
-						MegaMenuData,
-						dropdownMaxWidth || 0,
-						this.megamenu.classList.contains(
-							'has-full-width-dropdown'
-						)
-					)
-				);
 			}
 
-			await delay( 310 );
+			setNewPosition(
+				dropdown,
+				calcNewPosition(
+					MegaMenuData,
+					getLowestWidth( bodySize, dropdownMaxWidth ) || 0,
+					hasFullWidthDropdown
+				)
+			);
 		}
 	}
 
@@ -405,9 +408,12 @@ export default class MegaMenu {
 	 *
 	 * @return {NodeList} - The list of interactive items.
 	 */
-	getInteractiveItems(): NodeListOf< Element > {
-		return this.megamenu.classList.contains( 'is-mobile' )
+	getInteractiveItems(): NodeListOf< HTMLElement > {
+		const menuItems = this.megamenu.classList.contains( 'is-mobile' )
 			? this.megamenu.querySelectorAll( '.has-children' )
 			: this.menuItems;
+		return (
+			menuItems.length ? menuItems : []
+		) as NodeListOf< HTMLElement >;
 	}
 }
