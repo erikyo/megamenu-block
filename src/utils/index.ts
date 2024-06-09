@@ -1,8 +1,15 @@
-import {
-	DropDownCoords,
-	type MenuItemAttributes,
-} from '../menu-item/constants';
-import { MegaMenuAttributes } from '../menu/constants';
+import { DropDownCoords } from '../menu-item/constants';
+
+/**
+ * Generate a random id
+ * You can pass a prefix to generate a random id with a prefix
+ *
+ * @param prefix - The prefix to be added to the random id
+ * @return A random id
+ */
+export function generateRandomId( prefix: string ) {
+	return prefix + Math.random().toString( 36 ).substring( 2, 9 );
+}
 
 /**
  * Returns the lowest number in an array of numbers.
@@ -49,21 +56,6 @@ export function setNewPosition( el: HTMLElement, style: DropDownCoords ) {
 
 export function removeStyles( el: HTMLElement, stylesToRemove: string[] ) {
 	stylesToRemove.forEach( ( style ) => el.style.removeProperty( style ) );
-}
-
-/**
- * The function checks if the current viewport width is less than a specified breakpoint to determine
- * if the device is a mobile device.
- *
- * @param {number} breakpoint The `breakpoint` parameter is a number that represents the maximum
- *                            width of the viewport at which the device is considered to be a mobile device. If the width of the
- *                            viewport is less than the `breakpoint`, the function will return `true`, indicating that the device
- *                            is a mobile device. Otherwise
- * @return A boolean value indicating whether the current viewport width is less than the specified
- * breakpoint.
- */
-export function isMobile( breakpoint: number ): boolean {
-	return breakpoint !== 0 && document.body.clientWidth < breakpoint;
 }
 
 /**
