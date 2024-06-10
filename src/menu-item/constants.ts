@@ -8,9 +8,9 @@ export const TEMPLATE: InnerBlockTemplate[] = [
 	[
 		'core/group',
 		{
-			layout: { type: 'constrained', tags: 'nav' },
+			backgroundColor: 'background',
 			className: 'wp-block-megamenu-item',
-			children: [],
+			layout: { type: 'constrained' },
 		},
 	],
 ];

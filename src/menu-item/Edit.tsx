@@ -14,7 +14,6 @@ import {
 import {
 	type BlockInstance,
 	createBlocksFromInnerBlocksTemplate,
-	type InnerBlockTemplate,
 } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Icon } from '@wordpress/components';
@@ -84,7 +83,8 @@ export default function Edit( props: {
 	const dropdownRef = useRef< HTMLElement | null >( null );
 
 	const updateInnerBlocks = async ( content = TEMPLATE ) => {
-		return replaceInnerBlocks( clientId, [], false );
+		const innerBlocks = createBlocksFromInnerBlocksTemplate( content );
+		return replaceInnerBlocks( clientId, innerBlocks, false );
 	};
 
 	const {
