@@ -10,6 +10,7 @@ import { TIMEOUT } from '../utils/constants';
 export default class MegaMenu {
 	private readonly megamenu: HTMLElement;
 	private readonly originalState: boolean;
+	private readonly hasFullWidthDropdown: boolean;
 	private menuItems: NodeListOf<HTMLElement> | null = null;
 	public hamburgerIconEl: HTMLElement;
 	public breakpoint: number | undefined;
@@ -23,6 +24,10 @@ export default class MegaMenu {
 		/** eagerly detect support for mobile */
 		this.originalState = this.megamenu.classList.contains('is-mobile');
 
+		this.hasFullWidthDropdown = this.megamenu.classList.contains(
+			'has-full-width-dropdown'
+		);
+
 		/** The hamburger icon */
 		this.hamburgerIconEl = this.megamenu?.nextElementSibling as HTMLElement;
 
@@ -33,8 +38,6 @@ export default class MegaMenu {
 		// Add event listeners
 		window.addEventListener('DOMContentLoaded', this.init.bind(this));
 		window.addEventListener('resize', this.resize.bind(this));
-
-		this.init();
 	}
 
 	/**
@@ -189,17 +192,25 @@ export default class MegaMenu {
 	 * to open the corresponding menu item.
 	 */
 	handleUserEvents() {
-		this.menuItems?.forEach((menuItem) => {
+		if (!this.menuItems) {
+			return;
+		}
+		/** loop over all menu items and initialize the event listeners  */
+		for (const menuItem of this.menuItems) {
 			let timeoutId: NodeJS.Timeout;
 
 			/* Handle click / hover */
 			if (this.activator === 'click') {
-				menuItem.onclick = (ev: MouseEvent) => this.openMenuItem(ev);
-				menuItem.onmouseenter = null;
+				menuItem.onclick = (ev: MouseEvent) => {
+					ev.preventDefault();
+					ev.stopImmediatePropagation();
+					this.openMenuItem(ev.target as HTMLElement, 'click');
+					menuItem.onmouseenter = null;
+				};
 			} else {
 				menuItem.onmouseenter = (ev) => {
 					clearTimeout(timeoutId);
-					this.openMenuItem(ev);
+					this.openMenuItem(menuItem, 'mouseenter');
 				};
 				menuItem.onclick = null;
 			}
@@ -217,11 +228,14 @@ export default class MegaMenu {
 
 				timeoutId = setTimeout(() => {
 					if (target.classList.contains('is-left')) {
-						this.openMenuItem(ev);
+						this.openMenuItem(
+							ev.target as HTMLElement,
+							'mouseleave'
+						);
 					}
 				}, TIMEOUT);
 			};
-		});
+		}
 	}
 
 	/**
@@ -268,19 +282,16 @@ export default class MegaMenu {
 	 * The function `openMenuItem` is used to handle events such as click, mouseenter, and mouseleave to
 	 * open and close menu items.
 	 *
-	 * @param {MouseEvent | TouchEvent} event - The event parameter is of type MouseEvent or TouchEvent. It
-	 *                                        represents the event that triggered the function. It can be either a mouse event or a touch event.
+	 * @param {MouseEvent | TouchEvent} event  - The event parameter is of type MouseEvent or TouchEvent. It
+	 *                                         represents the event that triggered the function. It can be either a mouse event or a touch event.
+	 * @param                           target
+	 * @param                           action
 	 */
-	openMenuItem(event: MouseEvent | TouchEvent) {
+	openMenuItem(target: HTMLElement, action: string = 'open') {
 		// the event target could be the clicked item or the menu item
-		const target = event.target as HTMLElement;
-
 		if (target.parentElement?.classList.contains('menu-item-link')) {
 			return;
 		}
-
-		event.preventDefault();
-		event.stopImmediatePropagation();
 
 		// the menu item, in case of root menu item fallbacks to wp-block-megamenu-item
 		const menuItem: HTMLElement | null = target.classList.contains(
@@ -289,14 +300,22 @@ export default class MegaMenu {
 			? target
 			: target.closest('.has-children');
 
-		const toggleButton = document.querySelector(
-			'.wp-block-megamenu__toggle-wrapper'
-		) as HTMLButtonElement;
+		if (menuItem) {
+			this.updateDropdownPosition(
+				menuItem,
+				this.megamenu.getBoundingClientRect(),
+				this.megamenu.ownerDocument.body.scrollWidth
+			);
 
-		if (event.type === 'click' || event.type === 'mouseenter') {
-			this.openMenuItemHelper(menuItem, toggleButton);
-		} else if (event.type === 'mouseleave') {
-			this.closeMenuItemHelper(menuItem, toggleButton);
+			const toggleButton = document.querySelector(
+				'.wp-block-megamenu__toggle-wrapper'
+			) as HTMLButtonElement;
+
+			if (action === 'click' || action === 'mouseenter') {
+				this.openMenuItemHelper(menuItem, toggleButton);
+			} else if (action === 'mouseleave') {
+				this.closeMenuItemHelper(menuItem, toggleButton);
+			}
 		}
 	}
 
@@ -312,6 +331,7 @@ export default class MegaMenu {
 	) {
 		this.menuLevel(this.currentLevel + 1);
 
+		/* Close the remaining elements */
 		const parentElements =
 			menuItem?.parentElement?.querySelectorAll('.is-opened');
 		if (parentElements) {
@@ -350,6 +370,11 @@ export default class MegaMenu {
 	 * element.
 	 */
 	updateDropdownsPosition() {
+		// return if no menu items available
+		if (!this.menuItems) {
+			return;
+		}
+
 		if (this.isResponsive) {
 			this.menuItems?.forEach((menuItem) => {
 				const dropdown = menuItem.querySelector(
@@ -364,39 +389,44 @@ export default class MegaMenu {
 		}
 
 		const megamenu = this.megamenu;
-		const megamenuRect = megamenu.getBoundingClientRect();
 		const dropdownMaxWidth = Number(megamenu.dataset.dropdownWidth) || 0;
-		const bodySize = document.body.scrollWidth;
+		const maxBodyWidth = getLowestWidth(
+			document.body.scrollWidth,
+			dropdownMaxWidth
+		);
+		const megamenuRect = this.megamenu.getBoundingClientRect();
 
 		for (const menuItem of this.menuItems) {
-			const dropdown: HTMLElement | null = menuItem.querySelector(
-				'.wp-block-megamenu-item__dropdown'
-			);
-			const hasFullWidthDropdown = this.megamenu.classList.contains(
-				'has-full-width-dropdown'
-			);
+			this.updateDropdownPosition(menuItem, megamenuRect, maxBodyWidth);
+		}
+	}
 
-			if (!dropdown) {
-				continue;
-			}
+	/**
+	 * Updates the position of the dropdown menu item based on the maximum width allowed.
+	 *
+	 * @param {HTMLElement} menuItem     - The menu item element.
+	 * @param               megamenuRect
+	 * @param {number}      [maxWidth=0] - The maximum width allowed for the dropdown. 0 means auto width
+	 */
+	private updateDropdownPosition(
+		menuItem: HTMLElement,
+		megamenuRect: DOMRect,
+		maxWidth: number = 0
+	) {
+		const dropdown: HTMLElement | null = menuItem.querySelector(
+			'.wp-block-megamenu-item__dropdown'
+		);
 
-			const MegaMenuData = {
+		if (dropdown) {
+			const items = {
 				blockBBox: menuItem.getBoundingClientRect(),
 				dropdownBBox: dropdown?.getBoundingClientRect(),
 				megamenuBBox: megamenuRect,
 			};
 
-			if (hasFullWidthDropdown) {
-				dropdown.style.cssText = 'left: 0; right: 0;';
-			}
-
 			setNewPosition(
 				dropdown,
-				calcNewPosition(
-					MegaMenuData,
-					getLowestWidth(bodySize, dropdownMaxWidth) || 0,
-					hasFullWidthDropdown
-				)
+				calcNewPosition(items, maxWidth, this.hasFullWidthDropdown)
 			);
 		}
 	}
@@ -407,7 +437,7 @@ export default class MegaMenu {
 	 * @return {NodeList} - The list of interactive items.
 	 */
 	getMenuItems(): NodeListOf<HTMLElement> | null {
-		return this.megamenu.classList.contains('is-mobile')
+		return this.isResponsive
 			? (this.megamenu.querySelectorAll(
 					'.has-children'
 				) as NodeListOf<HTMLElement>)
