@@ -3,8 +3,11 @@
  */
 .wp-block-megamenu:not(.is-mobile) {
 	.wp-block-megamenu-item {
+
+		// The responsive dropdown menu
 		.wp-block-megamenu-item__dropdown {
 			max-height: var(--full-height);
+
 			// lower the padding whenever the screen in a small screen
 			@media screen and (max-height: 820px) {
 				& > .wp-block-group {
@@ -41,10 +44,9 @@
 	}
 
 	.wp-block-megamenu-item {
+		display: block;
 		li.vsge-product-categories-list-item a {
 			width: 100%;
-			text-align: left;
-			display: block;
 		}
 
 		.wp-block-megamenu-item__dropdown {

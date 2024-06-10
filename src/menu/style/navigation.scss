@@ -11,12 +11,6 @@
 		background-color: var(--wp--preset--color--white);
 	}
 
-	.wp-block-megamenu-item__link {
-		@media (max-width: 1023px) {
-			justify-content: start !important;
-		}
-	}
-
 	@media (max-width: 1023px) {
 		button#pls-language-switcher {
 			padding: 16px 15px 0;

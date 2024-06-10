@@ -5,14 +5,14 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 
 .wp-block-megamenu {
 
-	.show-on.mobile {
+	.show-on-mobile {
 		display: none;
 	}
 
 	&.is-mobile {
 		position: relative;
 
-		.show-on.mobile {
+		.show-on-mobile {
 			display: block;
 		}
 	}
@@ -36,8 +36,6 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 			top: 100%;
 
 			overflow: hidden;
-			min-width: 80px;
-			min-height: 60px;
 			max-width: 100%;
 
 			height: auto;
@@ -242,8 +240,12 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 		.wp-block-megamenu-menu > .is-layout-flex {
 			height: 100%;
 			align-content: space-between;
-			flex-direction: column;
 			flex-wrap: nowrap;
+		}
+
+		.wp-block-megamenu-menu .is-layout-flex:first-child {
+			flex-direction: column;
+			justify-content: center;
 		}
 
 		.wp-block-megamenu-item {
