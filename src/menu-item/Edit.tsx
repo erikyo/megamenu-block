@@ -39,19 +39,19 @@ import { calcPosition } from '../utils';
  * @param props.clientId
  * @param props.context
  */
-export default function Edit(props: {
+export default function Edit( props: {
 	attributes: MenuItemAttributes;
 	setAttributes: Function;
 	isSelected: boolean;
-	onReplace: (blocks: BlockInstance<{ [k: string]: any }>[]) => void;
-	mergeBlocks: (forward: boolean) => void;
+	onReplace: ( blocks: BlockInstance< { [ k: string ]: any } >[] ) => void;
+	mergeBlocks: ( forward: boolean ) => void;
 	clientId: string;
 	context: {
 		'megamenu/align': string;
 		'megamenu/menusMinWidth': string;
 		'megamenu/expandDropdown': boolean;
 	};
-}): JSX.Element {
+} ): JSX.Element {
 	const {
 		clientId,
 		attributes,
@@ -61,31 +61,30 @@ export default function Edit(props: {
 		mergeBlocks,
 	} = props;
 	// the menu item anchor data
-	const { text, linkTarget, rel, parentAttributes } = attributes;
-	const align = props?.context['megamenu/align'];
-	const menusMinWidth = props?.context['megamenu/menusMinWidth'];
-	const expandDropdown = props?.context['megamenu/expandDropdown'];
+	const { text, linkTarget, rel, parentAttributes, showOnMobile } =
+		attributes;
+	const align = props?.context[ 'megamenu/align' ];
+	const menusMinWidth = props?.context[ 'megamenu/menusMinWidth' ];
+	const expandDropdown = props?.context[ 'megamenu/expandDropdown' ];
 
 	const linkProps = {
-		...(linkTarget && { target: linkTarget }),
-		...(rel && { rel }),
+		...( linkTarget && { target: linkTarget } ),
+		...( rel && { rel } ),
 	};
 
-	const [dropdownPosition, setDropdownPosition] = useState(
+	const [ dropdownPosition, setDropdownPosition ] = useState(
 		{} as DropDownCoords
 	);
 
-	const [showDropdown, setShowDropdown] = useState(false);
-	const { replaceInnerBlocks } = useDispatch(blockEditorStore);
+	const [ showDropdown, setShowDropdown ] = useState( false );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
 	// the menu item ref
-	const menuItemRef = useRef<HTMLElement | null>(null);
-	const dropdownRef = useRef<HTMLElement | null>(null);
+	const menuItemRef = useRef< HTMLElement | null >( null );
+	const dropdownRef = useRef< HTMLElement | null >( null );
 
-	const updateInnerBlocks = async (
-		content: InnerBlockTemplate[] = TEMPLATE
-	) => {
-		return await replaceInnerBlocks(clientId, content, false);
+	const updateInnerBlocks = async ( content = TEMPLATE ) => {
+		return replaceInnerBlocks( clientId, [], false );
 	};
 
 	const {
@@ -94,16 +93,16 @@ export default function Edit(props: {
 	}: {
 		isParentOfSelectedBlock: boolean;
 		hasDescendants: boolean;
-	} = useSelect((select, {}) => {
+	} = useSelect( ( select, {} ) => {
 		const { hasSelectedInnerBlock, getBlockCount } = select(
 			blockEditorStore
 		) as any;
 
 		return {
-			isParentOfSelectedBlock: hasSelectedInnerBlock(clientId, true),
-			hasDescendants: !!getBlockCount(clientId),
+			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
+			hasDescendants: !! getBlockCount( clientId ),
 		};
-	}, []);
+	}, [] );
 
 	/**
 	 * A function that sets the attributes of the parent element.
@@ -111,14 +110,15 @@ export default function Edit(props: {
 	 * @return {void} No return value
 	 */
 	function setParentAttributes(): void {
-		setAttributes({
+		setAttributes( {
 			hasDescendants,
+			clientId,
 			parentAttributes: {
 				align,
 				menusMinWidth,
 				expandDropdown,
 			},
-		});
+		} );
 	}
 
 	/**
@@ -126,30 +126,30 @@ export default function Edit(props: {
 	 *
 	 * @return {void} No return value
 	 */
-	const addMenuItemDropdown = async (): void => {
-		if (!hasDescendants) {
-			// if there are no descendants, we can just replace the inner blocks
-			updateInnerBlocks();
+	const addMenuItemDropdown = async (): Promise< void > => {
+		if ( ! hasDescendants ) {
+			// if there are no descendants, we need to update the inner blocks
+			await updateInnerBlocks();
 		}
 		// then open the dropdown
-		setShowDropdown(true);
+		setShowDropdown( true );
 	};
 
 	/* will update the position of the dropdown based on the position of the menu item */
 	const updateDropdownPosition = useCallback(
-		(megamenuElements?: {
+		( megamenuElements?: {
 			megamenuItem: HTMLElement;
 			dropdown?: HTMLElement;
 			parentAttributes?: ParentAttributes;
-		}) => {
+		} ) => {
 			const { megamenuItem, dropdown } = megamenuElements || {
 				megamenuItem: menuItemRef.current ?? undefined,
 				dropdown: dropdownRef.current ?? undefined,
 			};
 
 			// if the menu item or the dropdown doesn't exist, exit
-			if (!megamenuItem || !dropdown) {
-				setDropdownPosition({});
+			if ( ! megamenuItem || ! dropdown ) {
+				setDropdownPosition( {} );
 				return {};
 			}
 
@@ -162,100 +162,103 @@ export default function Edit(props: {
 
 			return newPosition;
 		},
-		[parentAttributes]
+		[ parentAttributes ]
 	);
 
-	useEffect(() => {
-		if (isSelected || isParentOfSelectedBlock) {
+	useEffect( () => {
+		if ( isSelected || isParentOfSelectedBlock ) {
 			setParentAttributes();
-			setShowDropdown(hasDescendants);
+			setShowDropdown( hasDescendants );
 			return;
 		}
-		setShowDropdown(false);
-	}, [isSelected, isParentOfSelectedBlock]);
+		setShowDropdown( false );
+	}, [ isSelected, isParentOfSelectedBlock ] );
 
-	useEffect(() => {
-		if (menuItemRef.current) {
-			const newPosition = updateDropdownPosition({
+	useEffect( () => {
+		if ( menuItemRef.current ) {
+			const newPosition = updateDropdownPosition( {
 				megamenuItem: menuItemRef.current,
 				dropdown: dropdownRef.current ?? undefined,
 				parentAttributes,
-			});
-			setDropdownPosition(newPosition);
+			} );
+			setDropdownPosition( newPosition );
 		}
-	}, [showDropdown, parentAttributes]);
+	}, [ showDropdown, parentAttributes ] );
 
 	/** on resize, update the position of the dropdown */
-	useEffect(() => {
+	useEffect( () => {
 		setParentAttributes();
 		const blockNode: HTMLElement | null = menuItemRef.current;
 
-		if (blockNode) {
-			document?.addEventListener('resize', () => {
+		if ( blockNode ) {
+			document?.addEventListener( 'resize', () => {
 				const newPosition = updateDropdownPosition();
-				setDropdownPosition(newPosition);
-				setShowDropdown(false);
-			});
+				setDropdownPosition( newPosition );
+				setShowDropdown( false );
+			} );
 		}
-	}, []);
+	}, [] );
 
 	const blockProps = useBlockProps();
-	const innerBlockProps = useInnerBlocksProps({
+	const innerBlockProps = useInnerBlocksProps( {
 		className: 'wp-block-megamenu-item__dropdown',
 		style: dropdownPosition,
 		ref: dropdownRef,
-	});
+	} );
 
 	return (
 		<div
-			ref={menuItemRef}
-			className={classnames('wp-block-megamenu-item', {
+			ref={ menuItemRef as any }
+			className={ classnames( 'wp-block-megamenu-item', {
 				'has-children': hasDescendants,
+				'show-on-mobile': showOnMobile,
 				'is-opened': showDropdown,
-			})}
-			style={{
-				position: !parentAttributes.expandDropdown
+			} ) }
+			style={ {
+				position: ! parentAttributes.expandDropdown
 					? 'relative'
 					: undefined,
-			}}
+			} }
 		>
-			<Controls toggleItemDropdown={addMenuItemDropdown} {...props} />
+			<Controls toggleItemDropdown={ addMenuItemDropdown } { ...props } />
 			<a
-				{...linkProps}
-				className={'wp-block-megamenu-item__link'}
-				style={{
+				{ ...linkProps }
+				className={ 'wp-block-megamenu-item__link' }
+				style={ {
 					minWidth: parentAttributes.menusMinWidth
 						? parentAttributes.menusMinWidth + 'px'
 						: 'auto',
 					justifyContent: parentAttributes.align
 						? parentAttributes.align
 						: 'left',
-				}}
+				} }
 			>
-				<span className={'wp-block-megamenu-item__text'}>
+				<span className={ 'wp-block-megamenu-item__text' }>
 					<RichText
-						{...blockProps}
-						placeholder={__('Add a menu item')}
-						value={text}
-						onChange={(value) => setAttributes({ text: value })}
-						onReplace={onReplace}
-						onMerge={mergeBlocks}
+						{ ...blockProps }
+						placeholder={ __( 'Add a menu item' ) }
+						value={ text }
+						onChange={ ( value ) =>
+							setAttributes( { text: value } )
+						}
+						onReplace={ onReplace }
+						onMerge={ mergeBlocks }
 						identifier="content"
 						tagName="span"
 					/>
 				</span>
-				{hasDescendants ? (
+				{ hasDescendants ? (
 					<Icon
-						icon={chevronDown}
+						icon={ chevronDown }
 						className="wp-block-megamenu-item__toggle"
 						aria-hidden="true"
-						style={{
+						style={ {
 							fill: 'currentColor',
-						}}
+						} }
 					/>
-				) : null}
+				) : null }
 			</a>
-			{showDropdown && <div {...innerBlockProps} />}
+			{ showDropdown && <div { ...innerBlockProps } /> }
 		</div>
 	);
 }

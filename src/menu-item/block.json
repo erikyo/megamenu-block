@@ -41,7 +41,8 @@
 			"default": {}
 		},
 		"hasDescendants": {
-			"type": "boolean"
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
