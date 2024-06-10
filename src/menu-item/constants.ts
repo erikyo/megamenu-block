@@ -1,4 +1,8 @@
-import { InnerBlockTemplate, BlockAttributes } from '@wordpress/blocks';
+import {
+	InnerBlockTemplate,
+	BlockAttributes,
+	BlockInstance,
+} from '@wordpress/blocks';
 
 export const TEMPLATE: InnerBlockTemplate[] = [
 	[
@@ -21,7 +25,7 @@ export type DropDownCoords = {
 
 export type ParentAttributes = {
 	align: string;
-	menusMinWidth: number;
+	menusMinWidth: string;
 	expandDropdown: boolean;
 };
 

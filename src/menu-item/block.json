@@ -33,6 +33,10 @@
 		"rel": {
 			"type": "string"
 		},
+		"showOnMobile": {
+			"type": "boolean",
+			"default": false
+		},
 		"dropdownWrapperStyle": {
 			"type": "string"
 		},

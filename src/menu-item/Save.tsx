@@ -8,9 +8,18 @@ import classnames from 'classnames';
 import { type BlockAttributes, type BlockEditProps } from '@wordpress/blocks';
 import { MenuItemAttributes } from './constants';
 
-export default function save({ attributes }: BlockEditProps<BlockAttributes>) {
-	const { url, linkTarget, rel, text, parentAttributes, hasDescendants } =
-		attributes as MenuItemAttributes;
+export default function save( {
+	attributes,
+}: BlockEditProps< BlockAttributes > ) {
+	const {
+		url,
+		linkTarget,
+		rel,
+		text,
+		showOnMobile,
+		parentAttributes,
+		hasDescendants,
+	} = attributes as MenuItemAttributes;
 	const { menusMinWidth, align, expandDropdown } = parentAttributes ?? {
 		menusMinWidth: undefined,
 		align: undefined,
@@ -20,7 +29,8 @@ export default function save({ attributes }: BlockEditProps<BlockAttributes>) {
 	const blockProps = useBlockProps.save( {
 		className: classnames( 'wp-block-megamenu-item', {
 			'has-children': hasDescendants,
-		}),
+			'show-on-mobile': showOnMobile,
+		} ),
 		style: {
 			position: ! expandDropdown ? 'relative' : undefined,
 		},
