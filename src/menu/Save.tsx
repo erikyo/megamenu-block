@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import classnames from 'classnames';
 import { MegaMenuAttributes } from './constants';
 
@@ -21,8 +21,7 @@ export default function Save( {
 		<>
 			<nav
 				{ ...useBlockProps.save( {
-					className: classnames(
-						'wp-block-megamenu__content',
+					classnames: classnames(
 						'wp-block-megamenu',
 						`activator-${ activator }`,
 						{
@@ -33,8 +32,15 @@ export default function Save( {
 				} ) }
 				data-responsive-breakpoint={ responsiveBreakpoint }
 				data-dropdown-width={ dropdownMaxWidth }
+				data-activator={ activator }
 			>
-				<InnerBlocks.Content />
+				<div className={ 'wp-block-megamenu__content' }>
+					<div
+						{ ...useInnerBlocksProps.save( {
+							className: classnames( 'wp-block-megamenu-menu' ),
+						} ) }
+					/>
+				</div>
 			</nav>
 			<div
 				className={ classnames(

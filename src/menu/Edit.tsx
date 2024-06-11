@@ -14,18 +14,14 @@ import { useSelect } from '@wordpress/data';
 import { MegaMenuAttributes, TEMPLATE } from './constants';
 
 /**
- * The `MegaMenu` edit component.
- * @param args
- * @param args.isImmediateParentOfSelectedBlock
- * @param args.isSelected
- * @param args.attributes
- * @param args.setAttributes
- * @param args.clientId
- * @param props
- * @param props.isSelected
- * @param props.attributes
- * @param props.setAttributes
- * @param props.clientId
+ * Will display the responsive menu if true
+ *
+ * @param {props}    props               Object containing isSelected, attributes, setAttributes, and clientId
+ * @param {boolean}  props.isSelected    Whether the block is selected
+ * @param {Object}   props.attributes    The attributes of the block
+ * @param {Function} props.setAttributes The function to set the attributes
+ * @param {string}   props.clientId      The clientId of the block
+ * @return {JSX.Element} The JSX element representing the Edit function
  */
 export default function Edit( props: {
 	isSelected: boolean;
@@ -108,6 +104,7 @@ export default function Edit( props: {
 				) }
 				data-responsive-breakpoint={ responsiveBreakpoint }
 				data-dropdown-content-width={ dropdownMaxWidth }
+				data-activator={ activator }
 			>
 				<div className={ 'wp-block-megamenu__content' }>
 					<InnerBlocks
