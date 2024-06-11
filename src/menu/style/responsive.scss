@@ -34,9 +34,6 @@
  * TODO: make this more generic
  */
 .wp-block-megamenu.is-mobile {
-	.vsge-product-categories-list-item__name {
-		font-weight: var(--typography--font--default--regular);
-	}
 
 	.alignwide {
 		max-width: 100%;
@@ -61,11 +58,17 @@
 				padding-right: 24px;
 				box-sizing: border-box;
 
+				.wp-block-megamenu-item__text {
+					font-style: normal;
+					font-weight: 500;
+					text-transform: uppercase;
+				}
+
 				li {
 					box-sizing: border-box;
 					max-width: 100%;
-					padding: 4px 0;
-					line-height: 48px;
+					padding: 20px 0;
+					line-height: 1.2;
 
 					li {
 						padding-left: 36px;
@@ -123,8 +126,8 @@
 					justify-content: center;
 					flex-direction: column;
 
-					text-align: center;
-					padding: 0 24px;
+					text-align: left;
+					padding: 0 24px 0 40px;
 
 					transition:
 						350ms transform ease-out,

@@ -1,24 +1,12 @@
 /**
  *  The megamenu style
  */
+@import "vars";
 
 header {
 	--megamenu--hamburger-width: 42px;
 	--megamenu--responsive--internal-padding: var(--megamenu--hamburger-width) calc(var(--megamenu--hamburger-width) * 0.5);
 }
-
-/* Global style vars - sizes */
-$size__nav-height: 40px; // same as $size__branding-height
-$size__nav-width: 340px;
-$nav_padding: 0 0 0 var(--wp--preset--spacing--40);
-$nav_wrap_horizontal_padding: calc(
-	var(--wp--preset--spacing--50) + #{$size__nav-width * 1.2}
-);
-/* Responsive vars */
-$mq__smallphone: "(max-width : 376px)";
-$mq__tablet-portrait: "(max-width: 768px)";
-$mq__smaller-than-tablet: "(max-width : 1023px)";
-$mq__responsive_breakpoint: $mq__smaller-than-tablet;
 
 @import "style/core";
 @import "style/navigation";

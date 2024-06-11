@@ -1,7 +1,4 @@
-$mq__tablet-portrait: "(max-width : 768px)";
-$mq__smallphone: "(max-width : 376px)";
-$mq__smaller-than-tablet: "(max-width : 1023px)";
-$mq__responsive_breakpoint: $mq__smaller-than-tablet;
+@import "../menu/vars";
 
 .wp-block-megamenu {
 
@@ -22,6 +19,10 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 	}
 
 	.wp-block-megamenu-item {
+
+		:focus-visible {
+			outline: 2px solid var(--wp--preset--color--black);
+		}
 
 		&.has-child {
 			cursor: pointer;
@@ -168,7 +169,7 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 
 			.wp-block-megamenu-menu {
 				overflow-y: scroll;
-				width: calc(100vw - var(--megamenu--hamburger-width) * 1.8);
+				width: $megamenu--responsive--menu-width;
 				position: absolute;
 				top: 0;
 				left: 0;
@@ -183,7 +184,7 @@ $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 		.wp-block-megamenu-item__dropdown {
 			pointer-events: none;
 			z-index: 1006;
-			width: calc(100vw - var(--megamenu--hamburger-width) * 1.8);
+			width: $megamenu--responsive--menu-width;
 			max-width: 100%;
 			overflow: visible;
 			opacity: 0;

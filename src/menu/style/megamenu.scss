@@ -1,7 +1,4 @@
 .wp-block-megamenu {
-	margin: 0;
-	max-width: 100vw;
-
 	&__toggle-wrapper {
 		position: relative;
 
@@ -32,7 +29,7 @@
 		appearance: none;
 		border: none;
 		cursor: pointer;
-		margin: var(--megamenu--responsive--toggle-icon--position, 0 0 0 auto);
+		margin: auto;
 
 		&::before,
 		&::after,
