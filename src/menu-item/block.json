@@ -47,6 +47,12 @@
 		"hasDescendants": {
 			"type": "boolean",
 			"default": false
+		},
+		"style": {
+			"type": "object",
+			"default": {
+				"shadow": "var:preset|shadow|deep"
+			}
 		}
 	},
 	"supports": {
@@ -88,7 +94,7 @@
 		"__experimentalSelector": ".wp-block-megamenu-item"
 	},
 	"selectors": {
-		"shadow": ".wp-block-megamenu-item > .wp-block-megamenu-item__dropdown"
+		"shadow": ".wp-block-megamenu-item .wp-block-megamenu-item__dropdown"
 	},
 	"editorScript": "file:./index.js",
 	"style": "file:./style-index.css"

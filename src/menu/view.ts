@@ -1,4 +1,4 @@
-import MegaMenu from '../frontend/megaMenu';
+import MegaMenu from '../frontend/MegaMenu';
 import { generateRandomId } from '../utils';
 import './style.scss';
 

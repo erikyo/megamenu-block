@@ -51,6 +51,12 @@
 		"expandDropdown": {
 			"type": "boolean",
 			"default": true
+		},
+		"style": {
+			"type": "object",
+			"default": {
+				"shadow": "var:preset|shadow|deep"
+			}
 		}
 	},
 	"supports": {
@@ -82,19 +88,16 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
-			"__experimentalWritingMode": true,
-			"__experimentalDefaultControls": {
-				"fontSize": true
-			}
+			"__experimentalWritingMode": true
 		},
-		"reusable": false,
-		"lightBlockWrapper": false
+		"reusable": false
 	},
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
