@@ -4,7 +4,9 @@ export class MenuItem {
 	dropdown: HTMLElement | null;
 	fullWidthDropdown: boolean;
 	level: number;
-	private isOpened: boolean;
+	isOpened: boolean = false;
+	hasChildren: any;
+	button: HTMLElement | null;
 
 	constructor(
 		public el: HTMLElement,
@@ -16,33 +18,20 @@ export class MenuItem {
 		this.el = el;
 		this.level = args?.level ?? 0;
 		this.fullWidthDropdown = args?.fullWidthDropdown ?? false;
+		this.button =
+			this.el.querySelector( '.wp-block-megamenu-item' ) ||
+			this.el.querySelector( 'a, button' );
 		this.dropdown = this.el.querySelector(
 			'.wp-block-megamenu-item__dropdown'
 		);
-		this.isOpened = false;
-	}
-
-	getRootEl() {
-		// the menu item, in case of root menu item fallbacks to wp-block-megamenu-item__content
-		this.el.classList.contains( 'has-children' )
-			? this.el
-			: this.el.closest( '.has-children' );
+		this.hasChildren = this.el.classList.contains( 'has-children' );
 	}
 
 	/**
 	 * Helper function to open a menu item.
 	 */
 	open() {
-		/* Close the remaining elements */
-		const parentElements =
-			this.el?.parentElement?.querySelectorAll( '.is-opened' );
-		if ( parentElements ) {
-			parentElements.forEach( ( el ) => {
-				el.classList.remove( 'is-opened' );
-				el.classList.remove( 'is-left' );
-			} );
-		}
-
+		this.isOpened = true;
 		this.el?.classList.add( 'is-opened' );
 		this.el?.classList.remove( 'is-left' );
 	}
@@ -51,11 +40,9 @@ export class MenuItem {
 	 * Helper function to close a menu item.
 	 */
 	close() {
-		if (
-			this.dropdown &&
-			this.dropdown.classList.contains( 'is-opened' )
-		) {
-			this.dropdown.classList.remove( 'is-opened' );
+		if ( this.el && this.isOpened ) {
+			this.isOpened = false;
+			this.el.classList.remove( 'is-opened' );
 		}
 	}
 

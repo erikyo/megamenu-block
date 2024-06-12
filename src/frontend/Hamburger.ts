@@ -1,22 +1,22 @@
-import { disableBodyScroll } from '../utils';
+import { lockScroll } from '../utils';
 
 export class Hamburger {
 	el: HTMLElement;
 
 	constructor( root: HTMLElement ) {
-		this.el = root.nextElementSibling as HTMLElement;
+		this.el = root as HTMLElement;
 	}
 
 	status( status: string ) {
 		for ( const className of this.el.classList ) {
 			if (
 				className.startsWith( 'is-state' ) &&
-				className !== 'is-' + status
+				className !== `is-${ status }`
 			) {
 				this.el.classList.remove( className );
 			}
 		}
-		this.el.classList.add( 'is-' + status );
+		this.el.classList.add( `is-${ status }` );
 	}
 
 	display( display: boolean = true ) {
@@ -34,19 +34,20 @@ export class Hamburger {
 	 */
 	updateState( level: number ) {
 		if ( level > 1 ) {
-			this.status( 'state-open' );
-		} else if ( level === 1 ) {
 			this.status( 'state-back' );
+		} else if ( level === 1 ) {
+			this.status( 'state-open' );
 		} else {
-			this.status( 'state-close' );
+			this.disableBodyScroll();
+			this.status( 'state-ready' );
 		}
 	}
 
 	disableBodyScroll() {
-		disableBodyScroll( true );
+		lockScroll( true );
 	}
 
 	enableBodyScroll() {
-		disableBodyScroll( false );
+		lockScroll();
 	}
 }
