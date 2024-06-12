@@ -44,7 +44,7 @@
 			transition-delay: 0.05s;
 		}
 
-		.is-opened & {
+		.is-state-open & {
 
 			&::before {
 				transform: translateY(9px) rotate(135deg);
@@ -60,7 +60,7 @@
 		}
 
 
-		.is-back & {
+		.is-state-back & {
 
 			&::before {
 				transform: translate(-10px, 4px) rotate(135deg);
