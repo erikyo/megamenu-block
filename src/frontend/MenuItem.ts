@@ -6,7 +6,8 @@ export class MenuItem {
 	level: number;
 	isOpened: boolean = false;
 	hasChildren: any;
-	button: HTMLElement | null;
+	button: HTMLElement;
+	depth: number = 0;
 
 	constructor(
 		public el: HTMLElement,
@@ -20,7 +21,8 @@ export class MenuItem {
 		this.fullWidthDropdown = args?.fullWidthDropdown ?? false;
 		this.button =
 			this.el.querySelector( '.wp-block-megamenu-item' ) ||
-			this.el.querySelector( 'a, button' );
+			this.el.querySelector( 'a, button' ) ||
+			el;
 		this.dropdown = this.el.querySelector(
 			'.wp-block-megamenu-item__dropdown'
 		);

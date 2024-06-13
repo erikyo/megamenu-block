@@ -1,33 +1,46 @@
-import { addLevelClass, getLowestWidth, removeStyles } from '../utils';
+import {
+	addLevelClass,
+	createMenuTree,
+	detectTouchCapability,
+	getLowestWidth,
+	removeStyles,
+} from '../utils';
 import { TIMEOUT } from '../utils/constants';
 import { MenuItem } from './MenuItem';
 import { Hamburger } from './Hamburger';
 
 type ItemsAllowedEvents = 'click' | 'hover';
+const IS_OPEN = 'is-opened';
 
 export default class MegaMenu {
 	public el: HTMLElement;
-	private menuItems: MenuItem[] = [];
 	public hamburger: Hamburger;
-	private readonly originalState: boolean;
+	public menuItems: MenuItem[] = [];
 	private readonly hasFullWidthDropdown: boolean;
 	private readonly isCollapsible: boolean;
 	private isResponsive: boolean = false;
 	public breakpoint: number | undefined;
 	private activator: 'click' | 'hover' = 'hover';
 	currentLevel: number = 0;
-	openMenus: MenuItem[] | MegaMenu[] = [];
+	isOpened: boolean = false;
+	openMenus: ( MenuItem | MegaMenu )[] = [];
 
+	/**
+	 * Constructor function for MegaMenu class.
+	 *
+	 * @param {HTMLElement} megamenu - The HTML element representing the mega menu.
+	 */
 	constructor( megamenu: HTMLElement ) {
 		this.el = megamenu;
 
 		/** eagerly detect support for mobile */
-		this.originalState = this.el.classList.contains( 'is-mobile' );
 		this.isCollapsible = this.el.classList.contains( 'is-collapsible' );
 
 		this.hasFullWidthDropdown = this.el.classList.contains(
 			'has-full-width-dropdown'
 		);
+
+		// Set the activator property based on the result
 		this.activator = this.getActivator();
 
 		/** The hamburger icon */
@@ -65,40 +78,49 @@ export default class MegaMenu {
 		 * The function initializes a responsive menu by adding a click event listener to a hamburger icon
 		 * element, which toggles the visibility of the mega menu element.
 		 */
-		this.hamburger.el.onclick = () => this.handleResponsiveMenu();
+		this.hamburger.el.onclick = () => this.toggleHamburger();
 
 		// finally, add the "is-initialized" class to the megamenu container
 		this.el.classList.add( 'is-initialized' );
 	}
 
-	updateMenuItems() {
-		this.menuItems = this.collectMenuItems();
-
-		addLevelClass( this.menuItems );
-	}
-
-	handleResponsiveMenu() {
-		if ( this.currentLevel === 0 ) {
-			this.currentLevel++;
-			this.enableMegaMenu( true );
-			this.hamburger.enableBodyScroll();
-		} else {
-			// extract the last item from the openMenus array
-			this.closeLastOpenMenu();
-		}
-		this.hamburger.updateState( this.currentLevel );
-	}
-
+	/**
+	 * Reloads the megamenu by updating the menu items, the activator, and the responsive menu.
+	 */
 	reload() {
 		// update the flag that holds if the current device is under the menu breakpoint
-		this.isResponsive = this.isMobile();
+		this.updateBreakpoint();
 
+		// update the menu preferred activator
 		this.setActivator();
-		this.updateDropdownsPosition();
-		this.updateResponsiveMenu();
+
+		// close the currently open menu if the breakpoint changes
+		this.closeAllOpened();
+
+		// update the menu dropdown position and the hamburger icon
+		this.updateControls();
 
 		// Attach the events to the menu items.
 		this.handleUserEvents();
+	}
+
+	/**
+	 * Updates the menu items by collecting and adding level classes.
+	 */
+	updateMenuItems(): void {
+		this.menuItems = this.collectMenuItems();
+	}
+
+	/**
+	 * Toggles the visibility of the hamburger icon based on the current level.
+	 */
+	toggleHamburger() {
+		if ( this.currentLevel === 0 ) {
+			this.open();
+		} else {
+			// extract the last item from the openMenus array
+			this.closeLastOpenMenu( true );
+		}
 	}
 
 	/**
@@ -106,7 +128,7 @@ export default class MegaMenu {
 	 *
 	 * @param {string} activator The activator parameter is a string that represents the type of event that triggered
 	 */
-	setActivator = ( activator?: ItemsAllowedEvents ) => {
+	setActivator = ( activator?: ItemsAllowedEvents ): void => {
 		if ( activator ) {
 			this.activator = activator;
 			return;
@@ -114,7 +136,13 @@ export default class MegaMenu {
 		this.activator = this.getActivator();
 	};
 
+	/**
+	 * The function returns the activator based on the dataset attribute of the megamenu element.
+	 */
 	getActivator(): ItemsAllowedEvents {
+		if ( detectTouchCapability() ) {
+			return 'click';
+		}
 		if ( this.el.dataset.activator === 'hover' && ! this.isResponsive ) {
 			return 'hover';
 		}
@@ -125,8 +153,15 @@ export default class MegaMenu {
 	 * The function updates the breakpoint based on the dataset attribute of the megamenu element.
 	 */
 	updateBreakpoint() {
+		// store the current state
+		const current = this.isResponsive;
 		this.breakpoint = Number( this.el.dataset.responsiveBreakpoint );
 		this.isResponsive = this.isMobile() ?? false;
+		// if the state has changed reload the menu items and close all menus
+		if ( current !== this.isResponsive ) {
+			this.updateMenuItems();
+			this.reload();
+		}
 	}
 
 	/**
@@ -164,7 +199,7 @@ export default class MegaMenu {
 			return;
 		}
 
-		if ( this.hamburger ) {
+		if ( this.hamburger.el ) {
 			if ( this.isResponsive ) {
 				// show the menu toggle icon and set the megamnu in "mobile mode"
 				this.hamburger.display();
@@ -172,29 +207,62 @@ export default class MegaMenu {
 			} else {
 				// hide the menu toggle icon and remove the mobile classes
 				this.hamburger.display( false );
-				this.el.classList.remove( 'is-mobile', 'is-opened' );
+				this.el.classList.remove( 'is-mobile', IS_OPEN );
 			}
 		}
 	}
+	isMenuItem( item: any ): item is MenuItem {
+		return item instanceof MenuItem;
+	}
+
+	isMegaMenu( item: any ): item is MegaMenu {
+		return item instanceof MegaMenu;
+	}
+
+	closeLastOpenMenu( force = false ) {
+		if ( this.isResponsive && ! force ) {
+			return;
+		}
+		// extract the last item from the openMenus array
+		const lastOpenMenu = this.openMenus.pop();
+		if ( ! lastOpenMenu ) {
+			console.warn( 'No open menu found' );
+			this.closeAllOpened();
+			return;
+		}
+		if ( this.isMenuItem( lastOpenMenu ) ) {
+			lastOpenMenu.close();
+			this.updateLevel( this.currentLevel - 1 );
+		} else if ( this.isMegaMenu( lastOpenMenu ) ) {
+			this.close();
+		}
+		// update the hamburger state
+		this.hamburger.updateState( this.currentLevel );
+	}
 
 	/**
-	 * The function `updateResponsiveMenu` updates the responsive behavior of a mega menu based on the
-	 * current device's screen size.
+	 * Toggles the 'is-opened' class in the MegaMenu element based on the enable parameter.
+	 * Designed to enable the megamenu in the responsive view (using the hamburger icon)
+	 *
+	 * @param {boolean} enable - Flag to enable/disable the 'is-opened' class
 	 */
-	updateResponsiveMenu() {
-		// initialize the responsive menu toggle icon visibility.
-		this.showMenuToggleButton();
-
-		// reset the dropdown position for each item for the responsive menu
-		if ( this.isResponsive && this.menuItems.length ) {
-			for ( const menuItem of this.menuItems ) {
-				removeStyles( menuItem.dropdown, [
-					'left',
-					'width',
-					'maxWidth',
-				] );
-			}
+	private enableMegaMenu( enable: boolean = true ) {
+		if ( ! enable ) {
+			this.el.classList.remove( IS_OPEN );
+			return;
 		}
+		this.el.classList.add( IS_OPEN );
+	}
+
+	open() {
+		this.hamburger.enableBodyScroll();
+		this.enableMegaMenu( true );
+		this.updateLevel( 1 );
+	}
+
+	close() {
+		this.enableMegaMenu( false );
+		this.updateLevel( 0 );
 	}
 
 	/**
@@ -209,71 +277,72 @@ export default class MegaMenu {
 		for ( const menuItem of this.menuItems ) {
 			let timeoutId: NodeJS.Timeout;
 
-			/* Handle hover */
-			if ( this.activator === 'hover' ) {
-				menuItem.el.onmouseenter = ( ev: MouseEvent ) => {
-					if ( this.currentLevel === 0 ) {
-						this.closeLastOpenMenu();
-					}
-					if ( menuItem.hasChildren ) {
-						clearTimeout( timeoutId );
-						ev.preventDefault();
-						ev.stopImmediatePropagation();
-						this.openMenuItem( menuItem, 'mouseenter' );
-					}
-				};
-			}
-
-			/* Handle click */
-			menuItem.button.onclick = ( ev: MouseEvent ) => {
-				if ( this.currentLevel === 0 ) {
+			/**
+			 * Handles the action to be taken on a mouse event.
+			 *
+			 * @param {MouseEvent} ev - The mouse event triggering the action.
+			 */
+			const action = ( ev: MouseEvent ) => {
+				ev.preventDefault();
+				if ( ! menuItem.isOpened ) {
 					this.closeLastOpenMenu();
-				}
-				if ( menuItem.hasChildren ) {
-					ev.preventDefault();
-					ev.stopImmediatePropagation();
-					this.openMenuItem( menuItem, 'click' );
+					clearTimeout( timeoutId );
+					this.openMenuItem( menuItem );
 				}
 			};
 
-			/* Handle mouse leave */
-			menuItem.el.onmouseleave = () => {
+			const leaveAction = () => {
 				/* Avoid focus out the menu on mobile devices */
-				if ( ! this.isResponsive ) {
+				if ( ! this.isResponsive && this.isOpened ) {
 					// add the is-left class that will be checked in a while to handle menu re-focusing
 					menuItem.el.classList.add( 'is-left' );
 
 					timeoutId = setTimeout( () => {
 						if ( menuItem.el.classList.contains( 'is-left' ) ) {
-							this.openMenuItem( menuItem, 'mouseleave' );
+							this.closeMenuItem( menuItem );
 						}
 					}, TIMEOUT );
 				}
 			};
+
+			if ( this.activator === 'hover' ) {
+				/* Handle hover */
+				menuItem.el.onmouseenter = action;
+			}
+
+			/* Handle mouse leave */
+			menuItem.el.onmouseleave = leaveAction;
+
+			/* Handle click */
+			menuItem.button.onclick = action;
 		}
 	}
 
-	closeLastOpenMenu() {
-		// extract the last item from the openMenus array
-		const lastOpenMenu = this.openMenus.pop();
-		console.log( lastOpenMenu );
-		if ( ! lastOpenMenu ) {
-			this.enableMegaMenu( false );
-			this.updateLevel( 0 );
-			this.hamburger.updateState( 0 );
-		} else {
-			lastOpenMenu.close();
-			this.updateLevel( this.currentLevel - 1 );
-			this.hamburger.updateState( this.currentLevel );
+	/**
+	 * The function `openMenuItem` is used to handle events such as click, mouseenter, and mouseleave to
+	 * open and close menu items.
+	 *
+	 * @param menuItem
+	 */
+	openMenuItem( menuItem: MenuItem ) {
+		if ( ! this.isResponsive ) {
+			menuItem.updateDropdownPosition(
+				this.el.getBoundingClientRect(),
+				this.el.ownerDocument.body.scrollWidth
+			);
 		}
-	}
 
-	private enableMegaMenu( enable: boolean = true ) {
-		if ( ! enable ) {
-			this.el.classList.remove( 'is-opened' );
-			return;
-		}
-		this.el.classList.add( 'is-opened' );
+		// open the dropdown
+		menuItem.open();
+
+		// add the item to the openMenus array
+		this.openMenus.push( menuItem );
+
+		// update the current level
+		this.updateLevel( this.currentLevel + 1 );
+
+		// update the hamburger state in order to display the current level (available 0 to 2, 0 being the menu icon, 1 the close icon and > 2 the arrow back)
+		this.hamburger.updateState( this.currentLevel );
 	}
 
 	/**
@@ -283,56 +352,68 @@ export default class MegaMenu {
 	 * @param menuItem
 	 * @param action
 	 */
-	openMenuItem( menuItem: MenuItem, action: string ) {
-		if ( this.currentLevel === 0 ) {
+	closeMenuItem( menuItem: MenuItem ) {
+		if ( this.currentLevel === 1 ) {
 			menuItem.updateDropdownPosition(
 				this.el.getBoundingClientRect(),
 				this.el.ownerDocument.body.scrollWidth
 			);
 		}
 
-		if ( action === 'click' || action === 'mouseenter' ) {
-			// add the item to the openMenus array
-			this.openMenus.push( menuItem );
-			// open the dropdown
-			menuItem.open();
-			// update the current level
-			this.updateLevel( this.currentLevel + 1 );
-		} else if ( action === 'mouseleave' ) {
-			this.openMenus = this.openMenus.filter(
-				( openMenu ) => openMenu !== menuItem
-			);
-			menuItem.close();
-			this.updateLevel( this.currentLevel - 1 );
-		}
+		menuItem.close();
+
+		this.updateLevel( this.currentLevel - 1 );
+
 		// update the hamburger state in order to display the current level (available 0 to 2, 0 being the menu icon, 1 the close icon and > 2 the arrow back)
 		this.hamburger.updateState( this.currentLevel );
+	}
+
+	closeAllOpened() {
+		this.openMenus.forEach( ( menuItem ) => {
+			if ( menuItem.isOpened ) {
+				menuItem.close();
+			}
+		} );
+		this.close();
+		this.updateLevel( 0 );
+		this.hamburger.updateState( 0 );
 	}
 
 	/**
 	 * The function sets the position and width of dropdown menus based on the width of the parent menu
 	 * element.
 	 */
-	updateDropdownsPosition() {
+	updateControls() {
 		// return if no menu items available
-		if ( ! this.menuItems ) {
+		if ( ! this.menuItems || ! this.menuItems.length ) {
 			return;
 		}
 
+		// initialize the responsive menu toggle icon visibility.
+		this.showMenuToggleButton();
+
+		// reset the dropdown position for each item for the responsive menu
 		if ( this.isResponsive ) {
-			return;
-		}
+			for ( const menuItem of this.menuItems ) {
+				removeStyles( menuItem.dropdown, [
+					'left',
+					'width',
+					'maxWidth',
+				] );
+			}
+		} else {
+			const megamenu = this.el;
+			const dropdownMaxWidth =
+				Number( megamenu.dataset.dropdownWidth ) || 0;
+			const maxBodyWidth = getLowestWidth(
+				document.body.scrollWidth,
+				dropdownMaxWidth
+			);
+			const megamenuRect = this.el.getBoundingClientRect();
 
-		const megamenu = this.el;
-		const dropdownMaxWidth = Number( megamenu.dataset.dropdownWidth ) || 0;
-		const maxBodyWidth = getLowestWidth(
-			document.body.scrollWidth,
-			dropdownMaxWidth
-		);
-		const megamenuRect = this.el.getBoundingClientRect();
-
-		for ( const menuItem of this.menuItems ) {
-			menuItem.updateDropdownPosition( megamenuRect, maxBodyWidth );
+			for ( const menuItem of this.menuItems ) {
+				menuItem.updateDropdownPosition( megamenuRect, maxBodyWidth );
+			}
 		}
 	}
 
