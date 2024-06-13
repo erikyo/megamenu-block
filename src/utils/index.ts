@@ -1,5 +1,4 @@
 import { DropDownCoords } from '../menu-item/constants';
-import { MenuItem } from '../frontend/MenuItem';
 
 /**
  * Generate a random id
@@ -232,21 +231,6 @@ export function calcPosition(
 	);
 }
 
-export function addLevelClass(menuItems: MenuItem[]) {
-	for (const menuItem of menuItems) {
-		// Get the number of nested menus within this item (depth)
-		const depth = countNestedMenus(menuItem.el);
-
-		menuItem.level = depth;
-
-		menuItem.el.classList.add(`level-${depth}`);
-	}
-}
-
-function countNestedMenus(menuItem: Element): number {
-	const childrens = menuItem.querySelector('.has-children');
-	if (!childrens) {
-		return 1;
-	}
-	return 1 + countNestedMenus(childrens);
+export function detectTouchCapability() {
+	return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
