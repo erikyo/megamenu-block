@@ -7,7 +7,7 @@
 import { useState } from '@wordpress/element';
 import classnames from 'classnames';
 import { Controls } from './Controls';
-import { InnerBlocks } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import type { BlockAttributes } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -84,7 +84,7 @@ export default function Edit( props: {
 	);
 
 	return (
-		<div>
+		<>
 			<Controls
 				showResponsiveMenu={ showResponsiveMenu }
 				setShowResponsiveMenu={ setShowResponsiveMenu }
@@ -92,28 +92,35 @@ export default function Edit( props: {
 				setAttributes={ setAttributes }
 			/>
 			<nav
-				className={ classnames(
-					'wp-block-megamenu',
-					`activator-${ activator }`,
-					{
-						'is-hidden': showResponsiveMenu,
-						[ `has-full-width-dropdown` ]:
-							expandDropdown || dropdownMaxWidth === 0,
-						[ `is-collapsible` ]: collapseOnMobile,
-					}
-				) }
+				{ ...useBlockProps( {
+					className: classnames(
+						'wp-block-megamenu',
+						`activator-${ activator }`,
+						{
+							'is-hidden': showResponsiveMenu,
+							[ `has-full-width-dropdown` ]:
+								expandDropdown || dropdownMaxWidth === 0,
+							[ `is-collapsible` ]: collapseOnMobile,
+						}
+					),
+				} ) }
 				data-responsive-breakpoint={ responsiveBreakpoint }
 				data-dropdown-content-width={ dropdownMaxWidth }
 				data-activator={ activator }
 			>
-				<div className={ 'wp-block-megamenu__content' }>
-					<InnerBlocks
-						orientation="horizontal"
-						templateLock={ false }
-						template={ TEMPLATE }
-						templateInsertUpdatesSelection={ false }
-					/>
-				</div>
+				<div
+					{ ...useInnerBlocksProps(
+						{
+							className: 'wp-block-megamenu__content',
+						},
+						{
+							orientation: 'horizontal',
+							templateLock: false,
+							template: TEMPLATE,
+							templateInsertUpdatesSelection: false,
+						}
+					) }
+				/>
 			</nav>
 			<div
 				className={ classnames(
@@ -128,6 +135,6 @@ export default function Edit( props: {
 					<div></div>
 				</Button>
 			</div>
-		</div>
+		</>
 	);
 }

@@ -100,7 +100,7 @@
 		"reusable": false
 	},
 	"editorScript": "file:./index.js",
+	"viewScript": "file:./view.js",
 	"editorStyle": "file:./index.css",
-	"style": "file:./style-view.css",
-	"viewScript": "file:./view.js"
+	"viewStyle": "file:./style-view.css"
 }
