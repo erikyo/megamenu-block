@@ -1,0 +1,39 @@
+.wp-block-megamenu {
+	width: 100%;
+	.wp-block-megamenu__content {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+	}
+
+
+	/**
+	 * The desktop style for the category plugin @vsge-importer
+	 */
+	&:not(.is-mobile) {
+		.wp-block-megamenu-item {
+
+			// The responsive dropdown menu
+			.wp-block-megamenu-item__dropdown {
+				max-height: 100vh;
+
+				// lower the padding whenever the screen in a small screen
+				@media screen and (max-height: 820px) {
+					& > .wp-block-group {
+						padding-top: var(--wp--preset--spacing--60) !important;
+						padding-bottom: var(--wp--preset--spacing--60) !important;
+
+						li {
+							font-size: 95%;
+							line-height: 1.7;
+						}
+
+						ul {
+							margin: 0 0 var(--wp--preset--spacing--60);
+						}
+					}
+				}
+			}
+		}
+	}
+}

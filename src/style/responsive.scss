@@ -1,39 +1,13 @@
 /**
- * The desktop style for the category plugin @vsge-importer
- */
-.wp-block-megamenu:not(.is-mobile) {
-	.wp-block-megamenu-item {
-
-		// The responsive dropdown menu
-		.wp-block-megamenu-item__dropdown {
-			max-height: var(--full-height);
-
-			// lower the padding whenever the screen in a small screen
-			@media screen and (max-height: 820px) {
-				& > .wp-block-group {
-					padding-top: var(--wp--preset--spacing--60) !important;
-					padding-bottom: var(--wp--preset--spacing--60) !important;
-
-					li {
-						font-size: 95%;
-						line-height: 1.7;
-					}
-
-					ul {
-						margin: 0 0 var(--wp--preset--spacing--60);
-					}
-				}
-			}
-		}
-	}
-}
-
-/**
  * The mobile style for the category plugin @vsge-importer
  *
  * TODO: make this more generic
  */
 .wp-block-megamenu.is-mobile {
+
+	.wp-block-megamenu-menu {
+		background-color: var(--wp--preset--color--background);
+	}
 
 	.alignwide {
 		max-width: 100%;
@@ -67,7 +41,6 @@
 				li {
 					box-sizing: border-box;
 					max-width: 100%;
-					padding: 20px 0;
 					line-height: 1.2;
 
 					li {
@@ -77,7 +50,6 @@
 
 				@media #{$mq__responsive_breakpoint} {
 					overflow-x: visible;
-					padding-left: 64px;
 				}
 
 				@media #{$mq__tablet-portrait} {
@@ -97,12 +69,6 @@
 				}
 
 				@media #{$mq__smallphone} {
-					padding-left: 24px;
-
-					li li {
-						padding-left: 0;
-					}
-
 					.vsge-product-categories-list-item__image {
 						align-items: center;
 						display: none;
@@ -110,29 +76,16 @@
 				}
 
 				&.vsge-product-categories-list--depth-1 {
-					position: absolute;
 					z-index: 1007;
-					top: 0;
-					left: 0;
-					bottom: 0;
-					opacity: 0;
 					height: 100vh;
-					width: calc(100vw - var(--megamenu--hamburger-width) * 2.5);
-					max-width: inherit;
-					box-sizing: border-box;
 
 					display: flex;
 					align-items: center;
 					justify-content: center;
 					flex-direction: column;
 
-					text-align: left;
 					padding: 0 24px 0 40px;
 
-					transition:
-						350ms transform ease-out,
-						100ms opacity;
-					pointer-events: none;
 				}
 			}
 		}
