@@ -97,5 +97,6 @@
 		"shadow": ".wp-block-megamenu-item .wp-block-megamenu-item__dropdown"
 	},
 	"editorScript": "file:./index.js",
-	"style": "file:./style-index.css"
+	"editorStyle": "file:./index.css",
+	"viewStyle": "file:./style-index.css"
 }

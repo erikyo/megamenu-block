@@ -25,6 +25,7 @@ import {
 	TEMPLATE,
 } from './constants';
 import { calcPosition } from '../utils';
+import './editor.scss';
 
 /**
  * Internal dependencies
@@ -215,6 +216,9 @@ export default function Edit( props: {
 				'is-opened': showDropdown,
 			} ) }
 			style={ {
+				minWidth: parentAttributes.menusMinWidth
+					? parentAttributes.menusMinWidth + 'px'
+					: 'auto',
 				position: ! parentAttributes.expandDropdown
 					? 'relative'
 					: undefined,
@@ -225,9 +229,6 @@ export default function Edit( props: {
 				{ ...linkProps }
 				className={ 'wp-block-megamenu-item__link' }
 				style={ {
-					minWidth: parentAttributes.menusMinWidth
-						? parentAttributes.menusMinWidth + 'px'
-						: 'auto',
 					justifyContent: parentAttributes.align
 						? parentAttributes.align
 						: 'left',

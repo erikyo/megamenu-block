@@ -17,14 +17,14 @@ import { escapeHtml } from '../utils';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
-function Controls(props) {
+function Controls( props ) {
 	const { attributes, setAttributes, toggleItemDropdown } = props;
 
 	const { linkTarget, rel, text, url, showOnMobile, hasDescendants } =
 		attributes;
-	const [isURLPickerOpen, setIsURLPickerOpen] = useState(false);
+	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 
-	const isURLSet = !(url === undefined || url.trim().length === 0);
+	const isURLSet = ! ( url === undefined || url.trim().length === 0 );
 
 	/**
 	 * A function to open the link control.
@@ -32,7 +32,7 @@ function Controls(props) {
 	 * @return {boolean} False value is returned.
 	 */
 	const openLinkControl = () => {
-		setIsURLPickerOpen(true);
+		setIsURLPickerOpen( true );
 		return false;
 	};
 
@@ -42,44 +42,44 @@ function Controls(props) {
 	 * @return {void} No return value
 	 */
 	const unlinkItem = () => {
-		setAttributes({
+		setAttributes( {
 			url: undefined,
 			linkTarget: undefined,
 			rel: undefined,
-		});
-		setIsURLPickerOpen(false);
+		} );
+		setIsURLPickerOpen( false );
 	};
 
 	/**
 	 * Toggle the `linkTarget` attribute of the item.
 	 */
 	const onToggleOpenInNewTab = useCallback(
-		(value) => {
+		( value ) => {
 			const newLinkTarget = value ? '_blank' : undefined;
 
 			let updatedRel = rel;
-			if (newLinkTarget && !rel) {
+			if ( newLinkTarget && ! rel ) {
 				updatedRel = NEW_TAB_REL;
-			} else if (!newLinkTarget && rel === NEW_TAB_REL) {
+			} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
 				updatedRel = undefined;
 			}
 
-			setAttributes({
+			setAttributes( {
 				linkTarget: newLinkTarget,
 				rel: updatedRel,
-			});
+			} );
 		},
-		[rel, setAttributes]
+		[ rel, setAttributes ]
 	);
 
 	/**
 	 * Will set the `rel` attribute of the item.
 	 */
 	const onSetLinkRel = useCallback(
-		(value) => {
-			setAttributes({ rel: value });
+		( value ) => {
+			setAttributes( { rel: value } );
 		},
-		[setAttributes]
+		[ setAttributes ]
 	);
 
 	return (
@@ -88,84 +88,87 @@ function Controls(props) {
 				<Toolbar label="Options">
 					<ToolbarButton
 						icon="admin-links"
-						title={__('Edit Link')}
-						onClick={openLinkControl}
-						isActive={isURLSet}
+						title={ __( 'Edit Link' ) }
+						onClick={ openLinkControl }
+						isActive={ isURLSet }
 					/>
 					<ToolbarButton
 						icon="editor-unlink"
-						title={__('Unlink')}
-						onClick={unlinkItem}
-						isDisabled={!isURLSet}
+						title={ __( 'Unlink' ) }
+						onClick={ unlinkItem }
+						isDisabled={ ! isURLSet }
 					/>
 					<ToolbarButton
-						icon={'download'}
-						disabled={hasDescendants}
-						title={__('Add submenu')}
-						onClick={toggleItemDropdown}
+						icon={ 'download' }
+						disabled={ hasDescendants }
+						title={ __( 'Add submenu' ) }
+						onClick={ toggleItemDropdown }
 					/>
 				</Toolbar>
 			</BlockControls>
-			{isURLPickerOpen && (
+			{ isURLPickerOpen && (
 				<Popover
 					position="top center"
-					onClose={() => setIsURLPickerOpen(false)}
+					onClose={ () => setIsURLPickerOpen( false ) }
 				>
 					<LinkControl
-						value={{
+						value={ {
 							url,
 							opensInNewTab: linkTarget === '_blank',
-						}}
-						onChange={({
+						} }
+						onChange={ ( {
 							title: newTitle = '',
 							url: newURL = '',
 							opensInNewTab: newOpensInNewTab = false,
 							id: newId = '',
 							kind: newKind = '',
-						}) => {
-							setAttributes({
+						} ) => {
+							setAttributes( {
 								id: newId,
 								kind: newKind,
 								url: newURL,
-								text: (() => {
-									if (text) {
+								text: ( () => {
+									if ( text ) {
 										return text;
 									}
-									if (newTitle !== '' && text !== newTitle) {
-										return escapeHtml(newTitle);
+									if (
+										newTitle !== '' &&
+										text !== newTitle
+									) {
+										return escapeHtml( newTitle );
 									}
-								})(),
-							});
+								} )(),
+							} );
 
 							if (
-								(linkTarget === '_blank') !==
+								( linkTarget === '_blank' ) !==
 								newOpensInNewTab
 							) {
-								onToggleOpenInNewTab(newOpensInNewTab);
+								onToggleOpenInNewTab( newOpensInNewTab );
 							}
 
-							setIsURLPickerOpen(false);
-						}}
+							setIsURLPickerOpen( false );
+						} }
 					/>
 				</Popover>
-			)}
+			) }
 			<InspectorControls>
-				<PanelBody title={__('Link settings')}>
+				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
-						label={__('Open in new tab')}
-						onChange={onToggleOpenInNewTab}
-						checked={linkTarget === '_blank'}
+						label={ __( 'Open in new tab' ) }
+						onChange={ onToggleOpenInNewTab }
+						checked={ linkTarget === '_blank' }
 					/>
 					<TextControl
-						label={__('Link rel')}
-						value={rel || ''}
-						onChange={onSetLinkRel}
+						label={ __( 'Link rel' ) }
+						value={ rel || '' }
+						onChange={ onSetLinkRel }
 					/>
 					<ToggleControl
-						label={__('Show on mobile')}
-						value={showOnMobile}
-						onChange={(value) =>
-							setAttributes({ showOnMobile: value })
+						label={ __( 'Show on mobile' ) }
+						checked={ showOnMobile }
+						onChange={ ( value ) =>
+							setAttributes( { showOnMobile: value } )
 						}
 					/>
 				</PanelBody>
