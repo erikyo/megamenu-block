@@ -191,7 +191,7 @@
 
 		// the base style of the dropdown menu
 		.wp-block-megamenu__content,
-		.vsge-product-categories-list--depth-1,
+		.vsge-product-categories-list,
 		.wp-block-megamenu-item__dropdown {
 			overflow-y: scroll;
 			width: $megamenu--responsive--menu-width;
@@ -230,20 +230,21 @@
 			}
 		}
 
-		// the megamenu item is opened
-		&.is-opened {
+		// the megamenu is opened (responsive only)
+		&.is-opened  {
 			.wp-block-megamenu__content {
 				opacity: 1;
 				transform: translateX(0);
 				pointer-events: auto;
 			}
 		}
-		.is-opened {
-			.wp-block-megamenu-item__dropdown {
-				opacity: 1;
-				transform: translateX(0);
-				pointer-events: auto;
-			}
+
+		// a megamenu item child is opened
+		.is-opened > ul,
+		.is-opened > .wp-block-megamenu-item__dropdown {
+			opacity: 1;
+			transform: translateX(0);
+			pointer-events: auto;
 		}
 
 		.vsge-product-categories .vsge-product-categories-list-item.has-children.is-opened {
@@ -252,7 +253,7 @@
 				padding-left: 0;
 			}
 
-			> .vsge-product-categories-list--depth-1 {
+			> .vsge-product-categories-list {
 				transform: translateX(0);
 				opacity: 1;
 				pointer-events: auto;
@@ -277,8 +278,17 @@
 	.wp-block-megamenu-item__dropdown {
 
 		.vsge-product-categories {
+
 			> ul {
 				column-count: 3;
+
+				> li {
+					padding: 16px 0 16px 64px;
+
+					.vsge-product-categories-list-item__image {
+						margin-left: -56px;
+					}
+				}
 
 				@media (max-width: 1200px) {
 					column-count: 2;
@@ -296,11 +306,12 @@
 
 			.vsge-product-categories-list-item__image {
 				object-fit: contain;
-				position: absolute;
-				margin-left: -54px;
+				aspect-ratio: 1/1;
+				margin-left: 0;
 				margin-right: 15px;
 				vertical-align: text-top;
 				border: inherit;
+				position: absolute;
 			}
 		}
 
@@ -313,14 +324,9 @@
 			width: 100%;
 			max-width: $size__nav-width;
 			margin: 0;
-			padding: 0;
 			break-inside: avoid;
 			overflow: hidden;
 			text-overflow: ellipsis;
-		}
-
-		li.vsge-product-categories-list-item a {
-			font-weight: 600;
 		}
 
 		a {
@@ -328,7 +334,7 @@
 			box-sizing: border-box;
 		}
 
-		.vsge-product-categories-list--depth-1 li.vsge-product-categories-list-item a {
+		.vsge-product-categories-list--depth-1 li.vsge-product-categories-list-item	 a {
 			font-weight: 400;
 		}
 	}
