@@ -1,23 +1,4 @@
-.wp-site-blocks .wp-block-megamenu {
-
-	.show-on-mobile {
-		display: none;
-	}
-
-	&.is-mobile {
-		position: inherit;
-
-		.show-on-mobile {
-			display: block;
-		}
-	}
-}
-
 .wp-block-megamenu {
-
-	&.has-full-width-dropdown {
-		position: relative;
-	}
 
 	.wp-block-megamenu-item {
 
@@ -102,21 +83,6 @@
 	}
 
 	/**
-	 * The desktop style for the category plugin @vsge-importer
-	 */
-	.wp-block-megamenu-subitem {
-		overflow-y: auto;
-		box-sizing: border-box;
-		max-width: 100%;
-		padding: 4px 0;
-		line-height: 48px;
-		width: 100%;
-		margin: 0;
-		break-inside: avoid;
-		text-overflow: ellipsis;
-	}
-
-	/**
 	 * The menu in desktop mode
 	 */
 	&:not(.is-mobile) {
@@ -190,8 +156,8 @@
 		}
 
 		// the base style of the dropdown menu
+		.wc-block-product-categories-list,
 		.wp-block-megamenu__content,
-		.vsge-product-categories-list,
 		.wp-block-megamenu-item__dropdown {
 			overflow-y: scroll;
 			width: $megamenu--responsive--menu-width;
@@ -217,31 +183,17 @@
 			box-shadow: inherit;
 		}
 
-		// the megamenu is opened
-		&.is-opened {
-			overflow: visible;
-
-			.wp-block-megamenu-item > .wp-block-megamenu-item__dropdown {
-				pointer-events: auto;
-			}
-
-			> .wp-block-megamenu__content {
-				box-shadow: 80px 0 150px -120px rgb(0, 0, 0), -2px 0 16px -6px rgba(0, 0, 0, 0.8);
-			}
-		}
-
 		// the megamenu is opened (responsive only)
 		&.is-opened  {
 			.wp-block-megamenu__content {
 				opacity: 1;
 				transform: translateX(0);
 				pointer-events: auto;
+				box-shadow: 80px 0 150px -120px rgb(0, 0, 0), -2px 0 16px -6px rgba(0, 0, 0, 0.8);
 			}
 		}
 
-		// a megamenu item child is opened
-		.is-opened > ul,
-		.is-opened > .wp-block-megamenu-item__dropdown {
+		.is-active {
 			opacity: 1;
 			transform: translateX(0);
 			pointer-events: auto;
@@ -271,7 +223,6 @@
 }
 
 .wp-block-megamenu-item {
-
 	/**
 	 * The megamenu product section style
 	 */
@@ -315,6 +266,12 @@
 			}
 		}
 
+		.vsge-product-categories-list--depth-1 {
+			li.vsge-product-categories-list-item a {
+				font-weight: 400;
+			}
+		}
+
 		ul {
 			margin: 0 0 var(--wp--preset--spacing--60);
 			list-style-type: none;
@@ -332,10 +289,6 @@
 		a {
 			white-space: nowrap;
 			box-sizing: border-box;
-		}
-
-		.vsge-product-categories-list--depth-1 li.vsge-product-categories-list-item	 a {
-			font-weight: 400;
 		}
 	}
 }

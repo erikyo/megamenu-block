@@ -32,6 +32,7 @@ export class MenuItem {
 	open() {
 		this.isOpened = true;
 		this.el?.classList.add('is-opened');
+		this.dropdown?.classList.add('is-active');
 		this.el?.classList.remove('is-left');
 	}
 
@@ -41,6 +42,7 @@ export class MenuItem {
 	close() {
 		if (this.el && this.isOpened) {
 			this.isOpened = false;
+			this.dropdown?.classList.remove('is-active');
 			this.el.classList.remove('is-opened');
 		}
 	}

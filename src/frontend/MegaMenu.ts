@@ -266,7 +266,7 @@ export default class MegaMenu {
 	 */
 	open() {
 		this.isOpened = true;
-		this.hamburger.enableBodyScroll();
+		this.hamburger.disableBodyScroll();
 		this.enableMegaMenu();
 	}
 
@@ -279,7 +279,7 @@ export default class MegaMenu {
 		this.isOpened = false;
 		this.enableMegaMenu( false );
 		this.updateLevel( 0 );
-		this.hamburger.disableBodyScroll();
+		this.hamburger.enableBodyScroll();
 	}
 
 	/**
@@ -324,8 +324,10 @@ export default class MegaMenu {
 			};
 
 			/* Handle hover */
-			if ( ! this.activator === 'hover' ) {
+			if ( this.activator === 'hover' ) {
 				menuItem.el.onmouseenter = action;
+			} else {
+				menuItem.el.onmouseenter = null;
 			}
 
 			/* Handle mouse leave */

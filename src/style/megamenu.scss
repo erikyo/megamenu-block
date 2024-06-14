@@ -1,11 +1,30 @@
+.wp-site-blocks .wp-block-megamenu {
+
+	.show-on-mobile {
+		display: none;
+	}
+
+	&.is-mobile {
+		position: inherit;
+
+		.show-on-mobile {
+			display: block;
+		}
+	}
+}
+
 .wp-block-megamenu {
 	width: 100%;
+
+	&.has-full-width-dropdown {
+		position: relative;
+	}
+
 	.wp-block-megamenu__content {
 		width: 100%;
 		display: flex;
 		justify-content: space-between;
 	}
-
 
 	/**
 	 * The desktop style for the category plugin @vsge-importer
