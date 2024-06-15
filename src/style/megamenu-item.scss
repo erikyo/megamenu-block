@@ -1,0 +1,294 @@
+.wp-block-megamenu {
+
+	.wp-block-megamenu-item {
+
+		:focus-visible {
+			outline: 2px solid var(--wp--preset--color--black);
+		}
+
+		&.has-child {
+			cursor: pointer;
+		}
+
+		/**
+		 *  Dropdown
+		 */
+		&__dropdown {
+			position: absolute;
+			z-index: 1001;
+			top: 100%;
+
+			overflow: hidden;
+			max-width: 100%;
+
+			height: auto;
+			background: var(--megamenu--background-color, #fff);
+			box-sizing: border-box;
+
+			&::after,
+			&::before {
+				display: table;
+				content: "";
+				clear: both;
+			}
+		}
+
+		&.is-opened {
+			overflow: visible;
+
+			.wp-block-megamenu-item__dropdown {
+				overflow: visible;
+			}
+		}
+
+
+		/**
+		 *  the menu item link (or text, if the menu has not a link)
+		 */
+		&__link {
+			padding: 10px 15px;
+			// the chevron icon is 24px height so we need to make the line-height at least 24px to avoid misalignment
+			min-height: 24px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		/**
+		 * the chevron icon
+		 */
+		&__toggle {
+			display: block;
+			padding: 0;
+			background: transparent;
+			border: 0;
+			box-shadow: none;
+			color: inherit;
+			margin: 0;
+			outline: none;
+
+			&:active,
+			&:focus {
+				outline: none;
+				text-decoration: none;
+			}
+
+			&:hover {
+				text-decoration: none;
+				color: inherit;
+				background: inherit;
+				box-shadow: none;
+			}
+		}
+	}
+
+	/**
+	 * The menu in desktop mode
+	 */
+	&:not(.is-mobile) {
+
+		.wp-block-megamenu-item {
+
+			.wp-block-megamenu-item__dropdown {
+				height: 0;
+				opacity: 0;
+				box-shadow: 0 8px 40px -30px rgba(0, 0, 0, 1);
+				transform-origin: top;
+				transform: scale(0.99), translateY(-0.75em);
+				transition-delay: 0.03s;
+				transition-duration: 500ms;
+				transition-property: opacity, transform;
+				transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+			}
+
+			&.is-opened {
+				.wp-block-megamenu-item__dropdown {
+					height: auto;
+					transform: scale(1) translateY(0);
+					opacity: 1;
+				}
+			}
+		}
+
+		// The responsive dropdown menu
+		.wp-block-megamenu-item__dropdown {
+			max-height: 100vh;
+
+			// lower the padding whenever the screen in a small screen
+			@media #{$mq__smaller-than-tablet} {
+				& > .wp-block-group {
+					padding-top: var(--wp--preset--spacing--60) !important;
+					padding-bottom: var(--wp--preset--spacing--60) !important;
+
+					li {
+						font-size: 95%;
+						line-height: 1.7;
+					}
+
+					ul {
+						margin: 0 0 var(--wp--preset--spacing--60);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * The menu in mobile mode
+	 */
+	&.is-mobile {
+
+		// the style of the vertical menu in mobile after clicking the hamburger menu
+		> .wp-block-megamenu__content {
+			transition: 500ms box-shadow;
+			flex-direction: column;
+			background-color: var( --wp--preset--color--background );
+			box-shadow: 0 0 0 -120px rgb(0, 0, 0, 0), -2px 0 16px -6px rgb(0, 0, 0, 0);
+
+			.is-layout-flex {
+				height: auto;
+				&:first-child {
+					flex-direction: column;
+					justify-content: center;
+					height: 100%;
+				}
+			}
+		}
+
+		// the base style of the dropdown menu
+		.wc-block-product-categories-list,
+		.wp-block-megamenu__content,
+		.wp-block-megamenu-item__dropdown {
+			overflow-y: scroll;
+			width: $megamenu--responsive--menu-width;
+			max-width: 100%;
+			height: 100vh;
+			position: absolute;
+			top: 0;
+			left: 0;
+			bottom: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			opacity: 0;
+			box-sizing: border-box;
+			z-index: 1006;
+			transform: translateX(-100%);
+			background: var(--megamenu--background-color, #fff);
+			transition: 350ms transform, 100ms opacity 0.05s;
+			padding: var(--megamenu--responsive--internal-padding) !important;
+		}
+
+		.wp-block-megamenu-item__dropdown {
+			box-shadow: inherit;
+		}
+
+		// the megamenu is opened (responsive only)
+		&.is-opened  {
+			.wp-block-megamenu__content {
+				opacity: 1;
+				transform: translateX(0);
+				pointer-events: auto;
+				box-shadow: 80px 0 150px -120px rgb(0, 0, 0), -2px 0 16px -6px rgba(0, 0, 0, 0.8);
+			}
+		}
+
+		.is-active {
+			opacity: 1;
+			transform: translateX(0);
+			pointer-events: auto;
+		}
+
+		.vsge-product-categories .vsge-product-categories-list-item.has-children.is-opened {
+
+			li {
+				padding-left: 0;
+			}
+
+			> .vsge-product-categories-list {
+				transform: translateX(0);
+				opacity: 1;
+				pointer-events: auto;
+			}
+		}
+
+		.wp-block-megamenu-item__dropdown .wp-block-group {
+			overflow: auto;
+			width: 100%;
+			height: 100%;
+			display: flex;
+			align-items: center;
+		}
+	}
+}
+
+.wp-block-megamenu-item {
+	/**
+	 * The megamenu product section style
+	 */
+	.wp-block-megamenu-item__dropdown {
+
+		.vsge-product-categories {
+
+			> ul {
+				column-count: 3;
+
+				> li {
+					padding: 16px 0 16px 64px;
+
+					.vsge-product-categories-list-item__image {
+						margin-left: -56px;
+					}
+				}
+
+				@media (max-width: 1200px) {
+					column-count: 2;
+				}
+
+				@media (max-width: 800px) {
+					column-count: 1;
+
+					li {
+						width: 100%;
+						padding: 12px 0;
+					}
+				}
+			}
+
+			.vsge-product-categories-list-item__image {
+				object-fit: contain;
+				aspect-ratio: 1/1;
+				margin-left: 0;
+				margin-right: 15px;
+				vertical-align: text-top;
+				border: inherit;
+				position: absolute;
+			}
+		}
+
+		.vsge-product-categories-list--depth-1 {
+			li.vsge-product-categories-list-item a {
+				font-weight: 400;
+			}
+		}
+
+		ul {
+			margin: 0 0 var(--wp--preset--spacing--60);
+			list-style-type: none;
+		}
+
+		li {
+			width: 100%;
+			max-width: $size__nav-width;
+			margin: 0;
+			break-inside: avoid;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		a {
+			white-space: nowrap;
+			box-sizing: border-box;
+		}
+	}
+}

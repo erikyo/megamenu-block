@@ -1,9 +1,9 @@
 import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
+	__experimentalLinkControl as LinkControl,
 	BlockControls,
 	InspectorControls,
-	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -12,25 +12,35 @@ import {
 	ToggleControl,
 	Toolbar,
 	ToolbarButton,
-	ToolbarGroup,
 } from '@wordpress/components';
 import { escapeHtml } from '../utils';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
 function Controls( props ) {
-	const { attributes, setAttributes, toggleItemDropdown, hasDescendants } =
-		props;
+	const { attributes, setAttributes, toggleItemDropdown } = props;
 
-	const { linkTarget, rel, text, url } = attributes;
+	const { linkTarget, rel, text, url, showOnMobile, hasDescendants } =
+		attributes;
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 
 	const isURLSet = ! ( url === undefined || url.trim().length === 0 );
 
+	/**
+	 * A function to open the link control.
+	 *
+	 * @return {boolean} False value is returned.
+	 */
 	const openLinkControl = () => {
 		setIsURLPickerOpen( true );
 		return false;
 	};
+
+	/**
+	 * A function to unlink an item by setting URL, link target, and rel to undefined and closing the URL picker.
+	 *
+	 * @return {void} No return value
+	 */
 	const unlinkItem = () => {
 		setAttributes( {
 			url: undefined,
@@ -40,8 +50,11 @@ function Controls( props ) {
 		setIsURLPickerOpen( false );
 	};
 
+	/**
+	 * Toggle the `linkTarget` attribute of the item.
+	 */
 	const onToggleOpenInNewTab = useCallback(
-		( value: boolean ) => {
+		( value ) => {
 			const newLinkTarget = value ? '_blank' : undefined;
 
 			let updatedRel = rel;
@@ -59,8 +72,11 @@ function Controls( props ) {
 		[ rel, setAttributes ]
 	);
 
+	/**
+	 * Will set the `rel` attribute of the item.
+	 */
 	const onSetLinkRel = useCallback(
-		( value: string ) => {
+		( value ) => {
 			setAttributes( { rel: value } );
 		},
 		[ setAttributes ]
@@ -82,16 +98,12 @@ function Controls( props ) {
 						onClick={ unlinkItem }
 						isDisabled={ ! isURLSet }
 					/>
-					{ ! hasDescendants && (
-						<ToolbarGroup>
-							<ToolbarButton
-								icon={ 'download' }
-								className={ hasDescendants ? 'is-active' : '' }
-								title={ __( 'Add submenu' ) }
-								onClick={ toggleItemDropdown }
-							/>
-						</ToolbarGroup>
-					) }
+					<ToolbarButton
+						icon={ 'download' }
+						disabled={ hasDescendants }
+						title={ __( 'Add submenu' ) }
+						onClick={ toggleItemDropdown }
+					/>
 				</Toolbar>
 			</BlockControls>
 			{ isURLPickerOpen && (
@@ -151,6 +163,13 @@ function Controls( props ) {
 						label={ __( 'Link rel' ) }
 						value={ rel || '' }
 						onChange={ onSetLinkRel }
+					/>
+					<ToggleControl
+						label={ __( 'Show on mobile' ) }
+						checked={ showOnMobile }
+						onChange={ ( value ) =>
+							setAttributes( { showOnMobile: value } )
+						}
 					/>
 				</PanelBody>
 			</InspectorControls>

@@ -1,75 +1,63 @@
-/**
- * The `calcNewPosition` function calculates the left position, width, and maxWidth of a dropdown menu
- * based on the position and width of the root block node and a maximum width value.
- *
- * @param {{ x: number; width: number } | DOMRect} rootBlockNode           An object that represents the root
- *                                                                         block node. It has two properties: "x" which represents the x-coordinate of the root block node, and
- *                                                                         "width" which represents the width of the root block node.
- * @param {{ x: number } | DOMRect}                blockNode               The `blockNode` parameter represents the position and
- *                                                                         dimensions of a specific block element. It has a property `x` which represents the horizontal
- *                                                                         position of the block.
- * @param {number}                                 [dropdownMaxWidth=2000] The `dropdownMaxWidth` parameter is the maximum width that
- *                                                                         the dropdown can have. If the width of the `rootBlockNode` is greater than `dropdownMaxWidth`, the
- *                                                                         dropdown will be centered within the `rootBlockNode` by adjusting the `left` value.
- * @return an object with three properties: "left", "width", and "maxWidth". The values of these
- * properties are converted to strings and are based on the calculations performed in the function.
- */
-export function calcNewPosition(
-	rootBlockNode: { x: number; width: number } | DOMRect,
-	blockNode: { x: number } | DOMRect,
-	dropdownMaxWidth: number = 2000
-): { left: string; width: string; maxWidth: string } {
-	let left = -( blockNode.x - rootBlockNode.x );
+import { DropDownCoords } from '../menu-item/constants';
 
-	if ( dropdownMaxWidth && rootBlockNode.width > dropdownMaxWidth ) {
-		left = left + ( rootBlockNode.width - dropdownMaxWidth ) / 2;
+/**
+ * Generate a random id
+ * You can pass a prefix to generate a random id with a prefix
+ *
+ * @param prefix - The prefix to be added to the random id
+ * @return A random id
+ */
+export function generateRandomId(prefix: string) {
+	return prefix + Math.random().toString(36).substring(2, 9);
+}
+
+/**
+ * Returns the lowest number in an array of numbers.
+ * It returns `undefined` if all numbers are `undefined` or `0`.
+ *
+ * @param args the args parameter is an array of numbers
+ * @return the lowest number in the array
+ */
+export function getLowestWidth(
+	...args: (number | undefined)[]
+): number | undefined {
+	// Filter out undefined values
+	const filteredArgs = args.filter(
+		(num): num is number => num !== undefined && num !== 0
+	);
+
+	// If all values were undefined, return undefined
+	if (filteredArgs.length === 0) {
+		return undefined;
 	}
 
-	return {
-		left: left.toString(),
-		width: rootBlockNode.width.toString(),
-		maxWidth: dropdownMaxWidth.toString(),
-	};
+	// Return the minimum value
+	return Math.min(...filteredArgs);
 }
 
 /**
  * The function sets the left position, width, and maximum width of an HTML element.
  *
- * @param {HTMLElement} el             The `el` parameter is an HTMLElement, which represents the element that
- *                                     you want to set the new position for.
- * @param               style          The `style` parameter is an object that contains three properties: `left`, `width`,
- *                                     and `maxWidth`. Each property represents a CSS style value for the corresponding property of the
- *                                     `el` element. The `left` property represents the left position of the element, the `width` property
- * @param               style.left
- * @param               style.width
- * @param               style.maxWidth
+ * @param {HTMLElement}    el    The `el` parameter is an HTMLElement, which represents the element that
+ *                               you want to set the new position for.
+ * @param {DropDownCoords} style The `style` parameter is an object that contains three properties: `left`, `width`,
+ *                               and `maxWidth`. Each property represents a CSS style value for the corresponding property of the
+ *                               `el` element.
  */
-export function setNewPosition(
-	el: HTMLElement,
-	style: { left: string; width: string; maxWidth: string }
-) {
-	el.style.left = `${ style.left }px`;
-	el.style.width = `${ style.width }px`;
-	el.style.maxWidth = `${ style.maxWidth }px`;
+export function setNewPosition(el: HTMLElement, style: DropDownCoords) {
+	Object.entries(style).forEach(([key, value]) => {
+		// @ts-ignore
+		el.style[key as keyof CSSStyleDeclaration] = `${value}`;
+	});
 }
 
-export function removeStyles( el: HTMLElement, stylesToRemove: string[] ) {
-	stylesToRemove.forEach( ( style ) => el.style.removeProperty( style ) );
-}
-
-/**
- * The function checks if the current viewport width is less than a specified breakpoint to determine
- * if the device is a mobile device.
- *
- * @param {number} breakpoint The `breakpoint` parameter is a number that represents the maximum
- *                            width of the viewport at which the device is considered to be a mobile device. If the width of the
- *                            viewport is less than the `breakpoint`, the function will return `true`, indicating that the device
- *                            is a mobile device. Otherwise
- * @return A boolean value indicating whether the current viewport width is less than the specified
- * breakpoint.
- */
-export function isMobile( breakpoint: number ): boolean {
-	return breakpoint !== 0 && document.body.clientWidth < breakpoint;
+export function removeStyles(el: HTMLElement | null, stylesToRemove: string[]) {
+	if (!el) {
+		return;
+	}
+	stylesToRemove.forEach((style) => {
+		el?.style && style in el.style ? el.style.removeProperty(style) : null;
+	});
 }
 
 /**
@@ -79,8 +67,8 @@ export function isMobile( breakpoint: number ): boolean {
  * @param {number} ms The parameter "ms" is a number that represents the number of milliseconds to
  *                    delay before resolving the promise.
  */
-export const delay = ( ms: number ) =>
-	new Promise( ( resolve ) => setTimeout( resolve, ms ) );
+export const delay = (ms: number) =>
+	new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * The function `disableBodyScroll` is used to disable scrolling on the body element and apply
@@ -89,19 +77,21 @@ export const delay = ( ms: number ) =>
  * @param [scrollDisabled=false] - A boolean value indicating whether to disable scrolling or not. If
  *                               set to true, scrolling will be disabled. If set to false, scrolling will be enabled.
  */
-export function disableBodyScroll( scrollDisabled = false ) {
+export function lockScroll(scrollDisabled = false) {
 	const scrollTop = window.scrollY;
-	if ( scrollDisabled ) {
+	if (scrollDisabled) {
 		document.body.dataset.scrollTop = scrollTop.toString();
 	}
 
-	if ( scrollDisabled ) {
-		window.scrollTo( { top: 0 } );
-		document.body.classList.add( 'no-scroll' );
+	if (scrollDisabled) {
+		if (document.body.classList.contains('no-scroll')) {
+			return;
+		}
+		document.body.classList.add('no-scroll');
 	} else {
-		document.body.classList.remove( 'no-scroll' );
-		window.scrollTo( { top: scrollTop } );
-		document.body.removeAttribute( 'data-scroll-top' );
+		document.body.classList.remove('no-scroll');
+		window.scrollTo({ top: scrollTop });
+		document.body.removeAttribute('data-scroll-top');
 	}
 }
 
@@ -111,8 +101,8 @@ export function disableBodyScroll( scrollDisabled = false ) {
  * @param inputString The string to be converted.
  * @return The converted string with special characters replaced by HTML entities.
  */
-export function escapeHtml( inputString: string ): string {
-	const htmlEntities: Record< string, string > = {
+export function escapeHtml(inputString: string): string {
+	const htmlEntities: Record<string, string> = {
 		'&': '&amp;',
 		'<': '&lt;',
 		'>': '&gt;',
@@ -123,5 +113,124 @@ export function escapeHtml( inputString: string ): string {
 	// Regular expression to match any of the special characters
 	const regex = /[&<>"']/g;
 
-	return inputString.replace( regex, ( match ) => htmlEntities[ match ] );
+	return inputString.replace(regex, (match) => htmlEntities[match]);
+}
+
+/**
+ * The `calcNewPosition` function calculates the left position, width, and maxWidth of a dropdown menu
+ * based on the position and width of the root block node and a maximum width value.
+ *
+ * @param {{ x: number; width: number } | DOMRect} rootBBox           An object that represents the root
+ *                                                                    block node. It has two properties: "x" which represents the x-coordinate of the root block node, and
+ *                                                                    "width" which represents the width of the root block node.
+ * @param {{ x: number } | DOMRect}                blockCoords        The `blockNode` parameter represents the position and
+ *                                                                    dimensions of a specific block element. It has a property `x` which represents the horizontal
+ *                                                                    position of the block.
+ * @param                                          dropdownEl
+ * @param                                          items
+ * @param                                          items.editorBBox
+ * @param {number}                                 [dropdownMaxWidth] The `dropdownMaxWidth` parameter is the maximum width that
+ *                                                                    the dropdown can have. If the width of the `rootBlockNode` is greater than `dropdownMaxWidth`, the
+ * @param                                          items.blockBBox
+ *                                                                    dropdown will be centered within the `rootBlockNode` by adjusting the `left` value.
+ * @param                                          fit
+ * @param                                          items.dropdownBBox
+ * @param                                          items.megamenuBBox
+ * @return an object with three properties: "left", "width", and "maxWidth". The values of these
+ * properties are converted to strings and are based on the calculations performed in the function.
+ */
+export function calcNewPosition(
+	items: {
+		blockBBox: DOMRect;
+		dropdownBBox: DOMRect;
+		megamenuBBox: DOMRect;
+	},
+	dropdownMaxWidth: number,
+	fit: boolean = true
+): DropDownCoords {
+	/**
+	 * TO FIT the dropdown inside megamenu we need only left: 0; right: 0; width 100%
+	 */
+	const { blockBBox, dropdownBBox, megamenuBBox } = items;
+
+	if (fit) {
+		// the distance from the left edge of the root block node to the left edge of the dropdown block node
+		return {
+			left: `${megamenuBBox.x * -1}px`,
+			width: `${dropdownMaxWidth}px`,
+			maxWidth: `${dropdownMaxWidth}px`,
+		};
+	}
+
+	const center = blockBBox.width / 2 - dropdownBBox.width / 2;
+	const margins = {
+		left: dropdownMaxWidth - megamenuBBox.left,
+		right: dropdownMaxWidth - megamenuBBox.right,
+	};
+	console.log(center, 'margins', margins);
+
+	if (dropdownBBox.right > dropdownMaxWidth) {
+		return {
+			right: `-${margins.right}px`,
+			maxWidth: `${dropdownMaxWidth}px`,
+		};
+	}
+	if (dropdownBBox.left < 0) {
+		return {
+			left: `-${margins.left}px`,
+			maxWidth: `${dropdownMaxWidth}px`,
+		};
+	}
+
+	return {
+		left: `-${center}px`,
+		maxWidth: `${dropdownMaxWidth}px`,
+	};
+}
+
+/**
+ * Calculates the position of a dropdown menu based on the position and size of a megamenu item and its parent attributes.
+ *
+ * @param {HTMLElement}        megamenuItem                      - The megamenu item element.
+ * @param {HTMLDivElement}     dropdown                          - The dropdown element.
+ * @param {MenuItemAttributes} parentAttributes                  - The attributes of the parent menu item.
+ * @param                      parentAttributes.dropdownMaxWidth
+ * @param                      parentAttributes.expandDropdown
+ * @return {DropDownCoords} The calculated position of the dropdown menu.
+ */
+export function calcPosition(
+	megamenuItem: HTMLElement,
+	dropdown?: HTMLElement,
+	parentAttributes?: {
+		expandDropdown: boolean;
+	}
+): DropDownCoords {
+	const { expandDropdown } = parentAttributes ?? {
+		expandDropdown: false,
+	};
+
+	const editorIframe: HTMLIFrameElement | null = document.querySelector(
+		'.edit-site-visual-editor__editor-canvas'
+	);
+	const editorEl = editorIframe?.contentWindow?.document?.body;
+	const dropdownEl = dropdown ?? megamenuItem.closest('.wp-block-megamenu');
+
+	const items = {
+		blockBBox: megamenuItem?.getBoundingClientRect() as DOMRect,
+		dropdownBBox: dropdownEl?.getBoundingClientRect() as DOMRect,
+		megamenuBBox: (
+			megamenuItem?.closest('.wp-block-megamenu') as HTMLDivElement
+		)?.getBoundingClientRect(),
+	};
+
+	return calcNewPosition(
+		items,
+		editorEl?.clientWidth ??
+			(editorEl?.getBoundingClientRect()?.width as number),
+		expandDropdown
+	);
+}
+
+export function detectTouchCapability() {
+	return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }

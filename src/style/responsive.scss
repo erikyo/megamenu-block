@@ -1,0 +1,101 @@
+/**
+ * The mobile style for the category plugin @vsge-importer
+ *
+ * TODO: make this more generic
+ */
+.wp-block-megamenu.is-mobile {
+
+	.wp-block-megamenu-menu {
+		background-color: var(--wp--preset--color--background);
+	}
+
+	.alignwide {
+		max-width: 100%;
+		max-height: 100%;
+	}
+
+	.wp-block-megamenu-item {
+		display: block;
+
+		.wp-block-woocommerce-product-categories,
+		.wp-block-megamenu-item__dropdown {
+			width: 100%;
+		}
+
+		.wp-block-megamenu-item__dropdown.is-active .vsge-product-categories-list--depth-0 {
+			text-align: left;
+			opacity: 1;
+			transform: translateX(0);
+			flex-direction: column;
+		}
+
+		// the category icons are in position x -60px
+		.vsge-product-categories-list {
+			overflow-y: auto;
+			padding-left: 96px;
+			padding-right: 24px;
+			box-sizing: border-box;
+
+			.wp-block-megamenu-item__text {
+				font-style: normal;
+				font-weight: 500;
+				text-transform: uppercase;
+			}
+
+			li {
+				align-items: center;
+				padding: 12px 0;
+				text-align: center;
+
+				li {
+					padding-left: 36px;
+				}
+			}
+
+			.vsge-product-categories-list-item__image {
+				object-fit: contain;
+				vertical-align: text-top;
+				border: inherit;
+			}
+
+			@media #{$mq__responsive_breakpoint} {
+				overflow-x: visible;
+			}
+
+			@media #{$mq__tablet-portrait} {
+				.vsge-product-categories-list-item__image {
+					display: flex;
+					height: 48px;
+					width: 48px;
+					justify-content: center;
+					align-items: center;
+
+					img {
+						object-fit: contain;
+						width: 30px !important;
+						height: 30px !important;
+					}
+				}
+			}
+
+			.vsge-product-categories-list {
+				z-index: 1007;
+				height: 100vh;
+
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-direction: column;
+
+				padding: 0 24px 0 40px;
+			}
+
+			@media #{$mq__smallphone} {
+				.vsge-product-categories-list-item__image {
+					align-items: center;
+					display: none;
+				}
+			}
+		}
+	}
+}

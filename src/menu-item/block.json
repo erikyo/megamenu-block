@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "megamenu/menu-item",
 	"title": "Menu Item",
 	"category": "layout",
@@ -9,17 +9,18 @@
 		"core/group",
 		"core/navigation"
 	],
+	"usesContext": [ "megamenu/align","megamenu/menusMinWidth","megamenu/expandDropdown" ],
 	"attributes": {
 		"url": {
 			"type": "string",
 			"default": ""
 		},
-        "id": {
-            "type": "string"
-        },
-        "kind": {
-            "type": "string"
-        },
+		"id": {
+			"type": "string"
+		},
+		"kind": {
+			"type": "string"
+		},
 		"text": {
 			"type": "string"
 		},
@@ -32,6 +33,10 @@
 		"rel": {
 			"type": "string"
 		},
+		"showOnMobile": {
+			"type": "boolean",
+			"default": false
+		},
 		"dropdownWrapperStyle": {
 			"type": "string"
 		},
@@ -39,8 +44,15 @@
 			"type": "object",
 			"default": {}
 		},
-		"showDropdown": {
-			"type": "boolean"
+		"hasDescendants": {
+			"type": "boolean",
+			"default": false
+		},
+		"style": {
+			"type": "object",
+			"default": {
+				"shadow": "var:preset|shadow|deep"
+			}
 		}
 	},
 	"supports": {
@@ -62,9 +74,6 @@
 		"dimensions": {
 			"minHeight": false
 		},
-		"position": {
-			"sticky": true
-		},
 		"shadow": {
 			"__experimentalSkipSerialization": true
 		},
@@ -84,6 +93,10 @@
 		},
 		"__experimentalSelector": ".wp-block-megamenu-item"
 	},
+	"selectors": {
+		"shadow": ".wp-block-megamenu-item .wp-block-megamenu-item__dropdown"
+	},
 	"editorScript": "file:./index.js",
-	"style": "file:./style-index.css"
+	"editorStyle": "file:./index.css",
+	"viewStyle": "file:./style-index.css"
 }

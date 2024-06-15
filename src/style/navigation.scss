@@ -1,0 +1,11 @@
+// the main menu base style
+.wp-block-megamenu {
+
+	// hide the megamenu while loading to avoid page shifting
+	@media (max-width: 1023px) {
+		&:not(.is-initialized) .wp-block-megamenu-menu > .wp-block-group {
+			display: none;
+		}
+	}
+}
+

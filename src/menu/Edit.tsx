@@ -1,95 +1,131 @@
 /**
  * External dependencies
  */
-import { compose } from '@wordpress/compose';
 /**
  * WordPress dependencies
  */
-import { useRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import classnames from 'classnames';
-import { Controls } from './controls';
-import { InnerBlocks, useInnerBlocksProps } from '@wordpress/block-editor';
+import { Controls } from './Controls';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import type { Template } from '@wordpress/blocks';
-import { withSelect } from '@wordpress/data';
+import type { BlockAttributes } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+import { MegaMenuAttributes, TEMPLATE } from './constants';
 
-const TEMPLATE = [
-	[
-		'core/group',
-		{
-			layout: {
-				type: 'flex',
-				flexWrap: 'nowrap',
-				verticalAlignment: 'stretch',
-			},
-		},
-		[ [ 'megamenu/menu-item', {} ] ],
-	],
-] as Template[];
-
-const ALLOWED_BLOCKS = [
-	'megamenu/menu-item',
-	'codekraft/oh-my-svg',
-	'core/group',
-	'core/site-logo',
-	'core/social-link',
-];
-
-function MegaMenu( args ) {
+/**
+ * Will display the responsive menu if true
+ *
+ * @param {props}    props               Object containing isSelected, attributes, setAttributes, and clientId
+ * @param {boolean}  props.isSelected    Whether the block is selected
+ * @param {Object}   props.attributes    The attributes of the block
+ * @param {Function} props.setAttributes The function to set the attributes
+ * @param {string}   props.clientId      The clientId of the block
+ * @return {JSX.Element} The JSX element representing the Edit function
+ */
+export default function Edit( props: {
+	isSelected: boolean;
+	attributes: MegaMenuAttributes;
+	setAttributes: ( attributes: BlockAttributes ) => void;
+	clientId: string;
+} ): JSX.Element {
 	const {
-		selectedBlockHasDescendants,
-		isImmediateParentOfSelectedBlock,
-		isSelected,
-		attributes,
-	} = args;
+		clientId,
+		attributes: {
+			activator,
+			expandDropdown,
+			collapseOnMobile,
+			responsiveBreakpoint,
+			dropdownMaxWidth,
+			menuAlign,
+		},
+		isSelected: boolean,
+		setAttributes,
+	} = props;
 
+	/**
+	 * Will display the responsive menu if true
+	 */
 	const [ showResponsiveMenu, setShowResponsiveMenu ] = useState( false );
-	const ref = useRef( null );
+
+	useSelect(
+		( select, {} ) => {
+			const {
+				getClientIdsOfDescendants,
+				hasSelectedInnerBlock,
+				getSelectedBlockClientId,
+				getBlocksByClientId,
+			}: {
+				withInstanceId: string;
+				getClientIdsOfDescendants: Function;
+				hasSelectedInnerBlock: Function;
+				getSelectedBlockClientId: Function;
+				getBlocksByClientId: Function;
+				getBlock: Function;
+			} = select( 'core/block-editor' );
+			// Returns true if one of the block’s inner blocks is selected.
+			const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
+				clientId,
+				false
+			);
+			const selectedBlockId = getSelectedBlockClientId();
+			const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
+				selectedBlockId,
+			] )?.length;
+			const menuItems = getBlocksByClientId( clientId )[ 0 ].innerBlocks;
+
+			return {
+				isImmediateParentOfSelectedBlock,
+				selectedBlockHasDescendants,
+				menuItems,
+			};
+		},
+		[ clientId ]
+	);
 
 	return (
-		<div>
+		<>
 			<Controls
-				{ ...args }
 				showResponsiveMenu={ showResponsiveMenu }
 				setShowResponsiveMenu={ setShowResponsiveMenu }
+				attributes={ props.attributes }
+				setAttributes={ setAttributes }
 			/>
 			<nav
-				className={ classnames(
-					'wp-block-megamenu',
-					`activator-${ attributes.activator }`,
-					{
-						'is-hidden': showResponsiveMenu,
-						[ `has-full-width-dropdown` ]:
-							attributes.expandDropdown ||
-							attributes.dropdownMaxWidth === 0,
-						[ `is-collapsible` ]: attributes.collapseOnMobile,
-					}
-				) }
-				data-responsive-breakpoint={ attributes.responsiveBreakpoint }
-				data-dropdown-content-width={ attributes.dropdownMaxWidth }
-			>
-				<div className={ 'wp-block-megamenu__content' }>
-					<InnerBlocks
-						ref={ ref }
-						template={ TEMPLATE }
-						templateLock={ false }
-						allowedBlocks={ ALLOWED_BLOCKS }
-						templateInsertUpdatesSelection={ false }
-						renderAppender={
-							( isImmediateParentOfSelectedBlock &&
-								! selectedBlockHasDescendants ) ||
-							isSelected
-								? InnerBlocks.DefaultBlockAppender
-								: undefined
+				{ ...useBlockProps( {
+					className: classnames(
+						'wp-block-megamenu',
+						`activator-${ activator }`,
+						{
+							'is-hidden': showResponsiveMenu,
+							[ `has-full-width-dropdown` ]:
+								expandDropdown || dropdownMaxWidth === 0,
+							[ `is-collapsible` ]: collapseOnMobile,
 						}
-						orientation="horizontal"
-					/>
-				</div>
+					),
+				} ) }
+				data-responsive-breakpoint={ responsiveBreakpoint }
+				data-dropdown-content-width={ dropdownMaxWidth }
+				data-activator={ activator }
+			>
+				<div
+					{ ...useInnerBlocksProps(
+						{
+							className: 'wp-block-megamenu__content',
+						},
+						{
+							orientation: 'horizontal',
+							templateLock: false,
+							template: TEMPLATE,
+							templateInsertUpdatesSelection: false,
+						}
+					) }
+				/>
 			</nav>
 			<div
 				className={ classnames(
 					'wp-block-megamenu__toggle-wrapper',
-					`align-${ attributes.menuAlign || 'right' }`,
+					`align-${ menuAlign || 'right' }`,
 					{
 						'is-hidden': ! showResponsiveMenu,
 					}
@@ -99,32 +135,6 @@ function MegaMenu( args ) {
 					<div></div>
 				</Button>
 			</div>
-		</div>
+		</>
 	);
 }
-
-export default compose( [
-	withSelect( ( select, { clientId } ) => {
-		const {
-			getClientIdsOfDescendants,
-			hasSelectedInnerBlock,
-			getSelectedBlockClientId,
-			getBlocksByClientId,
-		} = select( 'core/block-editor' );
-		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
-			clientId,
-			false
-		);
-		const selectedBlockId = getSelectedBlockClientId();
-		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
-			selectedBlockId,
-		] )?.length;
-		const menuItems = getBlocksByClientId( clientId )[ 0 ].innerBlocks;
-
-		return {
-			isImmediateParentOfSelectedBlock,
-			selectedBlockHasDescendants,
-			menuItems,
-		};
-	} ),
-] as any )( MegaMenu );

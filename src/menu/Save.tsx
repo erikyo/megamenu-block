@@ -1,49 +1,50 @@
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import classnames from 'classnames';
+import { MegaMenuAttributes } from './constants';
 
-export default function save( {
+export default function Save({
 	attributes,
 }: {
-	attributes: {
-		activator: string;
-		expandDropdown: boolean;
-		collapseOnMobile: boolean;
-		responsiveBreakpoint: number;
-		dropdownMaxWidth: number;
-	};
-} ): JSX.Element {
-	const saveBlockProps = useBlockProps.save( {
-		className: classnames( 'wp-block-megamenu__content' ),
-	} );
-
+	attributes: MegaMenuAttributes;
+}): JSX.Element {
+	const {
+		activator,
+		expandDropdown,
+		collapseOnMobile,
+		responsiveBreakpoint,
+		dropdownMaxWidth,
+	} = attributes;
 	return (
 		<>
 			<nav
-				className={ classnames(
-					'wp-block-megamenu',
-					`activator-${ attributes.activator }`,
-					{
-						[ `has-full-width-dropdown` ]:
-							attributes.expandDropdown ||
-							attributes.dropdownMaxWidth === 0,
-						[ `is-collapsible` ]: attributes.collapseOnMobile,
-					}
-				) }
-				data-responsive-breakpoint={ attributes.responsiveBreakpoint }
-				data-dropdown-width={ attributes.dropdownMaxWidth }
+				{...useBlockProps.save({
+					className: classnames(
+						'wp-block-megamenu',
+						`activator-${activator}`,
+						{
+							[`has-full-width-dropdown`]: expandDropdown,
+							[`is-collapsible`]: collapseOnMobile,
+						}
+					),
+				})}
+				data-responsive-breakpoint={responsiveBreakpoint}
+				data-dropdown-width={dropdownMaxWidth}
+				data-activator={activator}
 			>
-				<div { ...saveBlockProps }>
-					<InnerBlocks.Content />
-				</div>
+				<div
+					{...useInnerBlocksProps.save({
+						className: classnames('wp-block-megamenu__content'),
+					})}
+				/>
 			</nav>
 			<div
-				className={ classnames(
+				className={classnames(
 					'wp-block-megamenu__toggle-wrapper',
 					'is-hidden'
-				) }
+				)}
 			>
 				<button
 					className="wp-block-megamenu__toggle hamburger"

@@ -7,5 +7,9 @@ header {
 	--megamenu--responsive--internal-padding: var(--megamenu--hamburger-width) calc(var(--megamenu--hamburger-width) * 0.5);
 }
 
-@import "style/core";
-@import "style/megamenu";
+@import "../style/vars";
+@import "../style/base";
+@import "../style/navigation";
+@import "../style/hamburger";
+@import "../style/responsive";
+@import "../style/megamenu";

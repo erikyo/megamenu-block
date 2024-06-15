@@ -1,11 +1,25 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
     "name": "megamenu/menu",
     "title": "Mega Menu",
     "category": "layout",
 	"icon": "menu",
-    "attributes": {
+	"allowedBlocks": [
+		"megamenu/menu-item",
+		"codekraft/oh-my-svg",
+		"core/group",
+		"core/heading",
+		"core/paragraph",
+		"core/site-logo",
+		"core/social-link"
+	],
+	"providesContext": {
+		"megamenu/align": "align",
+		"megamenu/menusMinWidth": "menusMinWidth",
+		"megamenu/expandDropdown": "expandDropdown"
+	},
+	"attributes": {
 		"align": {
 			"type": "string",
 			"default": "center"
@@ -33,7 +47,17 @@
         "responsiveBreakpoint": {
             "type": "number",
             "default": 1023
-        }
+        },
+		"expandDropdown": {
+			"type": "boolean",
+			"default": true
+		},
+		"style": {
+			"type": "object",
+			"default": {
+				"shadow": "var:preset|shadow|deep"
+			}
+		}
 	},
 	"supports": {
 		"align": true,
@@ -64,22 +88,19 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
-			"__experimentalWritingMode": true,
-			"__experimentalDefaultControls": {
-				"fontSize": true
-			}
+			"__experimentalWritingMode": true
 		},
-		"reusable": false,
-		"lightBlockWrapper": false
+		"reusable": false
 	},
 	"editorScript": "file:./index.js",
-	"style": "file:./style-index.css",
-	"editorStyle": "file:./style-editor.css",
-	"script": "file:./view.js"
+	"viewScript": "file:./view.js",
+	"editorStyle": "file:./index.css",
+	"viewStyle": "file:./style-view.css"
 }

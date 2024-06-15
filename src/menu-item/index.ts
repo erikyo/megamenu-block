@@ -1,13 +1,14 @@
-import { registerBlockType } from '@wordpress/blocks';
+import { BlockAttributes, registerBlockType } from '@wordpress/blocks';
 
 import blockMeta from './block.json';
-import save from './save';
-import edit from './edit';
+const metadata = blockMeta as BlockAttributes;
+import Save from './Save';
+import Edit from './Edit';
 import { CHILDREN_ICON } from '../utils/icons';
 import './style.scss';
 
-registerBlockType( blockMeta.name, {
+registerBlockType( metadata.name, {
 	icon: CHILDREN_ICON,
-	edit,
-	save,
+	edit: Edit,
+	save: Save,
 } );
