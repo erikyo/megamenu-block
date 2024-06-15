@@ -2,8 +2,10 @@
  * External dependencies
  */
 import classnames from 'classnames';
+/**
+ * WP dependencies
+ */
 import { __ } from '@wordpress/i18n';
-import Controls from './Controls';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	RichText,
@@ -18,26 +20,26 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Icon } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
-import {
-	DropDownCoords,
-	MenuItemAttributes,
-	ParentAttributes,
-	TEMPLATE,
-} from './constants';
+/**
+ * Internal dependencies
+ */
+import { DropDownCoords, MenuItemAttributes, ParentAttributes } from './types';
 import { calcPosition } from '../utils';
+import Controls from './Controls';
+import { DROPDOWN_TEMPLATE } from '../utils/constants';
 import './editor.scss';
 
 /**
- * Internal dependencies
+ * The Edit component.
  *
- * @param props
- * @param props.attributes
- * @param props.setAttributes
- * @param props.isSelected
- * @param props.onReplace
- * @param props.mergeBlocks
- * @param props.clientId
- * @param props.context
+ * @param props               The component props.
+ * @param props.attributes    The attributes of the block.
+ * @param props.setAttributes A function to set the attributes.
+ * @param props.isSelected    Whether the block is selected.
+ * @param props.onReplace     A function to replace the block.
+ * @param props.mergeBlocks   A function to merge blocks.
+ * @param props.clientId      The clientId of the block.
+ * @param props.context       The context of the block.
  */
 export default function Edit( props: {
 	attributes: MenuItemAttributes;
@@ -83,7 +85,7 @@ export default function Edit( props: {
 	const menuItemRef = useRef< HTMLElement | null >( null );
 	const dropdownRef = useRef< HTMLElement | null >( null );
 
-	const updateInnerBlocks = async ( content = TEMPLATE ) => {
+	const updateInnerBlocks = async ( content = DROPDOWN_TEMPLATE ) => {
 		const innerBlocks = createBlocksFromInnerBlocksTemplate( content );
 		return replaceInnerBlocks( clientId, innerBlocks, false );
 	};
@@ -136,7 +138,9 @@ export default function Edit( props: {
 		setShowDropdown( true );
 	};
 
-	/* will update the position of the dropdown based on the position of the menu item */
+	/**
+	 * Will update the position of the dropdown based on the position of the menu item
+	 */
 	const updateDropdownPosition = useCallback(
 		( megamenuElements?: {
 			megamenuItem: HTMLElement;

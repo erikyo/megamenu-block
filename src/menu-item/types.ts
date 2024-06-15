@@ -1,19 +1,4 @@
-import {
-	InnerBlockTemplate,
-	BlockAttributes,
-	BlockInstance,
-} from '@wordpress/blocks';
-
-export const TEMPLATE: InnerBlockTemplate[] = [
-	[
-		'core/group',
-		{
-			backgroundColor: 'background',
-			className: 'wp-block-megamenu-item',
-			layout: { type: 'constrained' },
-		},
-	],
-];
+import type { BlockAttributes } from '@wordpress/blocks';
 
 export type DropDownCoords = {
 	left?: string;
