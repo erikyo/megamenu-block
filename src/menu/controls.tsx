@@ -1,5 +1,4 @@
 import {
-	CheckboxControl,
 	PanelBody,
 	RangeControl,
 	SelectControl,
@@ -9,11 +8,8 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
-import { compose } from '@wordpress/compose';
-import { withDispatch } from '@wordpress/data';
-import { alignLeft, alignCenter, alignRight } from '@wordpress/icons';
-import { MenuItemAttributes } from '../menu-item/constants';
-import { MegaMenuAttributes } from './constants';
+import { alignCenter, alignLeft, alignRight } from '@wordpress/icons';
+import { MegaMenuAttributes } from './types';
 
 /**
  * Renders the controls for the MegaMenu block.
