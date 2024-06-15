@@ -1,21 +1,7 @@
 /**
  * Style for the editor
  */
-import type { BlockAttributes, Template } from '@wordpress/blocks';
-
-export const TEMPLATE = [
-	[
-		'core/group',
-		{
-			layout: {
-				type: 'flex',
-				flexWrap: 'nowrap',
-				justifyContent: 'center',
-			},
-		},
-		[ [ 'megamenu/menu-item', {} ] ],
-	],
-] as Template[];
+import type { BlockAttributes } from '@wordpress/blocks';
 
 export const ALLOWED_BLOCKS = [
 	'megamenu/menu-item',

@@ -6,11 +6,17 @@ import { Icon } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import classnames from 'classnames';
 import { type BlockAttributes, type BlockEditProps } from '@wordpress/blocks';
-import { MenuItemAttributes } from './constants';
+import { MenuItemAttributes } from './types';
 
+/**
+ * Save function for rendering the block on the frontend.
+ *
+ * @param {BlockEditProps<BlockAttributes>} attributes - The attributes of the block to be saved.
+ * @return {JSX.Element} The JSX element representing the saved block.
+ */
 export default function save( {
 	attributes,
-}: BlockEditProps< BlockAttributes > ) {
+}: BlockEditProps< BlockAttributes > ): JSX.Element {
 	const {
 		url,
 		linkTarget,
@@ -35,7 +41,8 @@ export default function save( {
 			position: ! expandDropdown ? 'relative' : undefined,
 		},
 	} );
-	const linkProps = {
+
+	const linkProps: { href: any; target?: any; rel?: any } = {
 		href: url ? url : '#',
 		...( linkTarget && { target: linkTarget } ),
 		...( rel && { rel } ),

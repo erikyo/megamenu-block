@@ -3,13 +3,13 @@
  */
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import classnames from 'classnames';
-import { MegaMenuAttributes } from './constants';
+import { MegaMenuAttributes } from './types';
 
-export default function Save({
+export default function Save( {
 	attributes,
 }: {
 	attributes: MegaMenuAttributes;
-}): JSX.Element {
+} ): JSX.Element {
 	const {
 		activator,
 		expandDropdown,
@@ -20,31 +20,31 @@ export default function Save({
 	return (
 		<>
 			<nav
-				{...useBlockProps.save({
+				{ ...useBlockProps.save( {
 					className: classnames(
 						'wp-block-megamenu',
-						`activator-${activator}`,
+						`activator-${ activator }`,
 						{
-							[`has-full-width-dropdown`]: expandDropdown,
-							[`is-collapsible`]: collapseOnMobile,
+							[ `has-full-width-dropdown` ]: expandDropdown,
+							[ `is-collapsible` ]: collapseOnMobile,
 						}
 					),
-				})}
-				data-responsive-breakpoint={responsiveBreakpoint}
-				data-dropdown-width={dropdownMaxWidth}
-				data-activator={activator}
+				} ) }
+				data-responsive-breakpoint={ responsiveBreakpoint }
+				data-dropdown-width={ dropdownMaxWidth }
+				data-activator={ activator }
 			>
 				<div
-					{...useInnerBlocksProps.save({
-						className: classnames('wp-block-megamenu__content'),
-					})}
+					{ ...useInnerBlocksProps.save( {
+						className: classnames( 'wp-block-megamenu__content' ),
+					} ) }
 				/>
 			</nav>
 			<div
-				className={classnames(
+				className={ classnames(
 					'wp-block-megamenu__toggle-wrapper',
 					'is-hidden'
-				)}
+				) }
 			>
 				<button
 					className="wp-block-megamenu__toggle hamburger"
