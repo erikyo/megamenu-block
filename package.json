@@ -44,8 +44,8 @@
 		"extends @wordpress/browserslist-config"
 	],
 	"engines": {
-		"node": ">=14.0.0",
-		"npm": ">=6.9.0"
+		"node": ">=18.0.0",
+		"npm": ">=7.0.0"
 	},
 	"eslintConfig": {
 		"extends": [
