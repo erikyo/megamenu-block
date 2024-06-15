@@ -1,21 +1,32 @@
 /**
  * The mobile style for the category plugin @vsge-importer
- *
- * TODO: make this more generic
  */
 .wp-block-megamenu.is-mobile {
 
-	.wp-block-megamenu-menu {
-		background-color: var(--wp--preset--color--background);
-	}
-
-	.alignwide {
-		max-width: 100%;
-		max-height: 100%;
+	&.is-opened {
+		&:before {
+			content: '';
+			position: fixed;
+			display: block;
+			pointer-events: none;
+			z-index: 990;
+			top: $size__nav-height;
+			bottom: 0;
+			left: 0;
+			right: -100%;
+			height: 100%;
+			width: 200%;
+			background: rgb(0 0 0 / 50%);
+		}
 	}
 
 	.wp-block-megamenu-item {
 		display: block;
+
+		.wp-block-megamenu-item__dropdown li {
+			text-align: center;
+			padding: 12px 0;
+		}
 
 		.wp-block-woocommerce-product-categories,
 		.wp-block-megamenu-item__dropdown {
@@ -31,42 +42,18 @@
 
 		// the category icons are in position x -60px
 		.vsge-product-categories-list {
-			overflow-y: auto;
 			padding-left: 96px;
 			padding-right: 24px;
 			box-sizing: border-box;
 
-			.wp-block-megamenu-item__text {
-				font-style: normal;
-				font-weight: 500;
-				text-transform: uppercase;
-			}
-
-			li {
-				align-items: center;
-				padding: 12px 0;
-				text-align: center;
-
-				li {
-					padding-left: 36px;
-				}
-			}
-
-			.vsge-product-categories-list-item__image {
-				object-fit: contain;
-				vertical-align: text-top;
-				border: inherit;
-			}
-
 			@media #{$mq__responsive_breakpoint} {
-				overflow-x: visible;
-			}
+				overflow-y: auto;
 
-			@media #{$mq__tablet-portrait} {
 				.vsge-product-categories-list-item__image {
 					display: flex;
 					height: 48px;
 					width: 48px;
+					margin-left: 0;
 					justify-content: center;
 					align-items: center;
 
@@ -76,6 +63,32 @@
 						height: 30px !important;
 					}
 				}
+			}
+
+			.wp-block-megamenu-item__text {
+				font-style: normal;
+				font-weight: 500;
+				text-transform: uppercase;
+			}
+
+			li {
+				align-items: start;
+
+				li {
+					padding-left: 36px;
+				}
+			}
+
+			.vsge-product-categories-list-item__image {
+				object-fit: contain;
+				border: inherit;
+				position: inherit;
+				justify-content: center;
+			}
+
+			.vsge-product-categories-list-item__title {
+				display: flex;
+				align-items: center;
 			}
 
 			.vsge-product-categories-list {

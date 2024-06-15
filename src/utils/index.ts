@@ -7,8 +7,8 @@ import { DropDownCoords } from '../menu-item/constants';
  * @param prefix - The prefix to be added to the random id
  * @return A random id
  */
-export function generateRandomId(prefix: string) {
-	return prefix + Math.random().toString(36).substring(2, 9);
+export function generateRandomId( prefix: string ) {
+	return prefix + Math.random().toString( 36 ).substring( 2, 9 );
 }
 
 /**
@@ -19,20 +19,20 @@ export function generateRandomId(prefix: string) {
  * @return the lowest number in the array
  */
 export function getLowestWidth(
-	...args: (number | undefined)[]
+	...args: ( number | undefined )[]
 ): number | undefined {
 	// Filter out undefined values
 	const filteredArgs = args.filter(
-		(num): num is number => num !== undefined && num !== 0
+		( num ): num is number => num !== undefined && num !== 0
 	);
 
 	// If all values were undefined, return undefined
-	if (filteredArgs.length === 0) {
+	if ( filteredArgs.length === 0 ) {
 		return undefined;
 	}
 
 	// Return the minimum value
-	return Math.min(...filteredArgs);
+	return Math.min( ...filteredArgs );
 }
 
 /**
@@ -44,20 +44,25 @@ export function getLowestWidth(
  *                               and `maxWidth`. Each property represents a CSS style value for the corresponding property of the
  *                               `el` element.
  */
-export function setNewPosition(el: HTMLElement, style: DropDownCoords) {
-	Object.entries(style).forEach(([key, value]) => {
+export function setNewPosition( el: HTMLElement, style: DropDownCoords ) {
+	Object.entries( style ).forEach( ( [ key, value ] ) => {
 		// @ts-ignore
-		el.style[key as keyof CSSStyleDeclaration] = `${value}`;
-	});
+		el.style[ key as keyof CSSStyleDeclaration ] = `${ value }`;
+	} );
 }
 
-export function removeStyles(el: HTMLElement | null, stylesToRemove: string[]) {
-	if (!el) {
+export function removeStyles(
+	el: HTMLElement | null,
+	stylesToRemove: string[]
+) {
+	if ( ! el ) {
 		return;
 	}
-	stylesToRemove.forEach((style) => {
-		el?.style && style in el.style ? el.style.removeProperty(style) : null;
-	});
+	stylesToRemove.forEach( ( style ) => {
+		el?.style && style in el.style
+			? el.style.removeProperty( style )
+			: null;
+	} );
 }
 
 /**
@@ -67,8 +72,8 @@ export function removeStyles(el: HTMLElement | null, stylesToRemove: string[]) {
  * @param {number} ms The parameter "ms" is a number that represents the number of milliseconds to
  *                    delay before resolving the promise.
  */
-export const delay = (ms: number) =>
-	new Promise((resolve) => setTimeout(resolve, ms));
+export const delay = ( ms: number ) =>
+	new Promise( ( resolve ) => setTimeout( resolve, ms ) );
 
 /**
  * The function `disableBodyScroll` is used to disable scrolling on the body element and apply
@@ -77,21 +82,21 @@ export const delay = (ms: number) =>
  * @param [scrollDisabled=false] - A boolean value indicating whether to disable scrolling or not. If
  *                               set to true, scrolling will be disabled. If set to false, scrolling will be enabled.
  */
-export function lockScroll(scrollDisabled = false) {
+export function lockScroll( scrollDisabled = false ) {
 	const scrollTop = window.scrollY;
-	if (scrollDisabled) {
+	if ( scrollDisabled ) {
 		document.body.dataset.scrollTop = scrollTop.toString();
 	}
 
-	if (scrollDisabled) {
-		if (document.body.classList.contains('no-scroll')) {
+	if ( scrollDisabled ) {
+		if ( document.body.classList.contains( 'no-scroll' ) ) {
 			return;
 		}
-		document.body.classList.add('no-scroll');
+		document.body.classList.add( 'no-scroll' );
 	} else {
-		document.body.classList.remove('no-scroll');
-		window.scrollTo({ top: scrollTop });
-		document.body.removeAttribute('data-scroll-top');
+		document.body.classList.remove( 'no-scroll' );
+		window.scrollTo( { top: scrollTop } );
+		document.body.removeAttribute( 'data-scroll-top' );
 	}
 }
 
@@ -101,8 +106,8 @@ export function lockScroll(scrollDisabled = false) {
  * @param inputString The string to be converted.
  * @return The converted string with special characters replaced by HTML entities.
  */
-export function escapeHtml(inputString: string): string {
-	const htmlEntities: Record<string, string> = {
+export function escapeHtml( inputString: string ): string {
+	const htmlEntities: Record< string, string > = {
 		'&': '&amp;',
 		'<': '&lt;',
 		'>': '&gt;',
@@ -113,7 +118,7 @@ export function escapeHtml(inputString: string): string {
 	// Regular expression to match any of the special characters
 	const regex = /[&<>"']/g;
 
-	return inputString.replace(regex, (match) => htmlEntities[match]);
+	return inputString.replace( regex, ( match ) => htmlEntities[ match ] );
 }
 
 /**
@@ -153,12 +158,12 @@ export function calcNewPosition(
 	 */
 	const { blockBBox, dropdownBBox, megamenuBBox } = items;
 
-	if (fit) {
+	if ( fit ) {
 		// the distance from the left edge of the root block node to the left edge of the dropdown block node
 		return {
-			left: `${megamenuBBox.x * -1}px`,
-			width: `${dropdownMaxWidth}px`,
-			maxWidth: `${dropdownMaxWidth}px`,
+			left: `${ megamenuBBox.x * -1 }px`,
+			width: `${ dropdownMaxWidth }px`,
+			maxWidth: `${ dropdownMaxWidth }px`,
 		};
 	}
 
@@ -167,24 +172,24 @@ export function calcNewPosition(
 		left: dropdownMaxWidth - megamenuBBox.left,
 		right: dropdownMaxWidth - megamenuBBox.right,
 	};
-	console.log(center, 'margins', margins);
+	console.log( center, 'margins', margins );
 
-	if (dropdownBBox.right > dropdownMaxWidth) {
+	if ( dropdownBBox.right > dropdownMaxWidth ) {
 		return {
-			right: `-${margins.right}px`,
-			maxWidth: `${dropdownMaxWidth}px`,
+			right: `-${ margins.right }px`,
+			maxWidth: `${ dropdownMaxWidth }px`,
 		};
 	}
-	if (dropdownBBox.left < 0) {
+	if ( dropdownBBox.left < 0 ) {
 		return {
-			left: `-${margins.left}px`,
-			maxWidth: `${dropdownMaxWidth}px`,
+			left: `-${ margins.left }px`,
+			maxWidth: `${ dropdownMaxWidth }px`,
 		};
 	}
 
 	return {
-		left: `-${center}px`,
-		maxWidth: `${dropdownMaxWidth}px`,
+		left: `-${ center }px`,
+		maxWidth: `${ dropdownMaxWidth }px`,
 	};
 }
 
@@ -213,24 +218,24 @@ export function calcPosition(
 		'.edit-site-visual-editor__editor-canvas'
 	);
 	const editorEl = editorIframe?.contentWindow?.document?.body;
-	const dropdownEl = dropdown ?? megamenuItem.closest('.wp-block-megamenu');
+	const dropdownEl = dropdown ?? megamenuItem.closest( '.wp-block-megamenu' );
 
 	const items = {
 		blockBBox: megamenuItem?.getBoundingClientRect() as DOMRect,
 		dropdownBBox: dropdownEl?.getBoundingClientRect() as DOMRect,
 		megamenuBBox: (
-			megamenuItem?.closest('.wp-block-megamenu') as HTMLDivElement
-		)?.getBoundingClientRect(),
+			megamenuItem?.closest( '.wp-block-megamenu' ) as HTMLDivElement
+		 )?.getBoundingClientRect(),
 	};
 
 	return calcNewPosition(
 		items,
 		editorEl?.clientWidth ??
-			(editorEl?.getBoundingClientRect()?.width as number),
+			( editorEl?.getBoundingClientRect()?.width as number ),
 		expandDropdown
 	);
 }
 
 export function detectTouchCapability() {
-	return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+	return 'ontouchstart' in window && navigator.maxTouchPoints > 0;
 }

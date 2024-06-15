@@ -1,5 +1,5 @@
 /* Global style vars - sizes */
-$size__nav-height: 40px; // same as $size__branding-height
+$size__nav-height: 56px; // same as $size__branding-height
 $size__nav-width: 340px;
 $nav_wrap_horizontal_padding: calc(
 	var(--wp--preset--spacing--50) + #{$size__nav-width * 1.2}
