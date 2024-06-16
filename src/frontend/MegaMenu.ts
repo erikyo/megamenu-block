@@ -135,7 +135,7 @@ export default class MegaMenu {
 		if (detectTouchCapability()) {
 			return 'click';
 		}
-		if (this.el.dataset.activator === 'hover' && !this.isResponsive) {
+		if (this.el.dataset.activator === 'hover') {
 			return 'hover';
 		}
 		return 'click';

@@ -4,6 +4,7 @@
 .wp-block-megamenu.is-mobile {
 
 	&.is-opened {
+		// the shadow behind the menu in responsive mode
 		&:before {
 			content: '';
 			position: fixed;
@@ -33,11 +34,21 @@
 			width: 100%;
 		}
 
-		.wp-block-megamenu-item__dropdown.is-active .vsge-product-categories-list--depth-0 {
-			text-align: left;
-			opacity: 1;
-			transform: translateX(0);
-			flex-direction: column;
+		.wp-block-megamenu-item__dropdown {
+			&.is-active {
+				.vsge-product-categories-list--depth-0 {
+					text-align: left;
+					opacity: 1;
+					transform: translateX(0);
+					flex-direction: column;
+				}
+			}
+			.vsge-product-categories-list--depth-0 {
+				.vsge-product-categories-list-item__title {
+					display: flex;
+					align-items: center;
+				}
+			}
 		}
 
 		// the category icons are in position x -60px
@@ -79,6 +90,23 @@
 				}
 			}
 
+			.vsge-product-categories-list-item__title {
+				display: flex;
+				align-items: center;
+			}
+
+			.vsge-product-categories-list {
+				z-index: 1007;
+				height: 100vh;
+
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-direction: column;
+
+				padding: 0 24px 0 40px;
+			}
+
 			.vsge-product-categories-list-item__image {
 				object-fit: contain;
 				border: inherit;
@@ -105,7 +133,6 @@
 
 			@media #{$mq__smallphone} {
 				.vsge-product-categories-list-item__image {
-					align-items: center;
 					display: none;
 				}
 			}

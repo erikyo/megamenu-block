@@ -24,12 +24,12 @@ import { MENU_TEMPLATE } from '../utils/constants';
  * @param {string}   props.clientId      The clientId of the block
  * @return {JSX.Element} The JSX element representing the Edit function
  */
-export default function Edit(props: {
+export default function Edit( props: {
 	isSelected: boolean;
 	attributes: MegaMenuAttributes;
-	setAttributes: (attributes: BlockAttributes) => void;
+	setAttributes: ( attributes: BlockAttributes ) => void;
 	clientId: string;
-}): JSX.Element {
+} ): JSX.Element {
 	const {
 		clientId,
 		attributes: {
@@ -47,10 +47,10 @@ export default function Edit(props: {
 	/**
 	 * Will display the responsive menu if true
 	 */
-	const [showResponsiveMenu, setShowResponsiveMenu] = useState(false);
+	const [ showResponsiveMenu, setShowResponsiveMenu ] = useState( false );
 
 	useSelect(
-		(select, {}) => {
+		( select, {} ) => {
 			const {
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
@@ -63,17 +63,17 @@ export default function Edit(props: {
 				getSelectedBlockClientId: Function;
 				getBlocksByClientId: Function;
 				getBlock: Function;
-			} = select('core/block-editor');
+			} = select( 'core/block-editor' );
 			// Returns true if one of the block’s inner blocks is selected.
 			const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
 				clientId,
 				false
 			);
 			const selectedBlockId = getSelectedBlockClientId();
-			const selectedBlockHasDescendants = !!getClientIdsOfDescendants([
+			const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
 				selectedBlockId,
-			])?.length;
-			const menuItems = getBlocksByClientId(clientId)[0].innerBlocks;
+			] )?.length;
+			const menuItems = getBlocksByClientId( clientId )[ 0 ].innerBlocks;
 
 			return {
 				isImmediateParentOfSelectedBlock,
@@ -81,36 +81,36 @@ export default function Edit(props: {
 				menuItems,
 			};
 		},
-		[clientId]
+		[ clientId ]
 	);
 
 	return (
 		<>
 			<Controls
-				showResponsiveMenu={showResponsiveMenu}
-				setShowResponsiveMenu={setShowResponsiveMenu}
-				attributes={props.attributes}
-				setAttributes={setAttributes}
+				showResponsiveMenu={ showResponsiveMenu }
+				setShowResponsiveMenu={ setShowResponsiveMenu }
+				attributes={ props.attributes }
+				setAttributes={ setAttributes }
 			/>
 			<nav
-				{...useBlockProps({
+				{ ...useBlockProps( {
 					className: classnames(
 						'wp-block-megamenu',
-						`activator-${activator}`,
+						`activator-${ activator }`,
 						{
 							'is-hidden': showResponsiveMenu,
-							[`has-full-width-dropdown`]:
+							[ `has-full-width-dropdown` ]:
 								expandDropdown || dropdownMaxWidth === 0,
-							[`is-collapsible`]: collapseOnMobile,
+							[ `is-collapsible` ]: collapseOnMobile,
 						}
 					),
-				})}
-				data-responsive-breakpoint={responsiveBreakpoint}
-				data-dropdown-content-width={dropdownMaxWidth}
-				data-activator={activator}
+				} ) }
+				data-responsive-breakpoint={ responsiveBreakpoint }
+				data-dropdown-content-width={ dropdownMaxWidth }
+				data-activator={ activator }
 			>
 				<div
-					{...useInnerBlocksProps(
+					{ ...useInnerBlocksProps(
 						{
 							className: 'wp-block-megamenu__content',
 						},
@@ -120,17 +120,17 @@ export default function Edit(props: {
 							template: MENU_TEMPLATE,
 							templateInsertUpdatesSelection: false,
 						}
-					)}
+					) }
 				/>
 			</nav>
 			<div
-				className={classnames(
+				className={ classnames(
 					'wp-block-megamenu__toggle-wrapper',
-					`align-${menuAlign || 'right'}`,
+					`align-${ menuAlign || 'right' }`,
 					{
-						'is-hidden': !showResponsiveMenu,
+						'is-hidden': ! showResponsiveMenu,
 					}
-				)}
+				) }
 			>
 				<Button className="wp-block-megamenu__toggle hamburger">
 					<div></div>
