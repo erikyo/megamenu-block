@@ -34,7 +34,7 @@
 		&::before,
 		&::after,
 		div {
-			background: var(--wp--preset--color--menu-toggle, black);
+			background: var(--wp--preset--color--menu-toggle, currentColor);
 			content: "";
 			display: block;
 			height: 2px;
