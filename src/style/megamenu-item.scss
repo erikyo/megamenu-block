@@ -23,6 +23,7 @@
 
 			height: auto;
 			background: var(--megamenu--background-color, #fff);
+			color: var(--megamenu--text-color, #000);
 			box-sizing: border-box;
 
 			&::after,
@@ -145,6 +146,11 @@
 			background-color: var( --wp--preset--color--background );
 			box-shadow: 0 0 0 -120px rgb(0, 0, 0, 0), -2px 0 16px -6px rgb(0, 0, 0, 0);
 
+			.wp-block-megamenu-item__text {
+				background: var(--megamenu--background-color, #fff);
+				color: var(--megamenu--text-color, #000);
+			}
+
 			.is-layout-flex {
 				height: auto;
 				&:first-child {
@@ -214,7 +220,7 @@
 
 		.wp-block-megamenu-item__dropdown .wp-block-group {
 			display: flex;
-			box-sizing: content-box;
+			box-sizing: border-box;
 			overflow: auto;
 			width: 100%;
 			height: 100%;

@@ -8,13 +8,12 @@ $nav_wrap_horizontal_padding: calc(
 /* Global style vars - margins */
 $size__nav-margin: 'var(--wp--preset--spacing--40)'; // same as $size__branding-height
 $size__nav-margin-large: 'var(--wp--preset--spacing--60)'; // same as $size__branding-height
-$nav_padding: 0 0 0 $size__nav-margin;
 
 /* Responsive vars */
 $mq__smallphone: "(max-width : 376px)";
 $mq__tablet-portrait: "(max-width: 768px)";
 $mq__smaller-than-tablet: "(max-width : 1023px)";
-$background-color: '--color--bg';
+
 $mq__responsive_breakpoint: $mq__smaller-than-tablet;
 $megamenu--responsive--menu-width: calc(100vw - (var(--megamenu--hamburger-width) + var(--wp--preset--spacing--60) + var(--wp--preset--spacing--60)));
 
