@@ -47,11 +47,11 @@ export default function Save( {
 					'wp-block-megamenu__toggle-wrapper',
 					'is-hidden'
 				) }
-				style={{ color: hamburgerColor }}
 			>
 				<button
 					className="wp-block-megamenu__toggle hamburger"
 					aria-label="Toggle megamenu"
+					style={ { color: hamburgerColor } }
 				>
 					<div></div>
 				</button>

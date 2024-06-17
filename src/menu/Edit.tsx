@@ -132,9 +132,11 @@ export default function Edit( props: {
 						'is-hidden': ! showResponsiveMenu,
 					}
 				) }
-				style={ { color: hamburgerColor } }
 			>
-				<Button className="wp-block-megamenu__toggle hamburger">
+				<Button
+					className="wp-block-megamenu__toggle hamburger"
+					style={ { color: hamburgerColor } }
+				>
 					<div></div>
 				</Button>
 			</div>
