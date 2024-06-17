@@ -18,13 +18,15 @@
 		"id": {
 			"type": "string"
 		},
-		"kind": {
+		"type": {
 			"type": "string"
 		},
 		"text": {
-			"type": "string"
+			"type": "string",
+            "source": "html",
+            "selector": "span"
 		},
-		"linkTarget": {
+		"target": {
 			"type": "string"
 		},
 		"opensInNewTab": {

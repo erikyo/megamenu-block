@@ -63,15 +63,14 @@ export default function Edit( props: {
 		mergeBlocks,
 	} = props;
 	// the menu item anchor data
-	const { text, linkTarget, rel, parentAttributes, showOnMobile } =
-		attributes;
+	const { text, target, rel, parentAttributes, showOnMobile } = attributes;
 	const align = props?.context[ 'megamenu/align' ];
 	const menusMinWidth = props?.context[ 'megamenu/menusMinWidth' ];
 	const expandDropdown = props?.context[ 'megamenu/expandDropdown' ];
 
 	const linkProps = {
-		...( linkTarget && { target: linkTarget } ),
-		...( rel && { rel } ),
+		target: target ? target : undefined,
+		rel: rel ? rel : undefined,
 	};
 
 	const [ dropdownPosition, setDropdownPosition ] = useState(
@@ -204,7 +203,9 @@ export default function Edit( props: {
 		}
 	}, [] );
 
+	/** the block */
 	const blockProps = useBlockProps();
+	/** the dropdown */
 	const innerBlockProps = useInnerBlocksProps( {
 		className: 'wp-block-megamenu-item__dropdown',
 		style: dropdownPosition,
@@ -229,7 +230,7 @@ export default function Edit( props: {
 			} }
 		>
 			<Controls toggleItemDropdown={ addMenuItemDropdown } { ...props } />
-			<a
+			<span
 				{ ...linkProps }
 				className={ 'wp-block-megamenu-item__link' }
 				style={ {
@@ -238,20 +239,21 @@ export default function Edit( props: {
 						: 'left',
 				} }
 			>
-				<span className={ 'wp-block-megamenu-item__text' }>
-					<RichText
-						{ ...blockProps }
-						placeholder={ __( 'Add a menu item' ) }
-						value={ text }
-						onChange={ ( value ) =>
-							setAttributes( { text: value } )
-						}
-						onReplace={ onReplace }
-						onMerge={ mergeBlocks }
-						identifier="content"
-						tagName="span"
-					/>
-				</span>
+				<RichText
+					{ ...blockProps }
+					value={ text }
+					allowedFormats={ [
+						'core/bold',
+						'core/italic',
+						'core/language',
+					] }
+					placeholder={ __( 'Add a menu item' ) }
+					className={ 'wp-block-megamenu-item__text' }
+					onChange={ ( value ) => setAttributes( { text: value } ) }
+					onReplace={ onReplace }
+					onMerge={ mergeBlocks }
+					tagName="span"
+				/>
 				{ hasDescendants ? (
 					<Icon
 						icon={ chevronDown }
@@ -262,7 +264,7 @@ export default function Edit( props: {
 						} }
 					/>
 				) : null }
-			</a>
+			</span>
 			{ showDropdown && <div { ...innerBlockProps } /> }
 		</div>
 	);

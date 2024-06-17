@@ -16,7 +16,7 @@ export type ParentAttributes = {
 
 export interface MenuItemAttributes extends BlockAttributes {
 	text: string;
-	linkTarget: string;
+	target: string;
 	rel: string;
 	id: number;
 	opensInNewTab: boolean;
