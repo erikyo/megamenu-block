@@ -45,6 +45,7 @@ export function Controls({
 		responsiveBreakpoint,
 		dropdownMaxWidth,
 		align,
+		menuAlign,
 		hamburgerColor,
 	} = attributes;
 	function setAlignment(newValue: string) {
@@ -143,6 +144,18 @@ export function Controls({
 						min={0}
 						max={2000}
 					/>
+					<SelectControl
+						label={__('Hamburger Menu Position')}
+						value={menuAlign}
+						options={[
+							{ label: __('Right'), value: 'right' },
+							{ label: __('Left'), value: 'left' },
+						]}
+						onChange={(newValue) =>
+							setAttributes({ menuAlign: newValue })
+						}
+						__nextHasNoMarginBottom
+					/>
 					<ToggleControl
 						label={__('Collapse on mobile?')}
 						help={
@@ -165,6 +178,7 @@ export function Controls({
 							setShowResponsiveMenu(!showResponsiveMenu)
 						}
 					/>
+					<p>{__('Hamburger color')}</p>
 					<ColorPicker
 						color={hamburgerColor}
 						onChange={(newColor) =>

@@ -45,7 +45,8 @@ export default function Save( {
 			<div
 				className={ classnames(
 					'wp-block-megamenu__toggle-wrapper',
-					'is-hidden'
+					'is-hidden',
+					`align${ menuAlign || 'right' }`
 				) }
 			>
 				<button

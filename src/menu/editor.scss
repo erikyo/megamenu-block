@@ -1,7 +1,12 @@
 /**
  * The editor style
  */
+@import "style";
+
 .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
 	max-width: 100%;
 }
-@import "style";
+
+.block-editor-block-list__block.wp-block-megamenu.is-hidden {
+	display: none;
+}

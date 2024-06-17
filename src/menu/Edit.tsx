@@ -99,7 +99,7 @@ export default function Edit( props: {
 						'wp-block-megamenu',
 						`activator-${ activator }`,
 						{
-							'is-hidden': ! showResponsiveMenu,
+							'is-hidden': showResponsiveMenu,
 							[ `has-full-width-dropdown` ]:
 								expandDropdown || dropdownMaxWidth === 0,
 							[ `is-collapsible` ]: collapseOnMobile,
@@ -127,7 +127,7 @@ export default function Edit( props: {
 			<div
 				className={ classnames(
 					'wp-block-megamenu__toggle-wrapper',
-					`align-${ menuAlign || 'right' }`,
+					`align${ menuAlign || 'right' }`,
 					{
 						'is-hidden': ! showResponsiveMenu,
 					}
