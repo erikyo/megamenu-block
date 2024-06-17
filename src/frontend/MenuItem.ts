@@ -17,13 +17,13 @@ export class MenuItem {
 		this.el = el;
 		this.fullWidthDropdown = args?.fullWidthDropdown ?? false;
 		this.button =
-			this.el.querySelector('.wp-block-megamenu-item') ||
-			this.el.querySelector('a, button') ||
+			this.el.querySelector( '.wp-block-megamenu-item__link' ) ||
+			this.el.querySelector( 'a, button' ) ||
 			el;
 		this.dropdown = this.el.querySelector(
 			'.wp-block-megamenu-item__dropdown'
 		);
-		this.hasChildren = this.el.classList.contains('has-children');
+		this.hasChildren = this.el.classList.contains( 'has-children' );
 	}
 
 	/**
@@ -31,19 +31,19 @@ export class MenuItem {
 	 */
 	open() {
 		this.isOpened = true;
-		this.el?.classList.add('is-opened');
-		this.dropdown?.classList.add('is-active');
-		this.el?.classList.remove('is-left');
+		this.el?.classList.add( 'is-opened' );
+		this.dropdown?.classList.add( 'is-active' );
+		this.el?.classList.remove( 'is-left' );
 	}
 
 	/**
 	 * Helper function to close a menu item.
 	 */
 	close() {
-		if (this.el && this.isOpened) {
+		if ( this.el && this.isOpened ) {
 			this.isOpened = false;
-			this.dropdown?.classList.remove('is-active');
-			this.el.classList.remove('is-opened');
+			this.dropdown?.classList.remove( 'is-active' );
+			this.el.classList.remove( 'is-opened' );
 		}
 	}
 
@@ -53,8 +53,8 @@ export class MenuItem {
 	 * @param          megamenuRect
 	 * @param {number} [maxWidth=0] - The maximum width allowed for the dropdown. 0 means auto width
 	 */
-	updateDropdownPosition(megamenuRect: DOMRect, maxWidth: number = 0) {
-		if (this.dropdown) {
+	updateDropdownPosition( megamenuRect: DOMRect, maxWidth: number = 0 ) {
+		if ( this.dropdown ) {
 			const items = {
 				blockBBox: this.el.getBoundingClientRect(),
 				dropdownBBox: this.dropdown?.getBoundingClientRect(),
@@ -63,7 +63,7 @@ export class MenuItem {
 
 			setNewPosition(
 				this.dropdown,
-				calcNewPosition(items, maxWidth, this.fullWidthDropdown)
+				calcNewPosition( items, maxWidth, this.fullWidthDropdown )
 			);
 		}
 	}
