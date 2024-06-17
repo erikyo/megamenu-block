@@ -5,14 +5,14 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import classnames from 'classnames';
+import classNames from 'classnames';
 import { Controls } from './Controls';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
-import { Button } from '@wordpress/components';
 import type { BlockAttributes } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { MegaMenuAttributes } from './types';
 import { MENU_TEMPLATE } from '../utils/constants';
+import { Hamburger } from './Hamburger';
 
 /**
  * Will display the responsive menu if true
@@ -95,7 +95,7 @@ export default function Edit( props: {
 			/>
 			<nav
 				{ ...useBlockProps( {
-					className: classnames(
+					className: classNames(
 						'wp-block-megamenu',
 						`activator-${ activator }`,
 						{
@@ -124,23 +124,11 @@ export default function Edit( props: {
 					) }
 				/>
 			</nav>
-			<div
-				className={ classnames(
-					'wp-block-megamenu__toggle-wrapper',
-					`align${ menuAlign || 'right' }`,
-					{
-						'is-hidden': ! showResponsiveMenu,
-					}
-				) }
-			>
-				<Button
-					className="wp-block-megamenu__toggle hamburger"
-					aria-label="Toggle megamenu"
-					style={ { color: hamburgerColor } }
-				>
-					<div></div>
-				</Button>
-			</div>
+			<Hamburger
+				hamburgerColor={ hamburgerColor }
+				menuAlign={ menuAlign }
+				showResponsiveMenu={ showResponsiveMenu }
+			/>
 		</>
 	);
 }

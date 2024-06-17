@@ -4,6 +4,7 @@
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import classnames from 'classnames';
 import { MegaMenuAttributes } from './types';
+import { Hamburger } from './Hamburger';
 
 export default function Save( {
 	attributes,
@@ -42,21 +43,11 @@ export default function Save( {
 					} ) }
 				/>
 			</nav>
-			<div
-				className={ classnames(
-					'wp-block-megamenu__toggle-wrapper',
-					'is-hidden',
-					`align${ menuAlign || 'right' }`
-				) }
-			>
-				<button
-					className="wp-block-megamenu__toggle hamburger"
-					aria-label="Toggle megamenu"
-					style={ { color: hamburgerColor } }
-				>
-					<div></div>
-				</button>
-			</div>
+			<Hamburger
+				hamburgerColor={ hamburgerColor }
+				menuAlign={ menuAlign }
+				showResponsiveMenu={ false }
+			/>
 		</>
 	);
 }
