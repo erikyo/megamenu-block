@@ -135,6 +135,7 @@ export default function Edit( props: {
 			>
 				<Button
 					className="wp-block-megamenu__toggle hamburger"
+					aria-label="Toggle megamenu"
 					style={ { color: hamburgerColor } }
 				>
 					<div></div>
