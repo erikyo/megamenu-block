@@ -39,6 +39,7 @@ export default function Edit( props: {
 			responsiveBreakpoint,
 			dropdownMaxWidth,
 			menuAlign,
+			hamburgerColor,
 		},
 		isSelected: boolean,
 		setAttributes,
@@ -98,7 +99,7 @@ export default function Edit( props: {
 						'wp-block-megamenu',
 						`activator-${ activator }`,
 						{
-							'is-hidden': showResponsiveMenu,
+							'is-hidden': ! showResponsiveMenu,
 							[ `has-full-width-dropdown` ]:
 								expandDropdown || dropdownMaxWidth === 0,
 							[ `is-collapsible` ]: collapseOnMobile,
@@ -131,6 +132,7 @@ export default function Edit( props: {
 						'is-hidden': ! showResponsiveMenu,
 					}
 				) }
+				style={ { color: hamburgerColor } }
 			>
 				<Button className="wp-block-megamenu__toggle hamburger">
 					<div></div>

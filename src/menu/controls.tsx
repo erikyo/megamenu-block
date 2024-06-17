@@ -1,4 +1,5 @@
 import {
+	ColorPicker,
 	PanelBody,
 	RangeControl,
 	SelectControl,
@@ -25,7 +26,7 @@ import { MegaMenuAttributes } from './types';
  * @param          props.attributes
  * @return {JSX.Element} The rendered controls.
  */
-export function Controls( {
+export function Controls({
 	setAttributes,
 	attributes,
 	showResponsiveMenu,
@@ -35,7 +36,7 @@ export function Controls( {
 	setShowResponsiveMenu: Function;
 	setAttributes: Function;
 	attributes: MegaMenuAttributes;
-} ): JSX.Element {
+}): JSX.Element {
 	const {
 		menusMinWidth,
 		activator,
@@ -44,11 +45,12 @@ export function Controls( {
 		responsiveBreakpoint,
 		dropdownMaxWidth,
 		align,
+		hamburgerColor,
 	} = attributes;
-	function setAlignment( newValue: string ) {
-		setAttributes( {
+	function setAlignment(newValue: string) {
+		setAttributes({
 			align: newValue,
-		} );
+		});
 	}
 
 	return (
@@ -56,121 +58,120 @@ export function Controls( {
 			<BlockControls>
 				<Toolbar label="Options">
 					<ToolbarButton
-						icon={ alignLeft }
+						icon={alignLeft}
 						label="Left"
-						title={ __( 'Justify items left' ) }
-						isActive={ 'left' === align }
-						onClick={ () => setAlignment( 'left' ) }
+						title={__('Justify items left')}
+						isActive={'left' === align}
+						onClick={() => setAlignment('left')}
 					/>
 					<ToolbarButton
-						icon={ alignCenter }
+						icon={alignCenter}
 						label="Center"
-						title={ __( 'Justify items center' ) }
-						isActive={ 'center' === align }
-						onClick={ () => setAlignment( 'center' ) }
+						title={__('Justify items center')}
+						isActive={'center' === align}
+						onClick={() => setAlignment('center')}
 					/>
 					<ToolbarButton
-						icon={ alignRight }
+						icon={alignRight}
 						label="Right"
-						title={ __( 'Justify items right' ) }
-						isActive={ 'right' === align }
-						onClick={ () => setAlignment( 'right' ) }
+						title={__('Justify items right')}
+						isActive={'right' === align}
+						onClick={() => setAlignment('right')}
 					/>
 				</Toolbar>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody
-					title={ __( 'Menu Dropdown Settings' ) }
-					initialOpen={ true }
+					title={__('Menu Dropdown Settings')}
+					initialOpen={true}
 				>
 					<ToggleControl
-						label={ __( 'Expand dropdown' ) }
+						label={__('Expand dropdown')}
 						help={
 							expandDropdown
-								? __( 'Dropdown width same as window width.' )
-								: __( 'Dropdown width same as menu width.' )
+								? __('Dropdown width same as window width.')
+								: __('Dropdown width same as menu width.')
 						}
-						checked={ expandDropdown }
-						onChange={ ( value ) =>
-							setAttributes( {
+						checked={expandDropdown}
+						onChange={(value) =>
+							setAttributes({
 								expandDropdown: value,
-							} )
+							})
 						}
 					/>
-					{ dropdownMaxWidth !== 0 && (
+					{dropdownMaxWidth !== 0 && (
 						<RangeControl
-							label={ __(
-								'Maximum width of dropdown in pixels'
-							) }
-							value={ dropdownMaxWidth }
-							onChange={ ( newWidth ) =>
-								setAttributes( { newWidth } )
-							}
-							min={ 0 }
-							max={ 2000 }
+							label={__('Maximum width of dropdown in pixels')}
+							value={dropdownMaxWidth}
+							onChange={(newWidth) => setAttributes({ newWidth })}
+							min={0}
+							max={2000}
 						/>
-					) }
+					)}
 					<SelectControl
-						label={ __( 'Activator' ) }
-						value={ activator }
-						options={ [
-							{ label: __( 'Click' ), value: 'click' },
-							{ label: __( 'Hover' ), value: 'hover' },
-						] }
-						onChange={ ( newValue ) =>
-							setAttributes( { activator: newValue } )
+						label={__('Activator')}
+						value={activator}
+						options={[
+							{ label: __('Click'), value: 'click' },
+							{ label: __('Hover'), value: 'hover' },
+						]}
+						onChange={(newValue) =>
+							setAttributes({ activator: newValue })
 						}
 						__nextHasNoMarginBottom
 					/>
 				</PanelBody>
-				<PanelBody
-					title={ __( 'Menu Item Settings' ) }
-					initialOpen={ false }
-				>
+				<PanelBody title={__('Menu Item Settings')} initialOpen={false}>
 					<RangeControl
-						label={ __( 'Minimum Width' ) }
-						value={ menusMinWidth }
-						onChange={ ( value ) =>
-							setAttributes( { menusMinWidth: value } )
+						label={__('Minimum Width')}
+						value={menusMinWidth}
+						onChange={(value) =>
+							setAttributes({ menusMinWidth: value })
 						}
-						min={ 0 }
-						max={ 1000 }
+						min={0}
+						max={1000}
 					/>
 				</PanelBody>
 				<PanelBody
-					title={ __( 'Responsive Settings' ) }
-					initialOpen={ false }
+					title={__('Responsive Settings')}
+					initialOpen={false}
 				>
 					<RangeControl
-						label={ __( 'Mobile device breakpoint in pixels' ) }
-						value={ responsiveBreakpoint }
-						onChange={ ( newValue ) =>
-							setAttributes( { newValue } )
-						}
-						min={ 0 }
-						max={ 2000 }
+						label={__('Mobile device breakpoint in pixels')}
+						value={responsiveBreakpoint}
+						onChange={(newValue) => setAttributes({ newValue })}
+						min={0}
+						max={2000}
 					/>
 					<ToggleControl
-						label={ __( 'Collapse on mobile?' ) }
+						label={__('Collapse on mobile?')}
 						help={
 							collapseOnMobile
-								? __( 'Menu will be transformed to burger.' )
-								: __( 'Menu will be as it is.' )
+								? __('Menu will be transformed to burger.')
+								: __('Menu will be as it is.')
 						}
-						checked={ collapseOnMobile }
-						onChange={ ( val ) => setAttributes( { val } ) }
+						checked={collapseOnMobile}
+						onChange={(val) => setAttributes({ val })}
 					/>
 					<ToggleControl
-						label={ __( 'Show responsive Toggle' ) }
+						label={__('Show responsive Toggle')}
 						help={
 							showResponsiveMenu
-								? __( 'Show hamburger.' )
-								: __( 'Hide hamburger.' )
+								? __('Show hamburger.')
+								: __('Hide hamburger.')
 						}
-						checked={ showResponsiveMenu }
-						onChange={ () =>
-							setShowResponsiveMenu( ! showResponsiveMenu )
+						checked={showResponsiveMenu}
+						onChange={() =>
+							setShowResponsiveMenu(!showResponsiveMenu)
 						}
+					/>
+					<ColorPicker
+						color={hamburgerColor}
+						onChange={(newColor) =>
+							setAttributes({ hamburgerColor: newColor })
+						}
+						enableAlpha
+						defaultValue="#000"
 					/>
 				</PanelBody>
 			</InspectorControls>

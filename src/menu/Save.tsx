@@ -16,6 +16,8 @@ export default function Save( {
 		collapseOnMobile,
 		responsiveBreakpoint,
 		dropdownMaxWidth,
+		menuAlign,
+		hamburgerColor,
 	} = attributes;
 	return (
 		<>
@@ -45,6 +47,7 @@ export default function Save( {
 					'wp-block-megamenu__toggle-wrapper',
 					'is-hidden'
 				) }
+				style={{ color: hamburgerColor }}
 			>
 				<button
 					className="wp-block-megamenu__toggle hamburger"
