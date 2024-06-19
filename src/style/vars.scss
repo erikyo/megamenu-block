@@ -5,10 +5,6 @@ $nav_wrap_horizontal_padding: calc(
 	var(--wp--preset--spacing--50) + #{$size__nav-width * 1.2}
 );
 
-/* Global style vars - margins */
-$size__nav-margin: 'var(--wp--preset--spacing--40)'; // same as $size__branding-height
-$size__nav-margin-large: 'var(--wp--preset--spacing--60)'; // same as $size__branding-height
-
 /* Responsive vars */
 $mq__smallphone: "(max-width : 376px)";
 $mq__tablet-portrait: "(max-width: 768px)";
