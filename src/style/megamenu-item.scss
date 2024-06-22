@@ -240,7 +240,7 @@
 				column-count: 3;
 
 				> li {
-					padding: 16px 0 16px 64px;
+					padding: 0 0 16px 64px;
 
 					.vsge-product-categories-list-item__image {
 						margin-left: -56px;
@@ -279,7 +279,6 @@
 		}
 
 		ul {
-			margin: 0 0 var(--wp--preset--spacing--60);
 			list-style-type: none;
 		}
 
