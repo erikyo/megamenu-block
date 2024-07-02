@@ -102,6 +102,7 @@
 			}
 
 			&.is-opened {
+
 				.wp-block-megamenu-item__dropdown {
 					height: auto;
 					transform: scale(1) translateY(0);
@@ -116,6 +117,7 @@
 
 			// lower the padding whenever the screen in a small screen
 			@media #{$mq__smaller-than-tablet} {
+
 				& > .wp-block-group {
 					padding-top: var(--wp--preset--spacing--60) !important;
 					padding-bottom: var(--wp--preset--spacing--60) !important;
@@ -142,16 +144,17 @@
 		> .wp-block-megamenu__content {
 			transition: 500ms box-shadow;
 			flex-direction: column;
-			background-color: var( --wp--preset--color--background );
+			background-color: var(--wp--preset--color--background);
 			box-shadow: 0 0 0 -120px rgb(0, 0, 0, 0), -2px 0 16px -6px rgb(0, 0, 0, 0);
 
-			.wp-block-megamenu-item__text {
+			.wp-block-megamenu-item__link {
 				background: var(--megamenu--background-color, #fff);
 				color: var(--megamenu--text-color, #000);
 			}
 
 			.is-layout-flex {
 				height: auto;
+
 				&:first-child {
 					flex-direction: column;
 					justify-content: center;
@@ -189,7 +192,8 @@
 		}
 
 		// the megamenu is opened (responsive only)
-		&.is-opened  {
+		&.is-opened {
+
 			.wp-block-megamenu__content {
 				opacity: 1;
 				transform: translateX(0);
@@ -229,6 +233,7 @@
 }
 
 .wp-block-megamenu-item {
+
 	/**
 	 * The megamenu product section style
 	 */
@@ -273,6 +278,7 @@
 		}
 
 		.vsge-product-categories-list--depth-1 {
+
 			li.vsge-product-categories-list-item a {
 				font-weight: 400;
 			}
@@ -283,7 +289,6 @@
 		}
 
 		li {
-			width: 100%;
 			max-width: $size__nav-width;
 			margin: 0;
 			break-inside: avoid;
