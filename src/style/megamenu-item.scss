@@ -97,16 +97,25 @@
 				transform: scale(0.99), translateY(-0.75em);
 				transition-delay: 0.03s;
 				transition-duration: 500ms;
-				transition-property: opacity, transform;
+				transition-property: opacity, transform, display;
 				transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+
+				> div {
+					display: none;
+				}
 			}
 
 			&.is-opened {
 
 				.wp-block-megamenu-item__dropdown {
+					display: block;
 					height: auto;
 					transform: scale(1) translateY(0);
 					opacity: 1;
+
+					> div {
+						display: block;
+					}
 				}
 			}
 		}
