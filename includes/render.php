@@ -16,12 +16,6 @@ defined( 'ABSPATH' ) || exit;
  * @return string Rendered HTML.
  */
 function render_megamenu_menu( $attributes, $content, $block ) {
-	$block_lang           = $attributes['lang'] ?? 'en';
-	$current_lang         = function_exists( 'pll_current_language' ) ? pll_current_language() : $block_lang;
-	if ( empty( $current_lang ) ) {
-		$current_lang = 'en';
-	}
-
 	$activator            = $attributes['activator'] ?? 'hover';
 	$expand_dropdown      = $attributes['expandDropdown'] ?? true;
 	$collapse_on_mobile   = $attributes['collapseOnMobile'] ?? true;
@@ -77,12 +71,6 @@ function render_megamenu_menu( $attributes, $content, $block ) {
  * @return string Rendered HTML.
  */
 function render_megamenu_menu_item( $attributes, $content, $block ) {
-	$block_lang           = $attributes['lang'] ?? 'en';
-	$current_lang         = function_exists( 'pll_current_language' ) ? pll_current_language() : $block_lang;
-	if ( empty( $current_lang ) ) {
-		$current_lang = 'en';
-	}
-
 	$url              = $attributes['url'] ?? '';
 	$target           = $attributes['target'] ?? '';
 	$rel              = $attributes['rel'] ?? '';
