@@ -1,7 +1,12 @@
 {
-	"core": null,
-	"plugins": [
-		".",
-		"erikyo/OH-MY-SVG"
-	]
+  "core": "WordPress/WordPress#6.9",
+  "plugins": [
+    "."
+  ],
+  "config": {
+    "WP_DEBUG": true,
+    "WP_DEBUG_LOG": "/var/www/html/wp-content/plugins/megamenu-block/debug.log",
+    "WP_DEBUG_DISPLAY": true,
+    "FS_METHOD": "direct"
+  }
 }

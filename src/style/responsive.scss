@@ -56,6 +56,13 @@
 			padding-left: 96px;
 			padding-right: 24px;
 			box-sizing: border-box;
+			z-index: 1007;
+			height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+			padding: 0 24px 0 40px;
 
 			@media #{$mq__responsive_breakpoint} {
 				overflow-y: auto;
@@ -73,6 +80,12 @@
 						width: 30px !important;
 						height: 30px !important;
 					}
+				}
+			}
+
+			@media #{$mq__smallphone} {
+				.vsge-product-categories-list-item__image {
+					display: none;
 				}
 			}
 
@@ -95,46 +108,11 @@
 				align-items: center;
 			}
 
-			.vsge-product-categories-list {
-				z-index: 1007;
-				height: 100vh;
-
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				flex-direction: column;
-
-				padding: 0 24px 0 40px;
-			}
-
 			.vsge-product-categories-list-item__image {
 				object-fit: contain;
 				border: inherit;
 				position: inherit;
 				justify-content: center;
-			}
-
-			.vsge-product-categories-list-item__title {
-				display: flex;
-				align-items: center;
-			}
-
-			.vsge-product-categories-list {
-				z-index: 1007;
-				height: 100vh;
-
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				flex-direction: column;
-
-				padding: 0 24px 0 40px;
-			}
-
-			@media #{$mq__smallphone} {
-				.vsge-product-categories-list-item__image {
-					display: none;
-				}
 			}
 		}
 	}
