@@ -90,7 +90,6 @@ function render_megamenu_menu_item( $attributes, $content, $block ) {
 	// Get context values from parent block
 	$context          = $block->context ?? array();
 	$menus_min_width  = $context['megamenu/menusMinWidth'] ?? 0;
-	$align            = $context['megamenu/align'] ?? 'left';
 	$expand_dropdown  = $context['megamenu/expandDropdown'] ?? true;
 
 	$classes = array(
