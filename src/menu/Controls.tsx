@@ -3,12 +3,9 @@ import {
 	RangeControl,
 	SelectControl,
 	ToggleControl,
-	Toolbar,
-	ToolbarButton,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls, BlockControls } from '@wordpress/block-editor';
-import { alignLeft, alignCenter, alignRight } from '@wordpress/icons';
+import { InspectorControls } from '@wordpress/block-editor';
 import { MegaMenuAttributes } from './types';
 
 /**
@@ -39,40 +36,10 @@ export function Controls( {
 		collapseOnMobile,
 		responsiveBreakpoint,
 		dropdownMaxWidth,
-		itemsJustify,
 	} = attributes;
-
-	function setAlignment( newValue: string ) {
-		setAttributes( { itemsJustify: newValue } );
-	}
 
 	return (
 		<>
-			<BlockControls>
-				<Toolbar label="Options">
-					<ToolbarButton
-						icon={ alignLeft }
-						label="Left"
-						title={ __( 'Justify items left' ) }
-						isActive={ 'left' === itemsJustify }
-						onClick={ () => setAlignment( 'left' ) }
-					/>
-					<ToolbarButton
-						icon={ alignCenter }
-						label="Center"
-						title={ __( 'Justify items center' ) }
-						isActive={ 'center' === itemsJustify }
-						onClick={ () => setAlignment( 'center' ) }
-					/>
-					<ToolbarButton
-						icon={ alignRight }
-						label="Right"
-						title={ __( 'Justify items right' ) }
-						isActive={ 'right' === itemsJustify }
-						onClick={ () => setAlignment( 'right' ) }
-					/>
-				</Toolbar>
-			</BlockControls>
 			<InspectorControls>
 				<PanelBody
 					title={ __( 'Menu Dropdown Settings' ) }
