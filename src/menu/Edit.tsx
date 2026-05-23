@@ -38,6 +38,7 @@ export default function Edit( props: {
 			collapseOnMobile,
 			responsiveBreakpoint,
 			dropdownMaxWidth,
+			itemsJustify,
 		},
 		isSelected: boolean,
 		setAttributes,
