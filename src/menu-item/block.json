@@ -49,10 +49,6 @@
 			"type": "boolean",
 			"default": false
 		},
-		"submenuId": {
-			"type": "number",
-			"default": 0
-		},
 		"style": {
 			"type": "object",
 			"default": {
