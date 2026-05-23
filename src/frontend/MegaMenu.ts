@@ -341,16 +341,21 @@ export default class MegaMenu {
 	 *
 	 * @param menuItem
 	 */
-	openMenuItem( menuItem: MenuItem ) {
-		if ( ! this.isResponsive ) {
-			menuItem.updateDropdownPosition(
-				this.el.getBoundingClientRect(),
-				this.el.ownerDocument.body.scrollWidth
-			);
-		}
+	async openMenuItem( menuItem: MenuItem ) {
+		// Extract layout context before opening
+		const megamenuRect = this.el.getBoundingClientRect();
+		const dropdownMaxWidth = Number( this.el.dataset.dropdownWidth ) || 0;
+		const maxBodyWidth = getLowestWidth(
+			this.el.ownerDocument.body.scrollWidth,
+			dropdownMaxWidth
+		);
 
-		// open the dropdown
-		menuItem.open();
+		// Open the dropdown and pass layout bounds for positioning after hydration
+		if ( ! this.isResponsive ) {
+			await menuItem.open( megamenuRect, maxBodyWidth );
+		} else {
+			await menuItem.open();
+		}
 
 		// add the item to the openMenus array
 		this.openMenus.push( menuItem );
