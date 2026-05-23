@@ -123,7 +123,7 @@ function render_megamenu_menu_item( $attributes, $content, $block ) {
 	if ( $menus_min_width ) {
 		$link_style .= 'min-width: ' . intval( $menus_min_width ) . 'px;';
 	}
-	$link_style .= 'justify-content: ' . esc_attr( $align ) . ';';
+	// Note: text alignment is now handled by native typography support via get_block_wrapper_attributes
 
 	$href = $url ? esc_url( $url ) : '#';
 	$target_attr = $target ? ' target="' . esc_attr( $target ) . '"' : '';
