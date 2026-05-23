@@ -113,7 +113,7 @@
 		// the chevron icon is 24px height so we need to make the line-height at least 24px to avoid misalignment
 		min-height: 24px;
 		display: flex;
-		justify-content: center;
+		justify-content: flex-start;
 		align-items: center;
 	}
 
@@ -305,3 +305,13 @@
 		}
 	}
 }
+
+// 1. Parent Menu alignment cascade
+.wp-block-megamenu.has-text-align-left .wp-block-megamenu-item__link { justify-content: flex-start; }
+.wp-block-megamenu.has-text-align-center .wp-block-megamenu-item__link { justify-content: center; }
+.wp-block-megamenu.has-text-align-right .wp-block-megamenu-item__link { justify-content: flex-end; }
+
+// 2. Child Item specific alignment (wins in cascade)
+.wp-block-megamenu-item.has-text-align-left .wp-block-megamenu-item__link { justify-content: flex-start; }
+.wp-block-megamenu-item.has-text-align-center .wp-block-megamenu-item__link { justify-content: center; }
+.wp-block-megamenu-item.has-text-align-right .wp-block-megamenu-item__link { justify-content: flex-end; }
