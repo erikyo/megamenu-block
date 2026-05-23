@@ -145,9 +145,9 @@ export function escapeHtml( inputString: string ): string {
  */
 export function calcNewPosition(
 	items: {
-		blockBBox: DOMRect;
-		dropdownBBox: DOMRect;
-		megamenuBBox: DOMRect;
+		blockBBox?: DOMRect;
+		dropdownBBox?: DOMRect;
+		megamenuBBox?: DOMRect;
 	},
 	dropdownMaxWidth: number,
 	fit: boolean = true
@@ -156,6 +156,11 @@ export function calcNewPosition(
 	 * TO FIT the dropdown inside megamenu we need only left: 0; right: 0; width 100%
 	 */
 	const { blockBBox, dropdownBBox, megamenuBBox } = items;
+
+	// Return safe fallback if any required rect is undefined
+	if ( ! blockBBox || ! dropdownBBox || ! megamenuBBox ) {
+		return {};
+	}
 
 	if ( fit ) {
 		// the distance from the left edge of the root block node to the left edge of the dropdown block node
@@ -203,7 +208,7 @@ export function calcNewPosition(
  * @return {DropDownCoords} The calculated position of the dropdown menu.
  */
 export function calcPosition(
-	megamenuItem: HTMLElement,
+	megamenuItem?: HTMLElement,
 	dropdown?: HTMLElement,
 	parentAttributes?: {
 		expandDropdown: boolean;
@@ -213,6 +218,11 @@ export function calcPosition(
 		expandDropdown: false,
 	};
 
+	// Return safe fallback if megamenuItem is not available
+	if ( ! megamenuItem ) {
+		return {};
+	}
+
 	const editorIframe: HTMLIFrameElement | null = document.querySelector(
 		'.edit-site-visual-editor__editor-canvas'
 	);
@@ -220,8 +230,8 @@ export function calcPosition(
 	const dropdownEl = dropdown ?? megamenuItem.closest( '.wp-block-megamenu' );
 
 	const items = {
-		blockBBox: megamenuItem?.getBoundingClientRect() as DOMRect,
-		dropdownBBox: dropdownEl?.getBoundingClientRect() as DOMRect,
+		blockBBox: megamenuItem?.getBoundingClientRect(),
+		dropdownBBox: dropdownEl?.getBoundingClientRect(),
 		megamenuBBox: (
 			megamenuItem?.closest( '.wp-block-megamenu' ) as HTMLDivElement
 		 )?.getBoundingClientRect(),
@@ -230,7 +240,8 @@ export function calcPosition(
 	return calcNewPosition(
 		items,
 		editorEl?.clientWidth ??
-			( editorEl?.getBoundingClientRect()?.width as number ),
+			editorEl?.getBoundingClientRect()?.width ??
+			0,
 		expandDropdown
 	);
 }
