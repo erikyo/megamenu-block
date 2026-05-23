@@ -9,6 +9,7 @@
 		"core/group",
 		"core/navigation"
 	],
+	"allowedBlocks": [ "megamenu/menu-item", "core/social-links", "core/search", "core/spacer", "core/paragraph" ],
 	"usesContext": [ "megamenu/align","megamenu/menusMinWidth","megamenu/expandDropdown" ],
 	"attributes": {
 		"url": {
@@ -54,6 +55,10 @@
 			"default": {
 				"shadow": "var:preset|shadow|deep"
 			}
+		},
+		"lang": {
+			"type": "string",
+			"default": "en"
 		}
 	},
 	"supports": {

@@ -61,6 +61,10 @@
 			"default": {
 				"shadow": "var:preset|shadow|deep"
 			}
+		},
+		"lang": {
+			"type": "string",
+			"default": "en"
 		}
 	},
 	"supports": {
