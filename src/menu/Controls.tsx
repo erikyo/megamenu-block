@@ -66,7 +66,7 @@ export function Controls( {
 							) }
 							value={ dropdownMaxWidth }
 							onChange={ ( newWidth ) =>
-								setAttributes( { newWidth } )
+								setAttributes( { dropdownMaxWidth: newWidth } )
 							}
 							min={ 0 }
 							max={ 2000 }
@@ -139,7 +139,7 @@ export function Controls( {
 								) }
 								value={ responsiveBreakpoint }
 								onChange={ ( newValue ) =>
-									setAttributes( { newValue } )
+									setAttributes( { responsiveBreakpoint: newValue } )
 								}
 								min={ 0 }
 								max={ 2000 }

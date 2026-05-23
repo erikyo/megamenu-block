@@ -90,7 +90,6 @@ function render_megamenu_menu_item( $attributes, $content, $block ) {
 	// Get context values from parent block
 	$context          = $block->context ?? array();
 	$menus_min_width  = $context['megamenu/menusMinWidth'] ?? 0;
-	$align            = $context['megamenu/align'] ?? 'left';
 	$expand_dropdown  = $context['megamenu/expandDropdown'] ?? true;
 
 	$classes = array(
@@ -123,7 +122,7 @@ function render_megamenu_menu_item( $attributes, $content, $block ) {
 	if ( $menus_min_width ) {
 		$link_style .= 'min-width: ' . intval( $menus_min_width ) . 'px;';
 	}
-	$link_style .= 'justify-content: ' . esc_attr( $align ) . ';';
+	// Note: text alignment is now handled by native typography support via get_block_wrapper_attributes
 
 	$href = $url ? esc_url( $url ) : '#';
 	$target_attr = $target ? ' target="' . esc_attr( $target ) . '"' : '';
