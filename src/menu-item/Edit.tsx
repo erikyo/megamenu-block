@@ -229,6 +229,7 @@ export default function Edit( props: {
 		className: 'wp-block-megamenu-item__dropdown',
 		style: dropdownPosition,
 		ref: dropdownRef,
+		allowedBlocks: [ 'megamenu/menu-item', 'core/social-links', 'core/search', 'core/spacer', 'core/paragraph' ],
 	} );
 
 	return (
