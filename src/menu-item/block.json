@@ -9,7 +9,6 @@
 		"core/group",
 		"core/navigation"
 	],
-	"allowedBlocks": [ "megamenu/menu-item", "core/social-links", "core/search", "core/spacer", "core/paragraph" ],
 	"usesContext": [ "megamenu/align","megamenu/menusMinWidth","megamenu/expandDropdown" ],
 	"attributes": {
 		"url": {

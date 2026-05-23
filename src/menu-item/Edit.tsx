@@ -223,44 +223,33 @@ export default function Edit( props: {
 	}, [ showDropdown ] );
 
 	/** the block */
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		ref: menuItemRef,
+		className: classnames( 'wp-block-megamenu-item', {
+			'has-children': hasDescendants,
+			'show-on-mobile': showOnMobile,
+			'is-opened': showDropdown,
+		} ),
+		style: {
+			minWidth: parentAttributes.menusMinWidth ? `${parentAttributes.menusMinWidth}px` : 'auto',
+			position: ! parentAttributes.expandDropdown ? 'relative' : undefined,
+		}
+	} );
 	/** the dropdown */
 	const innerBlockProps = useInnerBlocksProps( {
 		className: 'wp-block-megamenu-item__dropdown',
 		style: dropdownPosition,
 		ref: dropdownRef,
-		allowedBlocks: [ 'megamenu/menu-item', 'core/social-links', 'core/search', 'core/spacer', 'core/paragraph' ],
 	} );
 
 	return (
-		<div
-			ref={ menuItemRef as any }
-			className={ classnames( 'wp-block-megamenu-item', {
-				'has-children': hasDescendants,
-				'show-on-mobile': showOnMobile,
-				'is-opened': showDropdown,
-			} ) }
-			style={ {
-				minWidth: parentAttributes.menusMinWidth
-					? parentAttributes.menusMinWidth + 'px'
-					: 'auto',
-				position: ! parentAttributes.expandDropdown
-					? 'relative'
-					: undefined,
-			} }
-		>
+		<div { ...blockProps }>
 			<Controls toggleItemDropdown={ addMenuItemDropdown } { ...props } />
 			<span
 				{ ...linkProps }
 				className={ 'wp-block-megamenu-item__link' }
-				style={ {
-					justifyContent: parentAttributes.align
-						? parentAttributes.align
-						: 'left',
-				} }
 			>
 				<RichText
-					{ ...blockProps }
 					value={ text }
 					allowedFormats={ [
 						'core/bold',
