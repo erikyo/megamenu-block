@@ -16,13 +16,10 @@ import {
 import {
 	type BlockInstance,
 	createBlocksFromInnerBlocksTemplate,
-	parse,
-	serialize,
 } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Icon } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
-import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
@@ -86,8 +83,6 @@ export default function Edit( props: {
 	// the menu item ref
 	const menuItemRef = useRef< HTMLElement | null >( null );
 	const dropdownRef = useRef< HTMLElement | null >( null );
-	const debouncedSaveRef = useRef< Function | null >( null );
-	const isHydratedRef = useRef( false );
 
 	const updateInnerBlocks = async ( content = DROPDOWN_TEMPLATE ) => {
 		const innerBlocks = createBlocksFromInnerBlocksTemplate( content );
@@ -226,86 +221,6 @@ export default function Edit( props: {
 			return () => window.removeEventListener( 'resize', handleResize );
 		}
 	}, [ showDropdown ] );
-
-	// Debounce function for API requests
-	const debounce = ( func: Function, wait: number ) => {
-		let timeout: NodeJS.Timeout;
-		return ( ...args: any[] ) => {
-			clearTimeout( timeout );
-			timeout = setTimeout( () => func.apply( this, args ), wait );
-		};
-	};
-
-	// Initialize persistent debounced save function
-	if ( ! debouncedSaveRef.current ) {
-		debouncedSaveRef.current = debounce( async ( id: number, blocks: BlockInstance[] ) => {
-			try {
-				const content = serialize( blocks );
-				await apiFetch( {
-					path: `/wp/v2/megamenu_submenu/${ id }`,
-					method: 'POST',
-					data: { content },
-				} );
-			} catch ( error ) {
-				console.error( 'Failed to update submenu post:', error );
-			}
-		}, 1000 );
-	}
-
-	// Sync inner blocks to remote post
-	useEffect( () => {
-		if ( ! hasDescendants ) {
-			return;
-		}
-
-		const { submenuId } = attributes;
-
-		// If inner blocks exist but submenuId is 0, create a new post
-		if ( hasDescendants && submenuId === 0 ) {
-			const createSubmenuPost = async () => {
-				try {
-					const content = serialize( innerBlocks );
-					const response = await apiFetch( {
-						path: '/wp/v2/megamenu_submenu',
-						method: 'POST',
-						data: {
-							title: `MegaMenu Submenu - ${ text || 'Untitled' }`,
-							content: content,
-							status: 'publish',
-						},
-					} );
-					setAttributes( { submenuId: response.id } );
-				} catch ( error ) {
-					console.error( 'Failed to create submenu post:', error );
-				}
-			};
-			createSubmenuPost();
-		}
-
-		// If submenuId exists, sync updates to the remote post with debouncing
-		if ( submenuId > 0 && debouncedSaveRef.current ) {
-			debouncedSaveRef.current( submenuId, innerBlocks );
-		}
-	}, [ innerBlocks, hasDescendants, attributes.submenuId, text ] );
-
-	// Hydrate inner blocks from remote post on initial load
-	useEffect( () => {
-		const { submenuId } = attributes;
-		if ( submenuId > 0 && innerBlocks.length === 0 && ! isHydratedRef.current ) {
-			isHydratedRef.current = true;
-			apiFetch( { path: `/wp/v2/megamenu_submenu/${ submenuId }?context=edit` } )
-				.then( ( response: any ) => {
-					if ( response?.content?.raw ) {
-						const parsedBlocks = parse( response.content.raw );
-						replaceInnerBlocks( clientId, parsedBlocks, false );
-					}
-				} )
-				.catch( ( error ) => {
-					console.error( 'Failed to hydrate submenu:', error );
-					isHydratedRef.current = false;
-				} );
-		}
-	}, [ attributes.submenuId, clientId, innerBlocks.length, replaceInnerBlocks ] );
 
 	/** the block */
 	const blockProps = useBlockProps();
