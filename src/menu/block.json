@@ -15,19 +15,10 @@
 		"core/social-link"
 	],
 	"providesContext": {
-		"megamenu/align": "align",
 		"megamenu/menusMinWidth": "menusMinWidth",
 		"megamenu/expandDropdown": "expandDropdown"
 	},
 	"attributes": {
-		"align": {
-			"type": "string",
-			"default": "center"
-		},
-		"menuAlign": {
-			"type": "string",
-			"default": "right"
-		},
 		"activator": {
 			"type": "string",
 			"default": "hover"
@@ -52,10 +43,6 @@
 			"type": "boolean",
 			"default": true
 		},
-        "hamburgerColor": {
-          "type": "string",
-          "default": "var(--wp--preset--color--black)"
-        },
 		"style": {
 			"type": "object",
 			"default": {
@@ -67,17 +54,21 @@
 		"align": true,
 		"className": true,
 		"color": {
-			"gradients": true,
-			"heading": true,
+			"text": true,
+			"background": true,
 			"link": true,
-			"__experimentalDefaultControls": {
-				"background": true,
-				"text": true
-			}
+			"gradients": true,
+			"heading": true
 		},
 		"spacing": {
 			"margin": true,
 			"padding": true
+		},
+		"layout": {
+			"allowEditing": true,
+			"default": {
+				"type": "flex"
+			}
 		},
 		"dimensions": {
 			"width": true,
@@ -104,7 +95,7 @@
 		"reusable": false
 	},
 	"editorScript": "file:./index.js",
-	"viewScript": "file:./view.js",
+	"viewScriptModule": "file:./view.js",
 	"editorStyle": "file:./index.css",
 	"viewStyle": "file:./style-view.css",
 	"render_callback": "render_megamenu_menu"

@@ -1,15 +1,11 @@
 import {
-	ColorPicker,
 	PanelBody,
 	RangeControl,
 	SelectControl,
 	ToggleControl,
-	Toolbar,
-	ToolbarButton,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { BlockControls, InspectorControls } from '@wordpress/block-editor';
-import { alignCenter, alignLeft, alignRight } from '@wordpress/icons';
+import { InspectorControls } from '@wordpress/block-editor';
 import { MegaMenuAttributes } from './types';
 
 /**
@@ -40,43 +36,10 @@ export function Controls( {
 		collapseOnMobile,
 		responsiveBreakpoint,
 		dropdownMaxWidth,
-		align,
-		menuAlign,
-		hamburgerColor,
 	} = attributes;
-	function setAlignment( newValue: string ) {
-		setAttributes( {
-			align: newValue,
-		} );
-	}
 
 	return (
 		<>
-			<BlockControls>
-				<Toolbar label="Options">
-					<ToolbarButton
-						icon={ alignLeft }
-						label="Left"
-						title={ __( 'Justify items left' ) }
-						isActive={ 'left' === align }
-						onClick={ () => setAlignment( 'left' ) }
-					/>
-					<ToolbarButton
-						icon={ alignCenter }
-						label="Center"
-						title={ __( 'Justify items center' ) }
-						isActive={ 'center' === align }
-						onClick={ () => setAlignment( 'center' ) }
-					/>
-					<ToolbarButton
-						icon={ alignRight }
-						label="Right"
-						title={ __( 'Justify items right' ) }
-						isActive={ 'right' === align }
-						onClick={ () => setAlignment( 'right' ) }
-					/>
-				</Toolbar>
-			</BlockControls>
 			<InspectorControls>
 				<PanelBody
 					title={ __( 'Menu Dropdown Settings' ) }
@@ -180,29 +143,6 @@ export function Controls( {
 								}
 								min={ 0 }
 								max={ 2000 }
-							/>
-							<SelectControl
-								label={ __( 'Hamburger Menu Position' ) }
-								value={ menuAlign }
-								options={ [
-									{ label: __( 'Right' ), value: 'right' },
-									{ label: __( 'Left' ), value: 'left' },
-								] }
-								onChange={ ( newValue ) =>
-									setAttributes( { menuAlign: newValue } )
-								}
-								__nextHasNoMarginBottom
-							/>
-							<p>{ __( 'Hamburger color' ) }</p>
-							<ColorPicker
-								color={ hamburgerColor }
-								onChange={ ( newColor ) =>
-									setAttributes( {
-										hamburgerColor: newColor,
-									} )
-								}
-								enableAlpha
-								defaultValue="#000"
 							/>
 						</>
 					) : null }
