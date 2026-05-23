@@ -82,6 +82,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,

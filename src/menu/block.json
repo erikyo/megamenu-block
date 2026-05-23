@@ -15,6 +15,7 @@
 		"core/social-link"
 	],
 	"providesContext": {
+		"megamenu/align": "itemsJustify",
 		"megamenu/menusMinWidth": "menusMinWidth",
 		"megamenu/expandDropdown": "expandDropdown"
 	},
@@ -43,6 +44,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"itemsJustify": {
+			"type": "string",
+			"default": "center"
+		},
 		"style": {
 			"type": "object",
 			"default": {
@@ -51,7 +56,7 @@
 		}
 	},
 	"supports": {
-		"align": true,
+		"align": [ "left", "center", "right", "wide", "full" ],
 		"className": true,
 		"color": {
 			"text": true,
@@ -67,7 +72,8 @@
 		"layout": {
 			"allowEditing": true,
 			"default": {
-				"type": "flex"
+				"type": "flex",
+				"flexWrap": "wrap"
 			}
 		},
 		"dimensions": {
