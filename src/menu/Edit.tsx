@@ -38,8 +38,6 @@ export default function Edit( props: {
 			collapseOnMobile,
 			responsiveBreakpoint,
 			dropdownMaxWidth,
-			menuAlign,
-			hamburgerColor,
 		},
 		isSelected: boolean,
 		setAttributes,
@@ -125,8 +123,6 @@ export default function Edit( props: {
 				/>
 			</nav>
 			<Hamburger
-				hamburgerColor={ hamburgerColor }
-				menuAlign={ menuAlign }
 				showResponsiveMenu={ showResponsiveMenu }
 			/>
 		</>

@@ -1,41 +1,90 @@
-import MegaMenu from '../frontend/MegaMenu';
-import { generateRandomId } from '../utils';
+import { store, getContext, getElement } from '@wordpress/interactivity';
 import './style.scss';
 
-declare global {
-	interface Window {
-		wpBlocks: {
-			megamenu: Record< string, MegaMenu >;
-		};
-	}
-}
+store( 'megamenu', {
+	state: {
+		isMobileMenuOpen: false,
+		currentLevel: 0,
+	},
+	actions: {
+		toggleMobileMenu: () => {
+			const context = getContext();
+			const state = store( 'megamenu' ).state;
+			const { ref } = getElement();
 
-/* The code is adding an event listener to the `DOMContentLoaded` event, which is fired when the
-initial HTML document has been completely loaded and parsed. When this event is triggered, the code
-selects all elements with the class `wp-block-megamenu` using
-`document.querySelectorAll('.wp-block-megamenu')`. It then iterates over each of these elements
-using the `forEach` method and calls the `initMegamenu` function for each element. This function
-initializes the mega menu by attaching event listeners and updating the menu's responsive behavior. */
-document.addEventListener( 'DOMContentLoaded', (): void => {
-	const megamenus = document.querySelectorAll( '.wp-block-megamenu' );
+			if ( state.currentLevel === 0 ) {
+				state.isMobileMenuOpen = true;
+				state.currentLevel = 1;
+			} else {
+				state.isMobileMenuOpen = false;
+				state.currentLevel = 0;
+			}
 
-	if ( ! megamenus.length ) {
-		return;
-	}
+			// Toggle body scroll
+			if ( state.isMobileMenuOpen ) {
+				document.body.style.overflow = 'hidden';
+			} else {
+				document.body.style.overflow = '';
+			}
+		},
+		openDropdown: ( event: Event ) => {
+			const context = getContext();
+			const state = store( 'megamenu' ).state;
+			const { ref } = getElement();
 
-	window.wpBlocks = window.wpBlocks || {};
-	window.wpBlocks.megamenu = window.wpBlocks.megamenu || [];
+			// Close other dropdowns
+			const allDropdowns = document.querySelectorAll( '.wp-block-megamenu-item__dropdown' );
+			allDropdowns.forEach( ( dropdown ) => {
+				if ( dropdown !== ref.nextElementSibling ) {
+					dropdown.classList.remove( 'is-open' );
+				}
+			} );
 
-	/**
-	 * For each menu init the above functions
-	 */
-	for ( const menu of megamenus ) {
-		// add a random id to identify the menu
-		menu.id = generateRandomId( 'megamenu-' );
+			// Toggle current dropdown
+			const dropdown = ref.nextElementSibling as HTMLElement;
+			if ( dropdown ) {
+				dropdown.classList.toggle( 'is-open' );
+			}
+		},
+		closeDropdown: () => {
+			const { ref } = getElement();
+			const dropdown = ref.querySelector( '.wp-block-megamenu-item__dropdown' ) as HTMLElement;
+			if ( dropdown ) {
+				dropdown.classList.remove( 'is-open' );
+			}
+		},
+	},
+	callbacks: {
+		initResponsive: () => {
+			const { ref } = getElement();
+			const context = getContext();
+			const state = store( 'megamenu' ).state;
 
-		// init the menu and add the menu to the global object
-		window.wpBlocks.megamenu[ menu.id ] = new MegaMenu(
-			menu as HTMLElement
-		);
-	}
+			const breakpoint = parseInt( ref.dataset.responsiveBreakpoint || '1023', 10 );
+			const isMobile = window.innerWidth < breakpoint;
+
+			if ( isMobile ) {
+				ref.classList.add( 'is-mobile' );
+			} else {
+				ref.classList.remove( 'is-mobile' );
+			}
+
+			// Handle resize
+			const handleResize = () => {
+				const newIsMobile = window.innerWidth < breakpoint;
+				if ( newIsMobile !== isMobile ) {
+					if ( newIsMobile ) {
+						ref.classList.add( 'is-mobile' );
+					} else {
+						ref.classList.remove( 'is-mobile' );
+						state.isMobileMenuOpen = false;
+						state.currentLevel = 0;
+						document.body.style.overflow = '';
+					}
+				}
+			};
+
+			window.addEventListener( 'resize', handleResize );
+		},
+	},
 } );
