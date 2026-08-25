@@ -6,7 +6,7 @@ import classnames from 'classnames';
  * WP dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from '@wordpress/element';
 import {
 	RichText,
 	store as blockEditorStore,
@@ -92,19 +92,22 @@ export default function Edit( props: {
 	const {
 		isParentOfSelectedBlock,
 		hasDescendants,
+		innerBlocks,
 	}: {
 		isParentOfSelectedBlock: boolean;
 		hasDescendants: boolean;
+		innerBlocks: BlockInstance[];
 	} = useSelect( ( select, {} ) => {
-		const { hasSelectedInnerBlock, getBlockCount } = select(
+		const { hasSelectedInnerBlock, getBlockCount, getBlocks } = select(
 			blockEditorStore
 		) as any;
 
 		return {
 			isParentOfSelectedBlock: hasSelectedInnerBlock( clientId, true ),
 			hasDescendants: !! getBlockCount( clientId ),
+			innerBlocks: getBlocks( clientId ),
 		};
-	}, [] );
+	}, [ clientId ] );
 
 	/**
 	 * A function that sets the attributes of the parent element.
@@ -178,14 +181,25 @@ export default function Edit( props: {
 		setShowDropdown( false );
 	}, [ isSelected, isParentOfSelectedBlock ] );
 
-	useEffect( () => {
-		if ( menuItemRef.current ) {
-			const newPosition = updateDropdownPosition( {
-				megamenuItem: menuItemRef.current,
-				dropdown: dropdownRef.current ?? undefined,
-				parentAttributes,
-			} );
-			setDropdownPosition( newPosition );
+	useLayoutEffect( () => {
+		// Only calculate position if both refs are attached to DOM and dropdown is shown
+		if ( menuItemRef.current && dropdownRef.current && showDropdown ) {
+			// Ensure elements are actually in the DOM before calculating position
+			const menuItem = menuItemRef.current;
+			const dropdown = dropdownRef.current;
+			
+			// Check if elements are connected to the DOM (use ownerDocument for iframe context)
+			const menuItemDoc = menuItem.ownerDocument;
+			const dropdownDoc = dropdown.ownerDocument;
+			
+			if ( menuItemDoc?.body.contains( menuItem ) && dropdownDoc?.body.contains( dropdown ) ) {
+				const newPosition = updateDropdownPosition( {
+					megamenuItem: menuItem,
+					dropdown: dropdown,
+					parentAttributes,
+				} );
+				setDropdownPosition( newPosition );
+			}
 		}
 	}, [ showDropdown, parentAttributes ] );
 
@@ -195,16 +209,32 @@ export default function Edit( props: {
 		const blockNode: HTMLElement | null = menuItemRef.current;
 
 		if ( blockNode ) {
-			document?.addEventListener( 'resize', () => {
-				const newPosition = updateDropdownPosition();
-				setDropdownPosition( newPosition );
-				setShowDropdown( false );
-			} );
+			const handleResize = () => {
+				// Only update if both refs are available and dropdown is shown
+				if ( menuItemRef.current && dropdownRef.current && showDropdown ) {
+					const newPosition = updateDropdownPosition();
+					setDropdownPosition( newPosition );
+				}
+			};
+			
+			window.addEventListener( 'resize', handleResize );
+			return () => window.removeEventListener( 'resize', handleResize );
 		}
-	}, [] );
+	}, [ showDropdown ] );
 
 	/** the block */
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		ref: menuItemRef,
+		className: classnames( 'wp-block-megamenu-item', {
+			'has-children': hasDescendants,
+			'show-on-mobile': showOnMobile,
+			'is-opened': showDropdown,
+		} ),
+		style: {
+			minWidth: parentAttributes.menusMinWidth ? `${parentAttributes.menusMinWidth}px` : 'auto',
+			position: ! parentAttributes.expandDropdown ? 'relative' : undefined,
+		}
+	} );
 	/** the dropdown */
 	const innerBlockProps = useInnerBlocksProps( {
 		className: 'wp-block-megamenu-item__dropdown',
@@ -213,34 +243,13 @@ export default function Edit( props: {
 	} );
 
 	return (
-		<div
-			ref={ menuItemRef as any }
-			className={ classnames( 'wp-block-megamenu-item', {
-				'has-children': hasDescendants,
-				'show-on-mobile': showOnMobile,
-				'is-opened': showDropdown,
-			} ) }
-			style={ {
-				minWidth: parentAttributes.menusMinWidth
-					? parentAttributes.menusMinWidth + 'px'
-					: 'auto',
-				position: ! parentAttributes.expandDropdown
-					? 'relative'
-					: undefined,
-			} }
-		>
+		<div { ...blockProps }>
 			<Controls toggleItemDropdown={ addMenuItemDropdown } { ...props } />
 			<span
 				{ ...linkProps }
 				className={ 'wp-block-megamenu-item__link' }
-				style={ {
-					justifyContent: parentAttributes.align
-						? parentAttributes.align
-						: 'left',
-				} }
 			>
 				<RichText
-					{ ...blockProps }
 					value={ text }
 					allowedFormats={ [
 						'core/bold',
