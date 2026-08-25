@@ -1,86 +1,151 @@
-.wp-block-megamenu {
+.wp-block-megamenu-item {
 
-	.wp-block-megamenu-item {
+	:focus-visible {
+		outline: 2px solid var(--wp--preset--color--black);
+	}
 
-		:focus-visible {
-			outline: 2px solid var(--wp--preset--color--black);
-		}
+	&.has-child {
+		cursor: pointer;
+	}
 
-		&.has-child {
-			cursor: pointer;
+	/**
+	 *  Dropdown
+	 */
+	&__dropdown {
+		position: absolute;
+		z-index: 1001;
+		top: 100%;
+
+		overflow: hidden;
+		max-width: 100%;
+
+		height: auto;
+		background: var(--megamenu--background-color, #fff);
+		color: var(--megamenu--text-color, #000);
+		box-sizing: border-box;
+
+		&::after,
+		&::before {
+			display: table;
+			content: "";
+			clear: both;
 		}
 
 		/**
-		 *  Dropdown
+		 * The megamenu product section style
 		 */
-		&__dropdown {
-			position: absolute;
-			z-index: 1001;
-			top: 100%;
+		.vsge-product-categories {
 
-			overflow: hidden;
-			max-width: 100%;
+			> ul {
+				column-count: 3;
 
-			height: auto;
-			background: var(--megamenu--background-color, #fff);
-			color: var(--megamenu--text-color, #000);
-			box-sizing: border-box;
+				> li {
+					padding: 0 0 16px 64px;
 
-			&::after,
-			&::before {
-				display: table;
-				content: "";
-				clear: both;
+					.vsge-product-categories-list-item__image {
+						margin-left: -56px;
+					}
+				}
+
+				@media (max-width: 1200px) {
+					column-count: 2;
+				}
+
+				@media (max-width: 800px) {
+					column-count: 1;
+
+					li {
+						width: 100%;
+						padding: 12px 0;
+					}
+				}
+			}
+
+			.vsge-product-categories-list-item__image {
+				object-fit: contain;
+				aspect-ratio: 1/1;
+				margin-left: 0;
+				margin-right: 15px;
+				vertical-align: text-top;
+				border: inherit;
+				position: absolute;
 			}
 		}
 
-		&.is-opened {
-			overflow: visible;
+		.vsge-product-categories-list--depth-1 {
 
-			.wp-block-megamenu-item__dropdown {
-				overflow: visible;
+			li.vsge-product-categories-list-item a {
+				font-weight: 400;
 			}
 		}
 
-		/**
-		 *  the menu item link (or text, if the menu has not a link)
-		 */
-		&__link {
-			padding: 10px 15px;
-			// the chevron icon is 24px height so we need to make the line-height at least 24px to avoid misalignment
-			min-height: 24px;
-			display: flex;
-			justify-content: center;
-			align-items: center;
+		ul {
+			list-style-type: none;
 		}
 
-		/**
-		 * the chevron icon
-		 */
-		&__toggle {
-			display: block;
-			padding: 0;
-			background: transparent;
-			border: 0;
-			box-shadow: none;
-			color: inherit;
+		li {
+			max-width: $size__nav-width;
 			margin: 0;
-			outline: none;
+			break-inside: avoid;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 
-			&:active,
-			&:focus {
-				outline: none;
-				text-decoration: none;
-			}
-
-			&:hover {
-				text-decoration: none;
-				color: inherit;
-				background: inherit;
-				box-shadow: none;
-			}
+		a {
+			white-space: nowrap;
+			box-sizing: border-box;
 		}
 	}
+
+	&.is-opened {
+		overflow: visible;
+
+		.wp-block-megamenu-item__dropdown {
+			overflow: visible;
+		}
+	}
+
+	/**
+	 *  the menu item link (or text, if the menu has not a link)
+	 */
+	&__link {
+		padding: 10px 15px;
+		// the chevron icon is 24px height so we need to make the line-height at least 24px to avoid misalignment
+		min-height: 24px;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+	}
+
+	/**
+	 * the chevron icon
+	 */
+	&__toggle {
+		display: block;
+		padding: 0;
+		background: transparent;
+		border: 0;
+		box-shadow: none;
+		color: inherit;
+		margin: 0;
+		outline: none;
+
+		&:active,
+		&:focus {
+			outline: none;
+			text-decoration: none;
+		}
+
+		&:hover {
+			text-decoration: none;
+			color: inherit;
+			background: inherit;
+			box-shadow: none;
+		}
+	}
+}
+
+.wp-block-megamenu {
 
 	/**
 	 * The menu in desktop mode
@@ -241,73 +306,12 @@
 	}
 }
 
-.wp-block-megamenu-item {
+// 1. Parent Menu alignment cascade
+.wp-block-megamenu.has-text-align-left .wp-block-megamenu-item__link { justify-content: flex-start; }
+.wp-block-megamenu.has-text-align-center .wp-block-megamenu-item__link { justify-content: center; }
+.wp-block-megamenu.has-text-align-right .wp-block-megamenu-item__link { justify-content: flex-end; }
 
-	/**
-	 * The megamenu product section style
-	 */
-	.wp-block-megamenu-item__dropdown {
-
-		.vsge-product-categories {
-
-			> ul {
-				column-count: 3;
-
-				> li {
-					padding: 0 0 16px 64px;
-
-					.vsge-product-categories-list-item__image {
-						margin-left: -56px;
-					}
-				}
-
-				@media (max-width: 1200px) {
-					column-count: 2;
-				}
-
-				@media (max-width: 800px) {
-					column-count: 1;
-
-					li {
-						width: 100%;
-						padding: 12px 0;
-					}
-				}
-			}
-
-			.vsge-product-categories-list-item__image {
-				object-fit: contain;
-				aspect-ratio: 1/1;
-				margin-left: 0;
-				margin-right: 15px;
-				vertical-align: text-top;
-				border: inherit;
-				position: absolute;
-			}
-		}
-
-		.vsge-product-categories-list--depth-1 {
-
-			li.vsge-product-categories-list-item a {
-				font-weight: 400;
-			}
-		}
-
-		ul {
-			list-style-type: none;
-		}
-
-		li {
-			max-width: $size__nav-width;
-			margin: 0;
-			break-inside: avoid;
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-
-		a {
-			white-space: nowrap;
-			box-sizing: border-box;
-		}
-	}
-}
+// 2. Child Item specific alignment (wins in cascade)
+.wp-block-megamenu-item.has-text-align-left .wp-block-megamenu-item__link { justify-content: flex-start; }
+.wp-block-megamenu-item.has-text-align-center .wp-block-megamenu-item__link { justify-content: center; }
+.wp-block-megamenu-item.has-text-align-right .wp-block-megamenu-item__link { justify-content: flex-end; }

@@ -1,18 +1,3 @@
-.wp-site-blocks .wp-block-megamenu {
-
-	.show-on-mobile {
-		display: none;
-	}
-
-	&.is-mobile {
-		position: inherit;
-
-		.show-on-mobile {
-			display: block;
-		}
-	}
-}
-
 .wp-block-megamenu {
 	width: 100%;
 
@@ -24,5 +9,17 @@
 		width: 100%;
 		display: flex;
 		justify-content: space-between;
+	}
+
+	.show-on-mobile {
+		display: none;
+	}
+
+	&.is-mobile {
+		position: inherit;
+
+		.show-on-mobile {
+			display: block;
+		}
 	}
 }
