@@ -3,7 +3,7 @@
  * Plugin Name: MegaMenu Block
  * Plugin URI: https://motopress.com/products/wordpress-mega-menu-block/
  * Description: Build better navigation menus with the WordPress mega menu blocks.
- * Version: 2.0.0
+ * Version: 2.1.0
  * Author: MotoPress, erikyo
  * Author URI: https://motopress.com/
  * License: GPLv2 or later
@@ -15,15 +15,7 @@
 defined( 'ABSPATH' ) || exit;
 
 define( 'MEGAMENU_FILE', __FILE__ );
+define( 'MEGAMENU_PATH', plugin_dir_path( __FILE__ ) );
 
-function register_megamenu() {
-	$blocks = array(
-		'menu',
-		'menu-item',
-	);
-
-	foreach ( $blocks as $block ) {
-		\register_block_type( __DIR__ . '/build/'. $block );
-}
-}
-add_action( 'init', 'register_megamenu' );
+require_once MEGAMENU_PATH . 'includes/render.php';
+require_once MEGAMENU_PATH . 'includes/blocks.php';
