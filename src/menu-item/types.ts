@@ -22,6 +22,7 @@ export interface MenuItemAttributes extends BlockAttributes {
 	opensInNewTab: boolean;
 	dropdownWrapperStyle: string;
 	hasDescendants: boolean;
+	submenuId: number;
 	parentAttributes: {
 		menusMinWidth: string;
 		expandDropdown: boolean;
