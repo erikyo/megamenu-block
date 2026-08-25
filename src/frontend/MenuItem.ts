@@ -29,11 +29,15 @@ export class MenuItem {
 	/**
 	 * Helper function to open a menu item.
 	 */
-	open() {
+	open( megamenuRect?: DOMRect, maxBodyWidth?: number ) {
 		this.isOpened = true;
 		this.el?.classList.add( 'is-opened' );
 		this.dropdown?.classList.add( 'is-active' );
 		this.el?.classList.remove( 'is-left' );
+
+		if ( megamenuRect && maxBodyWidth !== undefined ) {
+			this.updateDropdownPosition( megamenuRect, maxBodyWidth );
+		}
 	}
 
 	/**
