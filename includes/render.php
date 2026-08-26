@@ -53,7 +53,7 @@ function render_megamenu_menu( $attributes, $content, $block ) {
 	ob_start();
 	?>
 	<nav <?php echo $wrapper_attrs; ?>>
-		<div class="wp-block-megamenu__content" data-wp-bind--class="{'is-opened': state.isMobileMenuOpen}">
+		<div class="wp-block-megamenu__content" data-wp-class--is-opened="state.isMobileMenuOpen">
 			<?php echo $content; ?>
 		</div>
 	</nav>
