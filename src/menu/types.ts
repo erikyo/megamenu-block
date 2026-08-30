@@ -16,6 +16,7 @@ export const ALLOWED_BLOCKS = [
 export interface MegaMenuAttributes extends BlockAttributes {
 	menusMinWidth: number;
 	activator: string;
+	closeMode?: string;
 	collapseOnMobile: boolean;
 	responsiveBreakpoint: number;
 	dropdownMaxWidth: number;

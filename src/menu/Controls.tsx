@@ -32,6 +32,7 @@ export function Controls( {
 	const {
 		menusMinWidth,
 		activator,
+		closeMode,
 		expandDropdown,
 		collapseOnMobile,
 		responsiveBreakpoint,
@@ -81,6 +82,24 @@ export function Controls( {
 						] }
 						onChange={ ( newValue ) =>
 							setAttributes( { activator: newValue } )
+						}
+						__nextHasNoMarginBottom
+					/>
+					<SelectControl
+						label={ __( 'Close Submenu' ) }
+						value={ closeMode || 'automatic' }
+						options={ [
+							{
+								label: __( 'Automatic (Focus out)' ),
+								value: 'automatic',
+							},
+							{
+								label: __( 'Manual (Close control)' ),
+								value: 'manual',
+							},
+						] }
+						onChange={ ( newValue ) =>
+							setAttributes( { closeMode: newValue } )
 						}
 						__nextHasNoMarginBottom
 					/>
