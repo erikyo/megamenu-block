@@ -12,6 +12,8 @@ export default class MegaMenu {
 	private isResponsive: boolean = false;
 	public breakpoint: number | undefined;
 	private activator: EVENTS_ALLOWED = 'hover';
+	public closeMode: 'automatic' | 'manual' = 'automatic';
+	private lastFocusedTrigger: HTMLElement | null = null;
 	currentLevel: number = 0;
 	isOpened: boolean = false;
 	openMenus: ( MenuItem | MegaMenu )[] = [];
@@ -34,14 +36,23 @@ export default class MegaMenu {
 		// Set the activator property based on the result
 		this.activator = this.getActivator();
 
+		// Set the closeMode property based on dataset
+		this.closeMode = this.getCloseMode();
+
 		/** The hamburger icon */
 		this.hamburger = new Hamburger(
 			this.el.nextElementSibling as HTMLElement
 		);
 
 		// Add event listeners
-		window.addEventListener( 'DOMContentLoaded', this.init.bind( this ) );
+		if ( document.readyState === 'loading' ) {
+			window.addEventListener( 'DOMContentLoaded', this.init.bind( this ) );
+		} else {
+			this.init();
+		}
 		window.addEventListener( 'resize', this.reload.bind( this ) );
+		document.addEventListener( 'click', this.handleDocumentClick.bind( this ) );
+		document.addEventListener( 'keydown', this.handleKeyDown.bind( this ) );
 	}
 
 	/**
@@ -81,6 +92,9 @@ export default class MegaMenu {
 
 		// update the menu preferred activator
 		this.setActivator();
+
+		// update the menu preferred close mode
+		this.setCloseMode();
 
 		// close the currently open menu if the breakpoint changes
 		this.closeAllOpened();
@@ -135,10 +149,40 @@ export default class MegaMenu {
 		if ( detectTouchCapability() ) {
 			return 'click';
 		}
-		if ( this.el.dataset.activator === 'hover' && ! this.isResponsive ) {
+		const isHover =
+			this.el.dataset.activator === 'hover' ||
+			this.el.getAttribute( 'data-activator' ) === 'hover' ||
+			this.el.classList.contains( 'activator-hover' );
+
+		if ( isHover && ! this.isResponsive ) {
 			return 'hover';
 		}
 		return 'click';
+	}
+
+	/**
+	 * Updates the closeMode property based on the dataset attribute of the megamenu element.
+	 */
+	setCloseMode = ( closeMode?: 'automatic' | 'manual' ): void => {
+		if ( closeMode ) {
+			this.closeMode = closeMode;
+			return;
+		}
+		this.closeMode = this.getCloseMode();
+	};
+
+	/**
+	 * Returns the close mode based on dataset attribute. Defaults to 'automatic'.
+	 */
+	getCloseMode(): 'automatic' | 'manual' {
+		if (
+			this.el.dataset.closeMode === 'manual' ||
+			this.el.getAttribute( 'data-close-mode' ) === 'manual' ||
+			this.el.classList.contains( 'close-mode-manual' )
+		) {
+			return 'manual';
+		}
+		return 'automatic';
 	}
 
 	/**
@@ -151,6 +195,13 @@ export default class MegaMenu {
 		this.isResponsive = this.isMobile() ?? false;
 		// if the state has changed reload the menu items and close all menus
 		if ( current !== this.isResponsive ) {
+			this.closeAllOpened();
+			if ( this.isResponsive ) {
+				const closeButtons = this.el.querySelectorAll(
+					'.wp-block-megamenu__close-button'
+				);
+				closeButtons.forEach( ( btn ) => btn.remove() );
+			}
 			this.updateMenuItems();
 			this.reload();
 		}
@@ -303,12 +354,16 @@ export default class MegaMenu {
 					this.closeLastOpenMenu();
 					clearTimeout( timeoutId );
 					this.openMenuItem( menuItem );
+				} else if ( ev.type === 'click' ) {
+					ev.preventDefault();
+					this.closeMenuItem( menuItem );
+					this.closeLastOpenMenu();
 				}
 			};
 
 			const leaveAction = () => {
-				/* Avoid focus out the menu on mobile devices */
-				if ( ! this.isResponsive && menuItem.isOpened ) {
+				/* Avoid focus out the menu on mobile devices or in manual close mode */
+				if ( ! this.isResponsive && this.closeMode !== 'manual' && menuItem.isOpened ) {
 					// add the is-left class that will be checked in a while to handle menu re-focusing
 					menuItem.el.classList.add( 'is-left' );
 
@@ -342,6 +397,9 @@ export default class MegaMenu {
 	 * @param menuItem
 	 */
 	async openMenuItem( menuItem: MenuItem ) {
+		// Store trigger for focus restoration on Escape/close
+		this.lastFocusedTrigger = menuItem.button;
+
 		// Extract layout context before opening
 		const megamenuRect = this.el.getBoundingClientRect();
 		const dropdownMaxWidth = Number( this.el.dataset.dropdownWidth ) || 0;
@@ -353,6 +411,9 @@ export default class MegaMenu {
 		// Open the dropdown and pass layout bounds for positioning after hydration
 		if ( ! this.isResponsive ) {
 			await menuItem.open( megamenuRect, maxBodyWidth );
+			if ( this.closeMode === 'manual' && menuItem.dropdown ) {
+				this.ensureCloseButton( menuItem.dropdown );
+			}
 		} else {
 			await menuItem.open();
 		}
@@ -365,6 +426,85 @@ export default class MegaMenu {
 
 		// update the hamburger state in order to display the current level (available 0 to 2, 0 being the menu icon, 1 the close icon and > 2 the arrow back)
 		this.hamburger.updateState( this.currentLevel );
+	}
+
+	/**
+	 * Ensures a single close button exists in the open dropdown in manual closing mode.
+	 *
+	 * @param {HTMLElement} dropdown - The open dropdown element.
+	 */
+	private ensureCloseButton( dropdown: HTMLElement ) {
+		let closeBtn = dropdown.querySelector<HTMLButtonElement>(
+			'.wp-block-megamenu__close-button'
+		);
+		if ( ! closeBtn ) {
+			closeBtn = document.createElement( 'button' );
+			closeBtn.type = 'button';
+			closeBtn.className = 'wp-block-megamenu__close-button';
+			closeBtn.setAttribute( 'aria-label', 'Close menu' );
+			closeBtn.innerHTML = '<span aria-hidden="true">&times;</span>';
+			dropdown.appendChild( closeBtn );
+		}
+		closeBtn.onclick = ( e: MouseEvent ) => {
+			e.preventDefault();
+			e.stopPropagation();
+			this.closeAllOpened();
+			this.restoreFocus();
+		};
+	}
+
+	/**
+	 * Restores focus to the trigger that opened the menu.
+	 */
+	restoreFocus() {
+		if (
+			this.lastFocusedTrigger &&
+			typeof this.lastFocusedTrigger.focus === 'function'
+		) {
+			this.lastFocusedTrigger.focus();
+		}
+	}
+
+	/**
+	 * Handles outside click events in manual close mode on desktop.
+	 *
+	 * @param {MouseEvent} event - The click event.
+	 */
+	private handleDocumentClick( event: MouseEvent ) {
+		if ( this.isResponsive || this.closeMode !== 'manual' ) {
+			return;
+		}
+		const hasOpenMenu =
+			this.openMenus.length > 0 ||
+			this.menuItems.some( ( item ) => item.isOpened );
+		if ( ! hasOpenMenu ) {
+			return;
+		}
+		const target = event.target as Node;
+		if ( ! target ) {
+			return;
+		}
+		if ( ! this.el.contains( target ) ) {
+			this.closeAllOpened();
+		}
+	}
+
+	/**
+	 * Handles Escape keydown events in desktop mode.
+	 *
+	 * @param {KeyboardEvent} event - The keydown event.
+	 */
+	private handleKeyDown( event: KeyboardEvent ) {
+		if ( event.key === 'Escape' || event.key === 'Esc' ) {
+			const hasOpenMenu =
+				this.openMenus.length > 0 ||
+				this.menuItems.some( ( item ) => item.isOpened );
+			if ( hasOpenMenu && ! this.isResponsive ) {
+				event.preventDefault();
+				this.closeAllOpened();
+				this.restoreFocus();
+			}
+		}
 	}
 
 	/**
@@ -401,6 +541,12 @@ export default class MegaMenu {
 				menuItem.close();
 			}
 		} );
+		this.menuItems.forEach( ( menuItem ) => {
+			if ( menuItem.isOpened ) {
+				menuItem.close();
+			}
+		} );
+		this.openMenus = [];
 		this.close();
 	}
 
