@@ -71,4 +71,3 @@ if ( false === strpos( $rendered_manual, 'activator-click' ) ) {
 }
 
 echo "Mega Menu render smoke check passed.\n";
-

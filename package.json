@@ -33,6 +33,7 @@
 		"lint:js": "wp-scripts lint-js",
 		"wp-env:start": "npx wp-env start",
 		"wp-env:stop": "npx wp-env stop",
+		"@wordpress/block-editor": "^15.19.0",
 		"wp-env:destroy": "npx wp-env destroy"
 	},
 	"browserslist": [
