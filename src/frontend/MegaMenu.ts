@@ -1,5 +1,13 @@
 import { detectTouchCapability, getLowestWidth, removeStyles } from '../utils';
-import { IS_OPEN, EVENTS_ALLOWED, TIMEOUT } from '../utils/constants';
+import {
+	IS_OPEN,
+	EVENTS_ALLOWED,
+	TIMEOUT,
+	HOVER_INTENT_DELAY_DEFAULT,
+	HOVER_INTENT_DELAY_UPWARD,
+	HOVER_INTENT_DELAY_DOWNWARD,
+	HOVER_INTENT_DEAD_ZONE_PX,
+} from '../utils/constants';
 import { MenuItem } from './MenuItem';
 import { Hamburger } from './Hamburger';
 
@@ -12,6 +20,8 @@ export default class MegaMenu {
 	private isResponsive: boolean = false;
 	public breakpoint: number | undefined;
 	private activator: EVENTS_ALLOWED = 'hover';
+	public closeMode: 'automatic' | 'manual' = 'automatic';
+	private lastFocusedTrigger: HTMLElement | null = null;
 	currentLevel: number = 0;
 	isOpened: boolean = false;
 	openMenus: ( MenuItem | MegaMenu )[] = [];
@@ -34,14 +44,23 @@ export default class MegaMenu {
 		// Set the activator property based on the result
 		this.activator = this.getActivator();
 
+		// Set the closeMode property based on dataset
+		this.closeMode = this.getCloseMode();
+
 		/** The hamburger icon */
 		this.hamburger = new Hamburger(
 			this.el.nextElementSibling as HTMLElement
 		);
 
 		// Add event listeners
-		window.addEventListener( 'DOMContentLoaded', this.init.bind( this ) );
+		if ( document.readyState === 'loading' ) {
+			window.addEventListener( 'DOMContentLoaded', this.init.bind( this ) );
+		} else {
+			this.init();
+		}
 		window.addEventListener( 'resize', this.reload.bind( this ) );
+		document.addEventListener( 'click', this.handleDocumentClick.bind( this ) );
+		document.addEventListener( 'keydown', this.handleKeyDown.bind( this ) );
 	}
 
 	/**
@@ -81,6 +100,9 @@ export default class MegaMenu {
 
 		// update the menu preferred activator
 		this.setActivator();
+
+		// update the menu preferred close mode
+		this.setCloseMode();
 
 		// close the currently open menu if the breakpoint changes
 		this.closeAllOpened();
@@ -135,10 +157,40 @@ export default class MegaMenu {
 		if ( detectTouchCapability() ) {
 			return 'click';
 		}
-		if ( this.el.dataset.activator === 'hover' && ! this.isResponsive ) {
+		const isHover =
+			this.el.dataset.activator === 'hover' ||
+			this.el.getAttribute( 'data-activator' ) === 'hover' ||
+			this.el.classList.contains( 'activator-hover' );
+
+		if ( isHover && ! this.isResponsive ) {
 			return 'hover';
 		}
 		return 'click';
+	}
+
+	/**
+	 * Updates the closeMode property based on the dataset attribute of the megamenu element.
+	 */
+	setCloseMode = ( closeMode?: 'automatic' | 'manual' ): void => {
+		if ( closeMode ) {
+			this.closeMode = closeMode;
+			return;
+		}
+		this.closeMode = this.getCloseMode();
+	};
+
+	/**
+	 * Returns the close mode based on dataset attribute. Defaults to 'automatic'.
+	 */
+	getCloseMode(): 'automatic' | 'manual' {
+		if (
+			this.el.dataset.closeMode === 'manual' ||
+			this.el.getAttribute( 'data-close-mode' ) === 'manual' ||
+			this.el.classList.contains( 'close-mode-manual' )
+		) {
+			return 'manual';
+		}
+		return 'automatic';
 	}
 
 	/**
@@ -151,6 +203,13 @@ export default class MegaMenu {
 		this.isResponsive = this.isMobile() ?? false;
 		// if the state has changed reload the menu items and close all menus
 		if ( current !== this.isResponsive ) {
+			this.closeAllOpened();
+			if ( this.isResponsive ) {
+				const closeButtons = this.el.querySelectorAll(
+					'.wp-block-megamenu__close-button'
+				);
+				closeButtons.forEach( ( btn ) => btn.remove() );
+			}
 			this.updateMenuItems();
 			this.reload();
 		}
@@ -289,31 +348,160 @@ export default class MegaMenu {
 		}
 		/** loop over all menu items and initialize the event listeners  */
 		for ( const menuItem of this.menuItems ) {
-			let timeoutId: NodeJS.Timeout;
+			menuItem.cancelPendingOpen?.();
 
-			/**
-			 * Handles the action to be taken on a mouse event.
-			 *
-			 * @param {MouseEvent} ev - The mouse event triggering the action.
-			 */
-			const action = ( ev: MouseEvent ) => {
-				menuItem.el.classList.remove( 'is-left' );
+			let openTimeoutId: ReturnType< typeof setTimeout > | null = null;
+			let closeTimeoutId: ReturnType< typeof setTimeout > | null = null;
+			let startY: number | null = null;
+			let startTime: number = 0;
+			let currentIntent: 'neutral' | 'downward' | 'upward' = 'neutral';
+
+			const cancelPendingOpen = () => {
+				if ( openTimeoutId !== null ) {
+					clearTimeout( openTimeoutId );
+					openTimeoutId = null;
+				}
+				menuItem.el.onmousemove = null;
+				startY = null;
+				startTime = 0;
+				currentIntent = 'neutral';
+			};
+
+			menuItem.cancelPendingOpen = cancelPendingOpen;
+
+			const cancelPendingClose = () => {
+				if ( closeTimeoutId !== null ) {
+					clearTimeout( closeTimeoutId );
+					closeTimeoutId = null;
+				}
+			};
+
+			const executeOpen = () => {
+				cancelPendingOpen();
 				if ( ! menuItem.isOpened ) {
-					ev.preventDefault();
 					this.closeLastOpenMenu();
-					clearTimeout( timeoutId );
+					cancelPendingClose();
 					this.openMenuItem( menuItem );
 				}
 			};
 
+			/**
+			 * Handles trigger click to open/close immediately without hover-intent delays.
+			 *
+			 * @param {MouseEvent} ev The click event.
+			 */
+			const clickAction = ( ev: MouseEvent ) => {
+				ev.preventDefault();
+				cancelPendingOpen();
+				menuItem.el.classList.remove( 'is-left' );
+
+				if ( ! menuItem.isOpened ) {
+					this.closeLastOpenMenu();
+					cancelPendingClose();
+					this.openMenuItem( menuItem );
+				} else {
+					this.closeMenuItem( menuItem );
+					this.closeLastOpenMenu();
+				}
+			};
+
+			/**
+			 * Handles desktop hover entrance with lightweight intent detection.
+			 *
+			 * @param {MouseEvent} ev The mouse enter event.
+			 */
+			const enterAction = ( ev: MouseEvent ) => {
+				menuItem.el.classList.remove( 'is-left' );
+				cancelPendingClose();
+
+				if ( menuItem.isOpened ) {
+					return;
+				}
+
+				cancelPendingOpen();
+
+				startTime = Date.now();
+				startY = typeof ev.clientY === 'number' ? ev.clientY : null;
+				currentIntent = 'neutral';
+
+				const getDelayForIntent = (
+					intent: 'neutral' | 'downward' | 'upward'
+				): number => {
+					switch ( intent ) {
+						case 'downward':
+							return HOVER_INTENT_DELAY_DOWNWARD;
+						case 'upward':
+							return HOVER_INTENT_DELAY_UPWARD;
+						case 'neutral':
+						default:
+							return HOVER_INTENT_DELAY_DEFAULT;
+					}
+				};
+
+				const scheduleOpen = ( delayMs: number ) => {
+					if ( openTimeoutId !== null ) {
+						clearTimeout( openTimeoutId );
+					}
+					openTimeoutId = setTimeout( executeOpen, delayMs );
+				};
+
+				scheduleOpen( HOVER_INTENT_DELAY_DEFAULT );
+
+				menuItem.el.onmousemove = ( moveEv: MouseEvent ) => {
+					const currentY =
+						typeof moveEv.clientY === 'number'
+							? moveEv.clientY
+							: null;
+					if ( currentY === null ) {
+						return;
+					}
+
+					if ( startY === null ) {
+						startY = currentY;
+						return;
+					}
+
+					const deltaY = currentY - startY;
+					let newIntent: 'neutral' | 'downward' | 'upward';
+
+					if ( deltaY > HOVER_INTENT_DEAD_ZONE_PX ) {
+						newIntent = 'downward';
+					} else if ( deltaY < -HOVER_INTENT_DEAD_ZONE_PX ) {
+						newIntent = 'upward';
+					} else {
+						newIntent = 'neutral';
+					}
+
+					if ( newIntent !== currentIntent ) {
+						currentIntent = newIntent;
+						const targetTotalDelay = getDelayForIntent( newIntent );
+						const elapsed = Date.now() - startTime;
+						const remaining = Math.max(
+							0,
+							targetTotalDelay - elapsed
+						);
+						scheduleOpen( remaining );
+					}
+				};
+			};
+
 			const leaveAction = () => {
-				/* Avoid focus out the menu on mobile devices */
-				if ( ! this.isResponsive && menuItem.isOpened ) {
+				cancelPendingOpen();
+
+				/* Avoid focus out the menu on mobile devices or in manual close mode */
+				if (
+					! this.isResponsive &&
+					this.closeMode !== 'manual' &&
+					menuItem.isOpened
+				) {
 					// add the is-left class that will be checked in a while to handle menu re-focusing
 					menuItem.el.classList.add( 'is-left' );
 
-					timeoutId = setTimeout( () => {
-						if ( menuItem.el.classList.contains( 'is-left' ) ) {
+					closeTimeoutId = setTimeout( () => {
+						if (
+							menuItem.isOpened &&
+							menuItem.el.classList.contains( 'is-left' )
+						) {
 							this.closeMenuItem( menuItem );
 						}
 					}, TIMEOUT );
@@ -321,8 +509,8 @@ export default class MegaMenu {
 			};
 
 			/* Handle hover */
-			if ( this.activator === 'hover' ) {
-				menuItem.el.onmouseenter = action;
+			if ( this.activator === 'hover' && ! this.isResponsive ) {
+				menuItem.el.onmouseenter = enterAction;
 			} else {
 				menuItem.el.onmouseenter = null;
 			}
@@ -331,7 +519,7 @@ export default class MegaMenu {
 			menuItem.el.onmouseleave = leaveAction;
 
 			/* Handle click */
-			menuItem.button.onclick = action;
+			menuItem.button.onclick = clickAction;
 		}
 	}
 
@@ -342,6 +530,9 @@ export default class MegaMenu {
 	 * @param menuItem
 	 */
 	async openMenuItem( menuItem: MenuItem ) {
+		// Store trigger for focus restoration on Escape/close
+		this.lastFocusedTrigger = menuItem.button;
+
 		// Extract layout context before opening
 		const megamenuRect = this.el.getBoundingClientRect();
 		const dropdownMaxWidth = Number( this.el.dataset.dropdownWidth ) || 0;
@@ -353,6 +544,9 @@ export default class MegaMenu {
 		// Open the dropdown and pass layout bounds for positioning after hydration
 		if ( ! this.isResponsive ) {
 			await menuItem.open( megamenuRect, maxBodyWidth );
+			if ( this.closeMode === 'manual' && menuItem.dropdown ) {
+				this.ensureCloseButton( menuItem.dropdown );
+			}
 		} else {
 			await menuItem.open();
 		}
@@ -368,12 +562,97 @@ export default class MegaMenu {
 	}
 
 	/**
+	 * Ensures a single close button exists in the open dropdown in manual closing mode.
+	 *
+	 * @param {HTMLElement} dropdown - The open dropdown element.
+	 */
+	private ensureCloseButton( dropdown: HTMLElement ) {
+		let closeBtn = dropdown.querySelector<HTMLButtonElement>(
+			'.wp-block-megamenu__close-button'
+		);
+		if ( ! closeBtn ) {
+			closeBtn = document.createElement( 'button' );
+			closeBtn.type = 'button';
+			closeBtn.className = 'wp-block-megamenu__close-button';
+			closeBtn.setAttribute( 'aria-label', 'Close menu' );
+			closeBtn.innerHTML = '<span aria-hidden="true">&times;</span>';
+			dropdown.appendChild( closeBtn );
+		}
+		closeBtn.onclick = ( e: MouseEvent ) => {
+			e.preventDefault();
+			e.stopPropagation();
+			this.closeAllOpened();
+			this.restoreFocus();
+		};
+	}
+
+	/**
+	 * Restores focus to the trigger that opened the menu.
+	 */
+	restoreFocus() {
+		if (
+			this.lastFocusedTrigger &&
+			typeof this.lastFocusedTrigger.focus === 'function'
+		) {
+			this.lastFocusedTrigger.focus();
+		}
+	}
+
+	/**
+	 * Handles outside click events in manual close mode on desktop.
+	 *
+	 * @param {MouseEvent} event - The click event.
+	 */
+	private handleDocumentClick( event: MouseEvent ) {
+		if ( this.isResponsive || this.closeMode !== 'manual' ) {
+			return;
+		}
+		const hasOpenMenu =
+			this.openMenus.length > 0 ||
+			this.menuItems.some( ( item ) => item.isOpened );
+		if ( ! hasOpenMenu ) {
+			return;
+		}
+		const target = event.target as Node;
+		if ( ! target ) {
+			return;
+		}
+		if ( ! this.el.contains( target ) ) {
+			this.closeAllOpened();
+		}
+	}
+
+	/**
+	 * Handles Escape keydown events in desktop mode.
+	 *
+	 * @param {KeyboardEvent} event - The keydown event.
+	 */
+	private handleKeyDown( event: KeyboardEvent ) {
+		if ( event.key === 'Escape' || event.key === 'Esc' ) {
+			if ( ! this.isResponsive ) {
+				this.menuItems.forEach(
+					( item ) => item.cancelPendingOpen?.()
+				);
+			}
+			const hasOpenMenu =
+				this.openMenus.length > 0 ||
+				this.menuItems.some( ( item ) => item.isOpened );
+			if ( hasOpenMenu && ! this.isResponsive ) {
+				event.preventDefault();
+				this.closeAllOpened();
+				this.restoreFocus();
+			}
+		}
+	}
+
+	/**
 	 * The function `openMenuItem` is used to handle events such as click, mouseenter, and mouseleave to
 	 * open and close menu items.
 	 *
 	 * @param menuItem - The MenuItem to be closed.
 	 */
 	closeMenuItem( menuItem: MenuItem ) {
+		menuItem.cancelPendingOpen?.();
 		if ( this.currentLevel === 1 ) {
 			menuItem.updateDropdownPosition(
 				this.el.getBoundingClientRect(),
@@ -401,6 +680,13 @@ export default class MegaMenu {
 				menuItem.close();
 			}
 		} );
+		this.menuItems.forEach( ( menuItem ) => {
+			menuItem.cancelPendingOpen?.();
+			if ( menuItem.isOpened ) {
+				menuItem.close();
+			}
+		} );
+		this.openMenus = [];
 		this.close();
 	}
 

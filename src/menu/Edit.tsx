@@ -34,6 +34,7 @@ export default function Edit( props: {
 		clientId,
 		attributes: {
 			activator,
+			closeMode,
 			expandDropdown,
 			collapseOnMobile,
 			responsiveBreakpoint,
@@ -96,6 +97,7 @@ export default function Edit( props: {
 					className: classNames(
 						'wp-block-megamenu',
 						`activator-${ activator }`,
+						`close-mode-${ closeMode || 'automatic' }`,
 						{
 							'is-hidden': showResponsiveMenu,
 							[ `has-full-width-dropdown` ]:
@@ -107,6 +109,7 @@ export default function Edit( props: {
 				data-responsive-breakpoint={ responsiveBreakpoint }
 				data-dropdown-content-width={ dropdownMaxWidth }
 				data-activator={ activator }
+				data-close-mode={ closeMode || 'automatic' }
 			>
 				<div
 					{ ...useInnerBlocksProps(

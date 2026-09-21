@@ -2,12 +2,10 @@
 	"name": "megamenu-block",
 	"version": "1.0.0",
 	"description": "WordPress Mega Menu Block",
-	"authors": [
-		"MotoPress",
-		"erikyo"
-	],
+	"author": "Erik Golinelli <erik@codekraft.it>",
 	"files": [
 		"build",
+		"includes",
 		"languages",
 		"megamenu-block.php",
 		"readme.txt"

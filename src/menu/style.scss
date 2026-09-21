@@ -3,8 +3,13 @@
  */
 
 header {
+	/* Hamburger button styles */
 	--megamenu--hamburger-width: 42px;
 	--megamenu--responsive--internal-padding: var(--megamenu--hamburger-width) calc(var(--megamenu--hamburger-width) * 0.5);
+
+	/* Toggle button styles */
+	--megamenu--toggle-size: 24px;
+	--megamenu--toggle-margin: 4px;
 }
 
 @import "../style/vars";

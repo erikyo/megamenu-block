@@ -17,6 +17,7 @@ defined( 'ABSPATH' ) || exit;
  */
 function render_megamenu_menu( $attributes, $content, $block ) {
 	$activator            = $attributes['activator'] ?? 'hover';
+	$close_mode           = $attributes['closeMode'] ?? 'automatic';
 	$expand_dropdown      = $attributes['expandDropdown'] ?? true;
 	$collapse_on_mobile   = $attributes['collapseOnMobile'] ?? true;
 	$responsive_breakpoint = $attributes['responsiveBreakpoint'] ?? 1023;
@@ -25,6 +26,7 @@ function render_megamenu_menu( $attributes, $content, $block ) {
 	$classes = array(
 		'wp-block-megamenu',
 		'activator-' . $activator,
+		'close-mode-' . $close_mode,
 	);
 
 	if ( $expand_dropdown ) {
@@ -42,10 +44,12 @@ function render_megamenu_menu( $attributes, $content, $block ) {
 		'data-responsive-breakpoint' => esc_attr( $responsive_breakpoint ),
 		'data-dropdown-width' => esc_attr( $dropdown_max_width ),
 		'data-activator' => esc_attr( $activator ),
+		'data-close-mode' => esc_attr( $close_mode ),
 		'data-wp-interactive' => 'megamenu',
 		'data-wp-context' => wp_json_encode( array(
 			'breakpoint' => $responsive_breakpoint,
 			'activator' => $activator,
+			'closeMode' => $close_mode,
 		) ),
 		'data-wp-init' => 'callbacks.initResponsive',
 	) );

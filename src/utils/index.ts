@@ -1,4 +1,4 @@
-import { DropDownCoords } from '../menu-item/types';
+import type { DropDownCoords } from '../menu-item/types';
 
 /**
  * Generate a random id
@@ -198,20 +198,19 @@ export function calcNewPosition(
 }
 
 /**
- * Calculates the position of a dropdown menu based on the position and size of a megamenu item and its parent attributes.
+ * Calculates the position of a dropdown menu in the editor based on the position and size of a megamenu item and its parent attributes.
  *
- * @param {HTMLElement}        megamenuItem                      The megamenu item element.
- * @param {HTMLDivElement}     dropdown                          The dropdown element.
- * @param {MenuItemAttributes} parentAttributes                  The attributes of the parent menu item.
- * @param                      parentAttributes.dropdownMaxWidth The maximum width of the dropdown.
- * @param                      parentAttributes.expandDropdown   Whether to expand the dropdown.
+ * @param {HTMLElement}        megamenuItem                    The megamenu item element.
+ * @param {HTMLElement}        [dropdown]                      The dropdown element.
+ * @param {object}             [parentAttributes]              The attributes of the parent menu item.
+ * @param {boolean}            [parentAttributes.expandDropdown] Whether to expand the dropdown to full width.
  * @return {DropDownCoords} The calculated position of the dropdown menu.
  */
 export function calcPosition(
 	megamenuItem?: HTMLElement,
 	dropdown?: HTMLElement,
 	parentAttributes?: {
-		expandDropdown: boolean;
+		expandDropdown?: boolean;
 	}
 ): DropDownCoords {
 	const { expandDropdown } = parentAttributes ?? {
@@ -223,10 +222,39 @@ export function calcPosition(
 		return {};
 	}
 
-	const editorIframe: HTMLIFrameElement | null = document.querySelector(
-		'.edit-site-visual-editor__editor-canvas'
-	);
-	const editorEl = editorIframe?.contentWindow?.document?.body;
+	const doc =
+		megamenuItem.ownerDocument ||
+		( typeof document !== 'undefined' ? document : null );
+	const win =
+		doc?.defaultView ||
+		( typeof window !== 'undefined' ? window : null );
+
+	const viewportWidth =
+		doc?.documentElement?.clientWidth ||
+		win?.innerWidth ||
+		doc?.body?.clientWidth ||
+		0;
+
+	if ( expandDropdown ) {
+		const positioningParent =
+			( dropdown?.offsetParent as HTMLElement ) ||
+			dropdown?.parentElement ||
+			megamenuItem;
+
+		const parentRect = positioningParent.getBoundingClientRect();
+		const originLeft = parentRect
+			? parentRect.left + ( positioningParent.clientLeft || 0 )
+			: 0;
+		const targetLeft = 0;
+		const leftOffset = targetLeft - originLeft;
+
+		return {
+			left: `${ leftOffset }px`,
+			width: `${ viewportWidth }px`,
+			maxWidth: `${ viewportWidth }px`,
+		};
+	}
+
 	const dropdownEl = dropdown ?? megamenuItem.closest( '.wp-block-megamenu' );
 
 	const items = {
@@ -234,16 +262,10 @@ export function calcPosition(
 		dropdownBBox: dropdownEl?.getBoundingClientRect(),
 		megamenuBBox: (
 			megamenuItem?.closest( '.wp-block-megamenu' ) as HTMLDivElement
-		 )?.getBoundingClientRect(),
+		)?.getBoundingClientRect(),
 	};
 
-	return calcNewPosition(
-		items,
-		editorEl?.clientWidth ??
-			editorEl?.getBoundingClientRect()?.width ??
-			0,
-		expandDropdown
-	);
+	return calcNewPosition( items, viewportWidth, false );
 }
 
 /**

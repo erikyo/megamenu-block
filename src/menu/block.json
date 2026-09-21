@@ -28,6 +28,10 @@
       "type": "string",
       "default": "hover"
     },
+    "closeMode": {
+      "type": "string",
+      "default": "automatic"
+    },
     "menusMinWidth": {
       "type": "number",
       "default": 0
@@ -107,7 +111,7 @@
     "reusable": false
   },
   "editorScript": "file:./index.js",
-  "viewScriptModule": "file:./view.js",
+  "viewScript": "file:./view.js",
   "editorStyle": "file:./index.css",
   "viewStyle": "file:./style-view.css",
   "render_callback": "render_megamenu_menu"

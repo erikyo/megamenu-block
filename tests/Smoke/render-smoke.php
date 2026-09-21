@@ -43,8 +43,30 @@ if ( false === strpos( $rendered, 'data-wp-class--is-opened="state.isMobileMenuO
 	exit( 1 );
 }
 
-if ( false !== strpos( $rendered, 'data-wp-bind--class' ) ) {
-	fwrite( STDERR, "Mega Menu content wrapper must not replace its class attribute.\n" );
+if ( false === strpos( $rendered, 'close-mode-automatic' ) ) {
+	fwrite( STDERR, "Mega Menu default render must include close-mode-automatic class.\n" );
+	exit( 1 );
+}
+
+if ( false === strpos( $rendered, 'data-close-mode="automatic"' ) ) {
+	fwrite( STDERR, "Mega Menu default render must include data-close-mode attribute.\n" );
+	exit( 1 );
+}
+
+$rendered_manual = render_megamenu_menu( array( 'closeMode' => 'manual', 'activator' => 'click' ), '<div class="menu-item">Products</div>', null );
+
+if ( false === strpos( $rendered_manual, 'close-mode-manual' ) ) {
+	fwrite( STDERR, "Mega Menu manual render must include close-mode-manual class.\n" );
+	exit( 1 );
+}
+
+if ( false === strpos( $rendered_manual, 'data-close-mode="manual"' ) ) {
+	fwrite( STDERR, "Mega Menu manual render must include data-close-mode=\"manual\".\n" );
+	exit( 1 );
+}
+
+if ( false === strpos( $rendered_manual, 'activator-click' ) ) {
+	fwrite( STDERR, "Mega Menu manual render must preserve activator-click class.\n" );
 	exit( 1 );
 }
 

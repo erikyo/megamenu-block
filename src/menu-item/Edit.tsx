@@ -64,9 +64,19 @@ export default function Edit( props: {
 	} = props;
 	// the menu item anchor data
 	const { text, target, rel, parentAttributes, showOnMobile } = attributes;
-	const align = props?.context[ 'megamenu/align' ];
-	const menusMinWidth = props?.context[ 'megamenu/menusMinWidth' ];
-	const expandDropdown = props?.context[ 'megamenu/expandDropdown' ];
+
+	// Runtime-derived values from parent block context (with fallback to legacy parentAttributes if context is absent)
+	const contextMenusMinWidth = props?.context?.[ 'megamenu/menusMinWidth' ];
+	const contextExpandDropdown = props?.context?.[ 'megamenu/expandDropdown' ];
+
+	const menusMinWidth =
+		contextMenusMinWidth !== undefined
+			? contextMenusMinWidth
+			: parentAttributes?.menusMinWidth;
+	const expandDropdown =
+		contextExpandDropdown !== undefined
+			? contextExpandDropdown
+			: ( parentAttributes?.expandDropdown ?? true );
 
 	const linkProps = {
 		target: target ? target : undefined,
@@ -110,21 +120,14 @@ export default function Edit( props: {
 	}, [ clientId ] );
 
 	/**
-	 * A function that sets the attributes of the parent element.
-	 *
-	 * @return {void} No return value
+	 * Synchronize hasDescendants only when the calculated state actually differs from the stored attribute.
+	 * Opening the editor with an already-correct value will never invoke setAttributes.
 	 */
-	function setParentAttributes(): void {
-		setAttributes( {
-			hasDescendants,
-			clientId,
-			parentAttributes: {
-				align,
-				menusMinWidth,
-				expandDropdown,
-			},
-		} );
-	}
+	useEffect( () => {
+		if ( attributes.hasDescendants !== hasDescendants ) {
+			setAttributes( { hasDescendants } );
+		}
+	}, [ hasDescendants, attributes.hasDescendants, setAttributes ] );
 
 	/**
 	 * A function that adds a dropdown menu item.
@@ -147,7 +150,7 @@ export default function Edit( props: {
 		( megamenuElements?: {
 			megamenuItem: HTMLElement;
 			dropdown?: HTMLElement;
-			parentAttributes?: ParentAttributes;
+			expandDropdown?: boolean;
 		} ) => {
 			const { megamenuItem, dropdown } = megamenuElements || {
 				megamenuItem: menuItemRef.current ?? undefined,
@@ -160,26 +163,30 @@ export default function Edit( props: {
 				return {};
 			}
 
+			const isExpanded =
+				megamenuElements?.expandDropdown !== undefined
+					? megamenuElements.expandDropdown
+					: expandDropdown;
+
 			// get the position of the menu item
 			const newPosition = calcPosition(
 				megamenuItem,
 				dropdown,
-				parentAttributes
+				{ expandDropdown: isExpanded }
 			);
 
 			return newPosition;
 		},
-		[ parentAttributes ]
+		[ expandDropdown ]
 	);
 
 	useEffect( () => {
 		if ( isSelected || isParentOfSelectedBlock ) {
-			setParentAttributes();
 			setShowDropdown( hasDescendants );
 			return;
 		}
 		setShowDropdown( false );
-	}, [ isSelected, isParentOfSelectedBlock ] );
+	}, [ isSelected, isParentOfSelectedBlock, hasDescendants ] );
 
 	useLayoutEffect( () => {
 		// Only calculate position if both refs are attached to DOM and dropdown is shown
@@ -196,16 +203,15 @@ export default function Edit( props: {
 				const newPosition = updateDropdownPosition( {
 					megamenuItem: menuItem,
 					dropdown: dropdown,
-					parentAttributes,
+					expandDropdown,
 				} );
 				setDropdownPosition( newPosition );
 			}
 		}
-	}, [ showDropdown, parentAttributes ] );
+	}, [ showDropdown, expandDropdown, updateDropdownPosition ] );
 
 	/** on resize, update the position of the dropdown */
 	useEffect( () => {
-		setParentAttributes();
 		const blockNode: HTMLElement | null = menuItemRef.current;
 
 		if ( blockNode ) {
@@ -216,11 +222,21 @@ export default function Edit( props: {
 					setDropdownPosition( newPosition );
 				}
 			};
-			
+
+			const ownerWindow = blockNode.ownerDocument?.defaultView;
 			window.addEventListener( 'resize', handleResize );
-			return () => window.removeEventListener( 'resize', handleResize );
+			if ( ownerWindow && ownerWindow !== window ) {
+				ownerWindow.addEventListener( 'resize', handleResize );
+			}
+
+			return () => {
+				window.removeEventListener( 'resize', handleResize );
+				if ( ownerWindow && ownerWindow !== window ) {
+					ownerWindow.removeEventListener( 'resize', handleResize );
+				}
+			};
 		}
-	}, [ showDropdown ] );
+	}, [ showDropdown, updateDropdownPosition ] );
 
 	/** the block */
 	const blockProps = useBlockProps( {
@@ -231,8 +247,8 @@ export default function Edit( props: {
 			'is-opened': showDropdown,
 		} ),
 		style: {
-			minWidth: parentAttributes.menusMinWidth ? `${parentAttributes.menusMinWidth}px` : 'auto',
-			position: ! parentAttributes.expandDropdown ? 'relative' : undefined,
+			minWidth: menusMinWidth ? `${ menusMinWidth }px` : 'auto',
+			position: ! expandDropdown ? 'relative' : undefined,
 		}
 	} );
 	/** the dropdown */
