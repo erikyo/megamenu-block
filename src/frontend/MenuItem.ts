@@ -6,6 +6,7 @@ export class MenuItem {
 	isOpened: boolean = false;
 	hasChildren: any;
 	button: HTMLElement;
+	public cancelPendingOpen?: () => void;
 
 	constructor(
 		public el: HTMLElement,

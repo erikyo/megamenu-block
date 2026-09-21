@@ -1,5 +1,13 @@
 import { detectTouchCapability, getLowestWidth, removeStyles } from '../utils';
-import { IS_OPEN, EVENTS_ALLOWED, TIMEOUT } from '../utils/constants';
+import {
+	IS_OPEN,
+	EVENTS_ALLOWED,
+	TIMEOUT,
+	HOVER_INTENT_DELAY_DEFAULT,
+	HOVER_INTENT_DELAY_UPWARD,
+	HOVER_INTENT_DELAY_DOWNWARD,
+	HOVER_INTENT_DEAD_ZONE_PX,
+} from '../utils/constants';
 import { MenuItem } from './MenuItem';
 import { Hamburger } from './Hamburger';
 
@@ -340,35 +348,160 @@ export default class MegaMenu {
 		}
 		/** loop over all menu items and initialize the event listeners  */
 		for ( const menuItem of this.menuItems ) {
-			let timeoutId: NodeJS.Timeout;
+			menuItem.cancelPendingOpen?.();
+
+			let openTimeoutId: ReturnType< typeof setTimeout > | null = null;
+			let closeTimeoutId: ReturnType< typeof setTimeout > | null = null;
+			let startY: number | null = null;
+			let startTime: number = 0;
+			let currentIntent: 'neutral' | 'downward' | 'upward' = 'neutral';
+
+			const cancelPendingOpen = () => {
+				if ( openTimeoutId !== null ) {
+					clearTimeout( openTimeoutId );
+					openTimeoutId = null;
+				}
+				menuItem.el.onmousemove = null;
+				startY = null;
+				startTime = 0;
+				currentIntent = 'neutral';
+			};
+
+			menuItem.cancelPendingOpen = cancelPendingOpen;
+
+			const cancelPendingClose = () => {
+				if ( closeTimeoutId !== null ) {
+					clearTimeout( closeTimeoutId );
+					closeTimeoutId = null;
+				}
+			};
+
+			const executeOpen = () => {
+				cancelPendingOpen();
+				if ( ! menuItem.isOpened ) {
+					this.closeLastOpenMenu();
+					cancelPendingClose();
+					this.openMenuItem( menuItem );
+				}
+			};
 
 			/**
-			 * Handles the action to be taken on a mouse event.
+			 * Handles trigger click to open/close immediately without hover-intent delays.
 			 *
-			 * @param {MouseEvent} ev - The mouse event triggering the action.
+			 * @param {MouseEvent} ev The click event.
 			 */
-			const action = ( ev: MouseEvent ) => {
+			const clickAction = ( ev: MouseEvent ) => {
+				ev.preventDefault();
+				cancelPendingOpen();
 				menuItem.el.classList.remove( 'is-left' );
+
 				if ( ! menuItem.isOpened ) {
-					ev.preventDefault();
 					this.closeLastOpenMenu();
-					clearTimeout( timeoutId );
+					cancelPendingClose();
 					this.openMenuItem( menuItem );
-				} else if ( ev.type === 'click' ) {
-					ev.preventDefault();
+				} else {
 					this.closeMenuItem( menuItem );
 					this.closeLastOpenMenu();
 				}
 			};
 
+			/**
+			 * Handles desktop hover entrance with lightweight intent detection.
+			 *
+			 * @param {MouseEvent} ev The mouse enter event.
+			 */
+			const enterAction = ( ev: MouseEvent ) => {
+				menuItem.el.classList.remove( 'is-left' );
+				cancelPendingClose();
+
+				if ( menuItem.isOpened ) {
+					return;
+				}
+
+				cancelPendingOpen();
+
+				startTime = Date.now();
+				startY = typeof ev.clientY === 'number' ? ev.clientY : null;
+				currentIntent = 'neutral';
+
+				const getDelayForIntent = (
+					intent: 'neutral' | 'downward' | 'upward'
+				): number => {
+					switch ( intent ) {
+						case 'downward':
+							return HOVER_INTENT_DELAY_DOWNWARD;
+						case 'upward':
+							return HOVER_INTENT_DELAY_UPWARD;
+						case 'neutral':
+						default:
+							return HOVER_INTENT_DELAY_DEFAULT;
+					}
+				};
+
+				const scheduleOpen = ( delayMs: number ) => {
+					if ( openTimeoutId !== null ) {
+						clearTimeout( openTimeoutId );
+					}
+					openTimeoutId = setTimeout( executeOpen, delayMs );
+				};
+
+				scheduleOpen( HOVER_INTENT_DELAY_DEFAULT );
+
+				menuItem.el.onmousemove = ( moveEv: MouseEvent ) => {
+					const currentY =
+						typeof moveEv.clientY === 'number'
+							? moveEv.clientY
+							: null;
+					if ( currentY === null ) {
+						return;
+					}
+
+					if ( startY === null ) {
+						startY = currentY;
+						return;
+					}
+
+					const deltaY = currentY - startY;
+					let newIntent: 'neutral' | 'downward' | 'upward';
+
+					if ( deltaY > HOVER_INTENT_DEAD_ZONE_PX ) {
+						newIntent = 'downward';
+					} else if ( deltaY < -HOVER_INTENT_DEAD_ZONE_PX ) {
+						newIntent = 'upward';
+					} else {
+						newIntent = 'neutral';
+					}
+
+					if ( newIntent !== currentIntent ) {
+						currentIntent = newIntent;
+						const targetTotalDelay = getDelayForIntent( newIntent );
+						const elapsed = Date.now() - startTime;
+						const remaining = Math.max(
+							0,
+							targetTotalDelay - elapsed
+						);
+						scheduleOpen( remaining );
+					}
+				};
+			};
+
 			const leaveAction = () => {
+				cancelPendingOpen();
+
 				/* Avoid focus out the menu on mobile devices or in manual close mode */
-				if ( ! this.isResponsive && this.closeMode !== 'manual' && menuItem.isOpened ) {
+				if (
+					! this.isResponsive &&
+					this.closeMode !== 'manual' &&
+					menuItem.isOpened
+				) {
 					// add the is-left class that will be checked in a while to handle menu re-focusing
 					menuItem.el.classList.add( 'is-left' );
 
-					timeoutId = setTimeout( () => {
-						if ( menuItem.el.classList.contains( 'is-left' ) ) {
+					closeTimeoutId = setTimeout( () => {
+						if (
+							menuItem.isOpened &&
+							menuItem.el.classList.contains( 'is-left' )
+						) {
 							this.closeMenuItem( menuItem );
 						}
 					}, TIMEOUT );
@@ -376,8 +509,8 @@ export default class MegaMenu {
 			};
 
 			/* Handle hover */
-			if ( this.activator === 'hover' ) {
-				menuItem.el.onmouseenter = action;
+			if ( this.activator === 'hover' && ! this.isResponsive ) {
+				menuItem.el.onmouseenter = enterAction;
 			} else {
 				menuItem.el.onmouseenter = null;
 			}
@@ -386,7 +519,7 @@ export default class MegaMenu {
 			menuItem.el.onmouseleave = leaveAction;
 
 			/* Handle click */
-			menuItem.button.onclick = action;
+			menuItem.button.onclick = clickAction;
 		}
 	}
 
@@ -496,6 +629,11 @@ export default class MegaMenu {
 	 */
 	private handleKeyDown( event: KeyboardEvent ) {
 		if ( event.key === 'Escape' || event.key === 'Esc' ) {
+			if ( ! this.isResponsive ) {
+				this.menuItems.forEach(
+					( item ) => item.cancelPendingOpen?.()
+				);
+			}
 			const hasOpenMenu =
 				this.openMenus.length > 0 ||
 				this.menuItems.some( ( item ) => item.isOpened );
@@ -514,6 +652,7 @@ export default class MegaMenu {
 	 * @param menuItem - The MenuItem to be closed.
 	 */
 	closeMenuItem( menuItem: MenuItem ) {
+		menuItem.cancelPendingOpen?.();
 		if ( this.currentLevel === 1 ) {
 			menuItem.updateDropdownPosition(
 				this.el.getBoundingClientRect(),
@@ -542,6 +681,7 @@ export default class MegaMenu {
 			}
 		} );
 		this.menuItems.forEach( ( menuItem ) => {
+			menuItem.cancelPendingOpen?.();
 			if ( menuItem.isOpened ) {
 				menuItem.close();
 			}
