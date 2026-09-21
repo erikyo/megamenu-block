@@ -121,14 +121,17 @@
 	 * the chevron icon
 	 */
 	&__toggle {
-		display: block;
+		display: flex;
 		padding: 0;
 		background: transparent;
 		border: 0;
 		box-shadow: none;
 		color: inherit;
-		margin: 0;
 		outline: none;
+		margin: 0 var(--megamenu--toggle-margin, 4px);
+		width: var(--megamenu--toggle-size, 24px);
+		height: auto;
+		vertical-align: middle;
 
 		&:active,
 		&:focus {
